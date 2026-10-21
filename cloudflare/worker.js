@@ -974,12 +974,18 @@ on('PUT', '/api/shift/settings', async ctx => {
   const clock = (v, d) => (typeof v === 'string' && v.trim()) ? v.trim().slice(0, 30) : d;
   const cur = await getWardShiftSettings(ctx.env, a.hospitalId, acc.ward.title);
   const clockM = clock(b.clock_m, cur.clock_m), clockE = clock(b.clock_e, cur.clock_e), clockN = clock(b.clock_n, cur.clock_n);
+  // ساعت را می‌شود دستی فرستاد؛ اگر عددی نیامد، از بازهٔ زمانی حساب می‌شود.
+  const hasVal = v => v !== undefined && v !== null && String(v).trim() !== '';
+  const hourPick = (raw, clockStr, curVal) => {
+    if (hasVal(raw)) return num(raw, curVal);
+    const h = shiftClockHours(clockStr);
+    return h != null ? h : curVal;
+  };
   const next = {
-    hour_m: shiftClockHours(clockM) != null ? shiftClockHours(clockM) : num(b.hour_m, cur.hour_m), clock_m: clockM,
-    hour_e: shiftClockHours(clockE) != null ? shiftClockHours(clockE) : num(b.hour_e, cur.hour_e), clock_e: clockE,
-    hour_n: shiftClockHours(clockN) != null ? shiftClockHours(clockN) : num(b.hour_n, cur.hour_n), clock_n: clockN,
-    // مرخصی همیشه معادل شیفت صبح است؛ فیلد جداگانه‌اش دیگر معنا ندارد.
-    hour_h: shiftClockHours(clockM) != null ? shiftClockHours(clockM) : num(b.hour_h, cur.hour_h),
+    hour_m: hourPick(b.hour_m, clockM, cur.hour_m), clock_m: clockM,
+    hour_e: hourPick(b.hour_e, clockE, cur.hour_e), clock_e: clockE,
+    hour_n: hourPick(b.hour_n, clockN, cur.hour_n), clock_n: clockN,
+    hour_h: hourPick(b.hour_h, null, cur.hour_h),
   };
   await qrun(ctx.env, `INSERT INTO shift_ward_settings (hospital_id, ward, hour_m, clock_m, hour_e, clock_e, hour_n, clock_n, hour_h, updated_at)
       VALUES (?,?,?,?,?,?,?,?,?, datetime('now'))

@@ -1,0 +1,62 @@
+  global.ssAutoHours = function () {
+    [['cm', 'hm'], ['ce', 'he'], ['cn', 'hn']].forEach(([clockId, hourId]) => {
+      const h = ssClockHours((document.getElementById('ss_' + clockId) || {}).value);
+      const out = document.getElementById('ss_' + hourId);
+      if (out && h != null) out.value = String(h);
+    });
+    ssSumLong();
+  };
+  global.ssSumLong = function () {
+    const num = (id) => {
+      const el = document.getElementById('ss_' + id);
+      if (!el) return 0;
+      const v = parseInt(String(el.value).replace(/[۰-۹]/g, ch => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(ch))), 10);
+      return Number.isFinite(v) ? v : 0;
+    };
+    const set = (id, v) => { const el = document.getElementById('ss_' + id); if (el) el.value = String(v); };
+    const m = num('hm'), e = num('he'), n = num('hn');
+    set('rme', m + e);
+    set('ren', e + n);
+    set('rmn', m + n);
+    set('rmen', m + e + n);
+  };
+  function ssSettingsHtml() {
+    const st = SS.settings || {};
+    const field = (label, clockId, hourId, clock, hour) => `<div class="fg">
+      <label>${label}</label>
+      <div class="ss-clock-row">
+        <input id="ss_${clockId}" class="ss-clock-input" style="direction:ltr" value="${e(clock || '')}"
+          oninput="ssAutoHours()" onchange="ssAutoHours()" placeholder="07:00-14:00">
+        <input id="ss_${hourId}" class="ss-hours-input" type="text" inputmode="numeric" value="${e(hour == null ? '' : String(hour))}"
+          oninput="ssSumLong()">
+        <span class="ss-hours-unit">ساعت</span>
+      </div></div>`;
+    const ro = (label, id, val) => `<div class="fg"><label>${label}</label>
+      <div class="ss-clock-row"><input id="ss_${id}" class="ss-hours-input" type="text" readonly tabindex="-1" value="${e(String(val))}"><span class="ss-hours-unit">ساعت</span></div></div>`;
+    const hm = Number(st.hour_m) || 0, he = Number(st.hour_e) || 0, hn = Number(st.hour_n) || 0;
+    return `<div class="panel g ss-settings-box" style="margin-bottom:16px;background:var(--bg)">
+      <div class="ss-box-head">
+        <div><b>ساعتِ شیفت‌های این بخش</b><span class="sub">بازه را بنویس، ساعت خودکار حساب می‌شود؛ اگر خواستی عدد را دستی هم می‌توانی عوض کنی.</span></div>
+        <button type="button" class="ss-box-close" aria-label="بستن" title="بستن" onclick="ssToggleSettings()">×</button>
+      </div>
+      <div class="pbody">
+        <div class="docgrid">
+          ${field('شیفت صبح (M)', 'cm', 'hm', st.clock_m, st.hour_m)}
+          ${field('شیفت عصر (E)', 'ce', 'he', st.clock_e, st.hour_e)}
+          ${field('شیفت شب (N)', 'cn', 'hn', st.clock_n, st.hour_n)}
+        </div>
+        <div class="docgrid" style="margin-top:8px">
+          <div class="fg"><label>مرخصی (H)</label>
+            <div class="ss-clock-row">
+              <input id="ss_hh" class="ss-hours-input" type="text" inputmode="numeric" value="${e(String(st.hour_h == null ? hm : st.hour_h))}">
+              <span class="ss-hours-unit">ساعت</span>
+            </div></div>
+          ${ro('صبح + عصر (ME)', 'rme', hm + he)}
+          ${ro('عصر + شب (EN)', 'ren', he + hn)}
+          ${ro('صبح + شب (MN)', 'rmn', hm + hn)}
+          ${ro('۲۴ ساعته (MEN)', 'rmen', hm + he + hn)}
+        </div>
+        <button class="btn btn-g btn-sm" style="margin-top:8px" onclick="ssSaveSettings()">${I('check')} ذخیره‌ی ساعتِ شیفت این بخش</button>
+      </div>
+    </div>`;
+  }
