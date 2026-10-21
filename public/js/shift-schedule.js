@@ -963,65 +963,72 @@
   };
   function ssSettingsHtml() {
     const st = SS.settings || {};
-    const field = (label, clockId, hourId, clock, hour) => `<div class="fg">
-      <label>${label}</label>
+    const sup = SS.supSettings || {};
+    const row = (label, clockId, hourId, clock, hour, hint) => `<div class="ss-hours-item">
+      <div class="ss-hours-label">${label}${hint ? `<span>${hint}</span>` : ''}</div>
       <div class="ss-clock-row">
         <input id="ss_${clockId}" class="ss-clock-input" style="direction:ltr" value="${e(clock || '')}"
           oninput="ssAutoHours()" onchange="ssAutoHours()" placeholder="07:00-14:00">
+        <span class="ss-hours-sep">⟵</span>
         <input id="ss_${hourId}" class="ss-hours-input" type="text" inputmode="numeric" value="${e(hour == null ? '' : String(hour))}"
           oninput="ssSumLong()">
         <span class="ss-hours-unit">ساعت</span>
       </div></div>`;
-    const ro = (label, id, val) => `<div class="fg"><label>${label}</label>
-      <div class="ss-clock-row"><input id="ss_${id}" class="ss-hours-input" type="text" readonly tabindex="-1" value="${e(String(val))}"><span class="ss-hours-unit">ساعت</span></div></div>`;
-    const sup = SS.supSettings || {};
-    const supField = (label, clockId, hourId, clock, hour) => `<div class="fg">
-      <label>${label}</label>
-      <div class="ss-clock-row">
-        <input id="ss_${clockId}" class="ss-clock-input" style="direction:ltr" value="${e(clock || '')}"
-          oninput="ssAutoHours()" onchange="ssAutoHours()" placeholder="07:00-14:00">
-        <input id="ss_${hourId}" class="ss-hours-input" type="text" inputmode="numeric" value="${e(hour == null ? '' : String(hour))}">
-        <span class="ss-hours-unit">ساعت</span>
-      </div></div>`;
     const hm = Number(st.hour_m) || 0, he = Number(st.hour_e) || 0, hn = Number(st.hour_n) || 0;
-    return `<div class="panel g ss-settings-box" style="margin-bottom:16px;background:var(--bg)">
-      <div class="ss-box-head">
-        <div><b>ساعتِ شیفت‌های این بخش</b><span class="sub">بازه را بنویس، ساعت خودکار حساب می‌شود؛ اگر خواستی عدد را دستی هم می‌توانی عوض کنی.</span></div>
+    const chip = (label, id, val) => `<span class="ss-hours-chip">${label}
+      <input id="ss_${id}" class="ss-hours-chipval" type="text" readonly tabindex="-1" value="${e(String(val))}"></span>`;
+    return `<div class="ss-hours-page">
+      <div class="ss-hours-top">
+        <span class="ss-hours-top-ico">${I('clock', 'lg')}</span>
+        <div><b>ساعت شیفت همهٔ بخش‌ها</b>
+          <span>هر عددی که این‌جا بگذاری، برای همهٔ بخش‌ها یکسان حساب می‌شود.</span></div>
         ${SS.tab === 'hours' ? '' : `<button type="button" class="ss-box-close" aria-label="بستن" title="بستن" onclick="ssToggleSettings()">×</button>`}
       </div>
-      <div class="pbody">
-        <div class="docgrid">
-          ${field('شیفت صبح (M)', 'cm', 'hm', st.clock_m, st.hour_m)}
-          ${field('شیفت عصر (E)', 'ce', 'he', st.clock_e, st.hour_e)}
-          ${field('شیفت شب (N)', 'cn', 'hn', st.clock_n, st.hour_n)}
-        </div>
-        <div class="docgrid" style="margin-top:8px">
-          <div class="fg"><label>مرخصی (H)</label>
+
+      <section class="ss-hours-group">
+        <div class="ss-hours-group-head"><span class="ss-hours-dot pro"></span>
+          <b>کادر درمان</b>
+          <span>مدیر پرستاری، سوپروایزر، مسئول، پرستار، کارشناس بیهوشی، کارشناس اتاق عمل، کمک‌پرستار و بهیار</span></div>
+        <div class="ss-hours-grid">
+          ${row('صبح (M)', 'cm', 'hm', st.clock_m, st.hour_m, '۷ تا ۱۴')}
+          ${row('عصر (E)', 'ce', 'he', st.clock_e, st.hour_e, '۱۳ تا ۱۹')}
+          ${row('شب (N)', 'cn', 'hn', st.clock_n, st.hour_n, '۱۹ تا ۷')}
+          <div class="ss-hours-item">
+            <div class="ss-hours-label">مرخصی (H)</div>
             <div class="ss-clock-row">
               <input id="ss_hh" class="ss-hours-input" type="text" inputmode="numeric" value="${e(String(st.hour_h == null ? hm : st.hour_h))}">
               <span class="ss-hours-unit">ساعت</span>
             </div></div>
-          ${ro('صبح + عصر (ME)', 'rme', hm + he)}
-          ${ro('عصر + شب (EN)', 'ren', he + hn)}
-          ${ro('صبح + شب (MN)', 'rmn', hm + hn)}
-          ${ro('۲۴ ساعته (MEN)', 'rmen', hm + he + hn)}
         </div>
-        <div class="ss-box-head" style="margin:14px 0 6px">
-          <div><b>پشتیبانی (کمک‌پرستار، بهیار، منشی، سایر سمت‌ها)</b><span class="sub">ساعتِ این گروه جدا از پرسنل پرستاری است</span></div>
+        <div class="ss-hours-chips">
+          <span class="ss-hours-chips-title">جمع خودکار ترکیب‌ها:</span>
+          ${chip('ME', 'rme', hm + he)}
+          ${chip('EN', 'ren', he + hn)}
+          ${chip('MN', 'rmn', hm + hn)}
+          ${chip('MEN', 'rmen', hm + he + hn)}
         </div>
-        <div class="docgrid">
-          ${supField('شیفت صبح (M)', 'sm', 'shm', sup.clock_m, sup.hour_m)}
-          ${supField('شیفت عصر (E)', 'se', 'she', sup.clock_e, sup.hour_e)}
-          ${supField('شیفت شب (N)', 'sn', 'shn', sup.clock_n, sup.hour_n)}
-        </div>
-        <div class="docgrid" style="margin-top:8px">
-          <div class="fg"><label>مرخصی (H)</label>
+      </section>
+
+      <section class="ss-hours-group sup">
+        <div class="ss-hours-group-head"><span class="ss-hours-dot sup"></span>
+          <b>پشتیبانی</b>
+          <span>منشی، انباردار، خدماتی و هر سمت غیردرمانی</span></div>
+        <div class="ss-hours-grid">
+          ${row('صبح (M)', 'sm', 'shm', sup.clock_m, sup.hour_m, '')}
+          ${row('عصر (E)', 'se', 'she', sup.clock_e, sup.hour_e, '')}
+          ${row('شب (N)', 'sn', 'shn', sup.clock_n, sup.hour_n, '')}
+          <div class="ss-hours-item">
+            <div class="ss-hours-label">مرخصی (H)</div>
             <div class="ss-clock-row">
               <input id="ss_shh" class="ss-hours-input" type="text" inputmode="numeric" value="${e(String(sup.hour_h == null ? (Number(sup.hour_m) || 0) : sup.hour_h))}">
               <span class="ss-hours-unit">ساعت</span>
             </div></div>
         </div>
-        <button class="btn btn-g btn-sm" style="margin-top:10px" onclick="ssSaveSettings()">${I('check')} ذخیره‌ی ساعت شیفت (برای همهٔ بخش‌ها)</button>
+      </section>
+
+      <div class="ss-hours-foot">
+        <button class="btn btn-g ss-hours-save" onclick="ssSaveSettings()">${I('check')} ذخیره برای همهٔ بخش‌ها</button>
+        <div class="ss-hours-hint">${I('info')} بازه را که عوض کنی، ساعت خودکار می‌آید؛ اگر خواستی عدد را دستی هم می‌توانی بنویسی.</div>
       </div>
     </div>`;
   }
