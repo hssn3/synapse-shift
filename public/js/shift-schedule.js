@@ -387,7 +387,11 @@
   /* ---------------- تب «ساعت شیفت» (فقط مدیر پرستاری) ---------------- */
   async function ssLoadHours() {
     try { const r = await API.shiftGetSettings('دفتر پرستاری'); SS.settings = r.settings; } catch (e) { /* پیش‌فرض */ }
-    try { const h = await API.shiftHoursGet(); SS.supSettings = h.sup || {}; } catch (e) { SS.supSettings = SS.supSettings || {}; }
+    try {
+      const h = await API.shiftHoursGet();
+      SS.supSettings = h.sup || {};
+      SS.hoursCombos = h.combos || SS.hoursCombos || {};
+    } catch (e) { SS.supSettings = SS.supSettings || {}; }
   }
   global.ssOpenHours = async function () {
     if (!SS.isManager) return;
@@ -975,8 +979,18 @@
         <span class="ss-hours-unit">ساعت</span>
       </div></div>`;
     const hm = Number(st.hour_m) || 0, he = Number(st.hour_e) || 0, hn = Number(st.hour_n) || 0;
-    const chip = (label, id, val) => `<span class="ss-hours-chip">${label}
-      <input id="ss_${id}" class="ss-hours-chipval" type="text" readonly tabindex="-1" value="${e(String(val))}"></span>`;
+    const cb = SS.hoursCombos || {};
+    const combo = (label, key, clockId, hourId) => {
+      const it = cb[key] || {};
+      return `<div class="ss-hours-item">
+      <div class="ss-hours-label">${label}</div>
+      <div class="ss-clock-row">
+        <input id="ss_${clockId}" class="ss-clock-input" style="direction:ltr" value="${e(it.clock || '')}" placeholder="07:00-19:00">
+        <span class="ss-hours-sep">⟵</span>
+        <input id="ss_${hourId}" class="ss-hours-input" type="text" inputmode="numeric" value="${e(it.hour == null ? '' : String(it.hour))}">
+        <span class="ss-hours-unit">ساعت</span>
+      </div></div>`;
+    };
     return `<div class="ss-hours-page">
       <div class="ss-hours-top">
         <span class="ss-hours-top-ico">${I('clock', 'lg')}</span>
@@ -1000,12 +1014,11 @@
               <span class="ss-hours-unit">ساعت</span>
             </div></div>
         </div>
-        <div class="ss-hours-chips">
-          <span class="ss-hours-chips-title">جمع خودکار ترکیب‌ها:</span>
-          ${chip('ME', 'rme', hm + he)}
-          ${chip('EN', 'ren', he + hn)}
-          ${chip('MN', 'rmn', hm + hn)}
-          ${chip('MEN', 'rmen', hm + he + hn)}
+        <div class="ss-hours-grid" style="margin-top:10px">
+          ${combo('صبح + عصر (ME)', 'me', 'ccme', 'chme')}
+          ${combo('عصر + شب (EN)', 'en', 'ccen', 'chen')}
+          ${combo('صبح + شب (MN)', 'mn', 'ccmn', 'chmn')}
+          ${combo('۲۴ ساعته (MEN)', 'men', 'ccmen', 'chmen')}
         </div>
       </section>
 
@@ -1050,7 +1063,17 @@
           hour_m: pick('shm'), clock_m: pick('sm'), hour_e: pick('she'), clock_e: pick('se'),
           hour_n: pick('shn'), clock_n: pick('sn'), hour_h: pick('shh'),
         };
-        try { const rs = await API.shiftHoursSet(sup); SS.supSettings = rs.sup || sup; } catch (e2) { /* بی‌صدا */ }
+        const combos = {
+          me: { clock: pick('ccme'), hour: pick('chme') },
+          en: { clock: pick('ccen'), hour: pick('chen') },
+          mn: { clock: pick('ccmn'), hour: pick('chmn') },
+          men: { clock: pick('ccmen'), hour: pick('chmen') },
+        };
+        try {
+          const rs = await API.shiftHoursSet(Object.assign({}, sup, { combos }));
+          SS.supSettings = rs.sup || sup;
+          SS.hoursCombos = rs.combos || combos;
+        } catch (e2) { /* بی‌صدا */ }
         if (typeof toast === 'function') toast('ساعت شیفت برای همهٔ بخش‌ها ذخیره شد');
         await ssLoadHours('دفتر پرستاری');
         ssDraw();

@@ -21,6 +21,8 @@ const SHIFT_KEYS = ['M', 'E', 'N', 'H'];
 function cellHours(codes, s) {
   if (!codes) return 0;
   if (codes.includes('H')) return Number(s.hour_m) || 0;
+  const combo = s['combo_' + codes];
+  if (combo != null && Number.isFinite(+combo)) return +combo;
   let h = 0;
   if (codes.includes('M')) h += Number(s.hour_m) || 0;
   if (codes.includes('E')) h += Number(s.hour_e) || 0;

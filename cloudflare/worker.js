@@ -304,6 +304,9 @@ function shiftCellHours(codes, hrs) {
   if (!codes) return 0;
   // مرخصی (H) معادل شیفت صبح است و در کارکرد کل جمع می‌شود.
   if (codes.includes('H')) return hrs.hour_m;
+  // ترکیب‌ها اگر ساعت مستقل داشته باشند، همان حساب می‌شود.
+  const combo = hrs['combo_' + codes];
+  if (combo != null && Number.isFinite(+combo)) return +combo;
   let h = 0;
   if (codes.includes('M')) h += hrs.hour_m;
   if (codes.includes('E')) h += hrs.hour_e;
@@ -813,6 +816,17 @@ on('GET', '/api/shift/schedule', async ctx => {
   const supHrs = Object.assign({}, hrs, parseJSON(supRow && supRow.value, {}) || {});
   const isMedicalPos = (pos) => /پرستار|سوپروایزر|مترون|مدیر پرستاری|مسئول|بیهوشی|اتاق عمل|بهیار|کمک|کارشناس/.test(pos || '');
   const hrsOf = (pos) => (isMedicalPos(pos) ? hrs : supHrs);
+  // ساعت مستقل ترکیب‌ها (ME/EN/MN/MEN) از تنظیمات سراسری
+  const combosRow = await q1(ctx.env, "SELECT value FROM platform_settings WHERE key = 'shift_hours_combos'");
+  const combosVal = parseJSON(combosRow && combosRow.value, {}) || {};
+  ['ME', 'EN', 'MN', 'MEN'].forEach(k => {
+    const item = combosVal[k.toLowerCase()];
+    const raw = item ? String(item.hour == null ? '' : item.hour).trim() : '';
+    if (raw !== '' && Number.isFinite(+raw)) {
+      hrs['combo_' + k] = +raw;
+      supHrs['combo_' + k] = +raw;
+    }
+  });
   let sched = await q1(ctx.env, 'SELECT * FROM shift_schedules WHERE hospital_id=? AND ward=? AND jalali_year=? AND jalali_month=?',
     [a.hospitalId, acc.ward.title, year, month]);
   if (!sched) sched = { id: null, note: null, holidays: '', description: null, custom_rows: null };

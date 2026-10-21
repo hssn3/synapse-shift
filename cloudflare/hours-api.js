@@ -9,6 +9,7 @@
    ===================================================================== */
 
 const KEY = 'shift_hours_support';
+const COMBO_KEY = 'shift_hours_combos';
 
 const json = (o, st = 200) => new Response(JSON.stringify(o), {
   status: st,
@@ -52,7 +53,12 @@ export async function handleHours(request, env, worker) {
     return Object.assign({}, DEFAULTS, val || {});
   };
 
-  if (request.method === 'GET') return json({ sup: await read() });
+  const readCombos = async () => {
+    const row = await q1(env, 'SELECT value FROM platform_settings WHERE key = ?', [COMBO_KEY]);
+    try { return row && row.value ? JSON.parse(row.value) : {}; } catch (e) { return {}; }
+  };
+
+  if (request.method === 'GET') return json({ sup: await read(), combos: await readCombos() });
 
   if (request.method === 'PUT') {
     const b = await request.json().catch(() => ({}));
@@ -66,7 +72,22 @@ export async function handleHours(request, env, worker) {
     };
     await env.DB.prepare('INSERT INTO platform_settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value')
       .bind(KEY, JSON.stringify(next)).run();
-    return json({ status: 'saved', sup: next });
+
+    // ساعت و بازهٔ مستقلِ ترکیب‌ها (ME/EN/MN/MEN)
+    const combos = {};
+    const bc = (b.combos && typeof b.combos === 'object') ? b.combos : {};
+    for (const k of ['me', 'en', 'mn', 'men']) {
+      const item = bc[k] || {};
+      const rawHour = String(item.hour == null ? '' : item.hour).trim();
+      combos[k] = {
+        clock: String(item.clock || '').slice(0, 30),
+        hour: rawHour === '' ? null
+          : ((Number.isFinite(+rawHour) && +rawHour >= 0 && +rawHour <= 48) ? Math.round(+rawHour) : null),
+      };
+    }
+    await env.DB.prepare('INSERT INTO platform_settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value')
+      .bind(COMBO_KEY, JSON.stringify(combos)).run();
+    return json({ status: 'saved', sup: next, combos });
   }
 
   return json({ error: 'مسیر پیدا نشد' }, 404);
