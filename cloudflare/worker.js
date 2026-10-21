@@ -990,7 +990,7 @@ on('PUT', '/api/shift/settings', async ctx => {
   const b = await readJson(ctx.request);
   const acc = await shiftAccessUnit(ctx.env, a.user, b.ward);
   if (acc.error) return json({ error: acc.error }, acc.status);
-  const num = (v, d) => (Number.isFinite(+v) && +v >= 0 && +v <= 24) ? Math.round(+v) : d;
+  const num = (v, d) => (Number.isFinite(+v) && +v >= 0 && +v <= 24) ? (Math.round(+v * 100) / 100) : d;
   const clock = (v, d) => (typeof v === 'string' && v.trim()) ? v.trim().slice(0, 30) : d;
   const cur = await getWardShiftSettings(ctx.env, a.hospitalId, acc.ward.title);
   const clockM = clock(b.clock_m, cur.clock_m), clockE = clock(b.clock_e, cur.clock_e), clockN = clock(b.clock_n, cur.clock_n);

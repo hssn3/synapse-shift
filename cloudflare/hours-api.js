@@ -62,7 +62,7 @@ export async function handleHours(request, env, worker) {
 
   if (request.method === 'PUT') {
     const b = await request.json().catch(() => ({}));
-    const num = (v, d) => (Number.isFinite(+v) && +v >= 0 && +v <= 24) ? Math.round(+v) : d;
+    const num = (v, d) => (Number.isFinite(+v) && +v >= 0 && +v <= 24) ? (Math.round(+v * 100) / 100) : d;
     const cur = await read();
     const next = {
       hour_m: num(b.hour_m, cur.hour_m), clock_m: (b.clock_m || cur.clock_m),
@@ -82,7 +82,7 @@ export async function handleHours(request, env, worker) {
       combos[k] = {
         clock: String(item.clock || '').slice(0, 30),
         hour: rawHour === '' ? null
-          : ((Number.isFinite(+rawHour) && +rawHour >= 0 && +rawHour <= 48) ? Math.round(+rawHour) : null),
+          : ((Number.isFinite(+rawHour) && +rawHour >= 0 && +rawHour <= 48) ? (Math.round(+rawHour * 100) / 100) : null),
       };
     }
     await env.DB.prepare('INSERT INTO platform_settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value')

@@ -947,7 +947,7 @@
     [['cm', 'hm'], ['ce', 'he'], ['cn', 'hn'], ['sm', 'shm'], ['se', 'she'], ['sn', 'shn']].forEach(([clockId, hourId]) => {
       const h = ssClockHours((document.getElementById('ss_' + clockId) || {}).value);
       const out = document.getElementById('ss_' + hourId);
-      if (out && h != null) out.value = String(Math.round(h));
+      if (out && h != null) out.value = String(Math.round(h * 100) / 100);
     });
     ssSumLong();
   };
