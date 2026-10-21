@@ -808,6 +808,11 @@ on('GET', '/api/shift/schedule', async ctx => {
   if (!year || !month || month < 1 || month > 12) return json({ error: 'سال/ماه نامعتبر است' }, 400);
   const days = daysInJalaliMonth(year, month);
   const hrs = await getWardShiftSettings(ctx.env, a.hospitalId, acc.ward.title);
+  // ساعتِ کادر غیردرمانی (منشی، انباردار، خدماتی) جدا و از تنظیمات سراسری می‌آید.
+  const supRow = await q1(ctx.env, "SELECT value FROM platform_settings WHERE key = 'shift_hours_support'");
+  const supHrs = Object.assign({}, hrs, parseJSON(supRow && supRow.value, {}) || {});
+  const isMedicalPos = (pos) => /پرستار|سوپروایزر|مترون|مدیر پرستاری|مسئول|بیهوشی|اتاق عمل|بهیار|کمک|کارشناس/.test(pos || '');
+  const hrsOf = (pos) => (isMedicalPos(pos) ? hrs : supHrs);
   let sched = await q1(ctx.env, 'SELECT * FROM shift_schedules WHERE hospital_id=? AND ward=? AND jalali_year=? AND jalali_month=?',
     [a.hospitalId, acc.ward.title, year, month]);
   if (!sched) sched = { id: null, note: null, holidays: '', description: null, custom_rows: null };
@@ -828,10 +833,11 @@ on('GET', '/api/shift/schedule', async ctx => {
   for (let d = 1; d <= days; d++) headcount[d] = { M: 0, E: 0, N: 0, H: 0 };
   const rows = staff.map(s => {
     const cells = byStaff[s.id] || {};
+    const rowHrs = hrsOf(s.position);
     let total = 0;
     for (let d = 1; d <= days; d++) {
       const c = cells[d] || '';
-      total += shiftCellHours(c, hrs);
+      total += shiftCellHours(c, rowHrs);
       if (c.includes('M')) headcount[d].M++;
       if (c.includes('E')) headcount[d].E++;
       if (c.includes('N')) headcount[d].N++;
@@ -841,7 +847,7 @@ on('GET', '/api/shift/schedule', async ctx => {
       position: s.position, gender: s.gender, monthly_hour_quota: s.monthly_hour_quota,
       years_experience: s.years_experience, hire_date: s.hire_date, fixed_shift: s.fixed_shift,
       employment_status: s.employment_status, sort_order: s.sort_order,
-      cells, leads: leadByStaff[s.id] || {}, total_hours: total, overtime: total - s.monthly_hour_quota };
+      cells, leads: leadByStaff[s.id] || {}, total_hours: total, overtime: total - s.monthly_hour_quota, hrs: rowHrs };
   });
   return json({
     schedule: { ward: acc.ward.title, jalali_year: year, jalali_month: month, note: sched.note, days,

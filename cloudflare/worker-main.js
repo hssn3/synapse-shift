@@ -40,10 +40,11 @@ function withFormDays(data) {
   }
   data.staff = data.staff.map(row => {
     const cells = row.cells || {};
+    const rowHrs = row.hrs || s;
     let total = 0;
     for (let d = 1; d <= days; d++) {
       const codes = cells[d] || '';
-      total += cellHours(codes, s);
+      total += cellHours(codes, rowHrs);
       for (const k of SHIFT_KEYS) {
         if (codes.includes(k)) headcount[d][k] += 1;
       }
