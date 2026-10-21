@@ -1,0 +1,92 @@
+/* ==========================================================================
+   tokens.css - Luxury Dark Health-Tech Design System
+   ========================================================================== */
+
+:root {
+  /* Backgrounds — عمق تیره نیلگون */
+  --bg-primary:    #081222;
+  --bg-secondary:  #0b1830;
+  --bg-tertiary:   #0f1f3a;
+  --bg-elevated:   #15294a;
+  --bg-overlay:    rgba(8, 18, 34, 0.85);
+
+  /* Accents — طلا و زمرد */
+  --accent-gold:        #d4a862;
+  --accent-gold-bright: #f0c987;
+  --accent-gold-dim:    rgba(212, 168, 98, 0.15);
+  --accent-emerald:     #3ec6d8;
+  --accent-emerald-dim: rgba(62, 198, 216, 0.12);
+  --accent-cyan:        #3ec6d8;
+  --accent-cyan-bright: #5fd9ea;
+  --accent-cyan-dim:    rgba(62, 198, 216, 0.12);
+
+  /* Text */
+  --text-primary:  #e9eef3;
+  --text-secondary:#a9b7c4;
+  --text-muted:    #6e7b8a;
+  --text-on-gold:  #1a1208;
+
+  /* Semantic */
+  --success: #2ecc8e;
+  --warning: #e0a94c;
+  --danger:  #e05a5a;
+  --info:    #5aa9e0;
+
+  /* Borders & Dividers */
+  --border-subtle: rgba(212, 168, 98, 0.08);
+  --border-normal: rgba(212, 168, 98, 0.15);
+  --border-strong: rgba(212, 168, 98, 0.30);
+
+  /* Shadows — عمق طبیعی */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.6);
+  --shadow-glow-gold: 0 0 24px rgba(212, 168, 98, 0.25);
+  --shadow-glow-emerald: 0 0 24px rgba(62, 198, 216, 0.20);
+  --shadow-glow-cyan: 0 0 26px rgba(62, 198, 216, 0.28);
+
+  /* Radii */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* Spacing Scale (4px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Typography */
+  --font-fa: 'Vazirmatn', system-ui, -apple-system, sans-serif;
+  --font-en: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-md: 15px;
+  --text-lg: 17px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 30px;
+  --text-4xl: 38px;
+
+  --leading-tight: 1.25;
+  --leading-normal: 1.55;
+  --leading-relaxed: 1.75;
+
+  /* Transitions */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+}

@@ -1,0 +1,309 @@
+/* ==========================================================================
+   PRINT AND UI SIZING POLISH — تخصصی و جامع برای کل سامانه و فرم‌ها
+   ========================================================================== */
+
+/* --- 1. UI SIZING: بهبود ابعاد المان‌های تعاملی و گزارش‌ها (فقط روی نمایشگر) --- */
+button.btn-sm, .btn.btn-sm {
+  padding: 8px 16px !important;
+  font-size: 14px !important;
+  min-height: 38px !important;
+  font-weight: 600;
+}
+
+.report-item, .dcard, .ccard, .report-box {
+  font-size: 15px !important;
+  line-height: 1.6;
+}
+
+.report-title, .sec-h h1, .sec-h h2 {
+  font-size: 1.2rem !important;
+}
+
+.report-box table td, .report-item table td {
+  font-size: 14px !important;
+  line-height: 1.6;
+}
+
+.report-box table th, .report-item table th {
+  font-size: 14px !important;
+  padding: 10px 8px !important;
+}
+
+/* --- 2. MASTER PRINT ENGINE: پاکسازی کامل پرینت، حذف دانا، حذف صفحات سفید و متون پراکنده --- */
+@media print {
+  /* تنظیم سراسری صفحه و رنگ‌ها */
+  html, body {
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 11pt !important;
+    line-height: 1.5 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    direction: rtl !important;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+  }
+
+  /* حذف قطعی و کامل دکل شناور، دستیار دانا، منوها، ویدیو و المان‌های رابط کاربری */
+  #floatDock, .floatdock,
+  #ent-assistant-trigger, .ent-assistant-bubble, .ent-assistant-badge,
+  #ent-assistant-drawer, .ent-assistant-drawer,
+  #dockMenuBtn, #dockMenuPop, .dockmenu, .dock-btn,
+  #danaAssistantContainer, #danaWidget, .floating-assistant, .dana-fab,
+  #guidePanel, #guideDockBtn, .gwid-panel, .gwid,
+  #paletteModal, .palette-modal, #themeDrawer, .theme-drawer, #settDrawer, .settdrawer, #themeToggle,
+  #bgVideo, #bgCanvas, .bgx-stage, .bgx-poster, .bgx-video, .bgx-motes, .bgx-veil, .bgx-scrim, .bgx-curtain,
+  .bgfx, .bgfx-bg, .bgfx-grid, .bgfx-aurora, .bgfx-beam, .bgfx-orb, #bgfx-fx, #bgstage, .bg-motes, .bg-canvas,
+  #side, #top, .side, .top, .nav, .sidebar, .app-header, header, nav, #ghdr, #gftr, .ghdr, .gftr,
+  .btn, button, .action-bar, .ef-actions, .tbl-actions, .actions, .nav-tabs, .mctl, .tgl,
+  .noprint, .no-print, [data-noprint], .phd, .abadge, .mbtn, .exbanner,
+  .docsec.noprint, .evidence-box, .ev-box, .skip, .gsearch, .hub-fold, .hub-cat,
+  .modal-backdrop, .soverlay, .toast-container, .toast, .tipfloat,
+  .admin-gear, #adminGearBtn, .agpop,
+  #copilot-trigger, #copilot-panel, #cp-spotlight-mask, #cp-tour-card,
+  #tourWrap, #tourBox, #pvBanner {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+    left: -99999px !important;
+    top: -99999px !important;
+  }
+
+  /* تفکیک فرزندان مستقیم بدنه هنگام حالت‌های پرینت اختصاصی (جلوگیری ۱۰۰٪ از ورود هرگونه المان شناور) */
+  body.dp-printing > *:not(.docprint):not(#plLandscape),
+  body.ss-printing > *:not(#ssPrintRoot):not(#plLandscape),
+  body.fc-printing > *:not(#fcPrintRoot),
+  body.fas-printing > *:not(.fas-print-root),
+  body.std-form-printing > *:not(#accStandardDocModal) {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* رفع باگ متون پراکنده: حذف pre-wrap مخرب و برقراری بسته‌بندی تمیز متن و کلمات */
+  div, p, td, th, span, b, strong, h1, h2, h3, h4, h5, h6 {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+  .docsv, pre, code, .pre-line {
+    white-space: pre-line !important;
+  }
+
+  /* رفع باگ برگه‌های سفید: کانتینرهای چندصفحه‌ای آزادانه بشکنند */
+  .panel, .card, .dcard, .ccard, .g, .docprint, .panel.docprint,
+  .pbody, .standard-form-sheet, .print-sheet, .standard-form-dialog,
+  #formEngineContainer, .form-container, .main, #content, #root {
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    color: #000 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    display: block !important;
+  }
+
+  /* مدیریت جدول‌ها، تکرار سربرگ/پانویس و جلوگیری از نصف‌شدن ردیف‌ها */
+  table, table.psheet, .tbl-wrap table {
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  thead {
+    display: table-header-group !important;
+  }
+  tfoot {
+    display: table-footer-group !important;
+  }
+  tbody {
+    display: table-row-group !important;
+  }
+
+  tr, .tbl-wrap tr, .ss-staff-row, .ss-hc-row {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* اجزای تک‌تک فرم و سند که نباید بریده شوند */
+  .docsec, .chksign, .doc-dates, .docletterhead, .ef-field-group,
+  .sign-block, .standard-form-section, .ss-print-sign, .ss-print-legend,
+  .ss-print-reminders, .ss-print-desc, h1, h2, h3, h4, h5, h6 {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+  }
+
+  /* سبک‌دهی رسمی جداول چک‌لیست‌ها و فرم‌ها */
+  table td, table th {
+    font-size: 10.5pt !important;
+    line-height: 1.45 !important;
+    color: #000 !important;
+    border-color: #888 !important;
+  }
+
+  th {
+    background-color: #f3f3f3 !important;
+    font-weight: 700 !important;
+  }
+
+  /* چک‌باکس‌ها و گزینه‌های ارزیابی در چاپ */
+  .psheet td span[style*="inline-block"] {
+    white-space: nowrap !important;
+    font-size: 10pt !important;
+  }
+
+  /* هدر رسمی و امضاها */
+  .print-only-letterhead {
+    display: block !important;
+  }
+  .docletterhead {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding-bottom: 8px !important;
+    margin-bottom: 12px !important;
+    border-bottom: 2px solid #000 !important;
+  }
+  .docletterhead b {
+    color: #000 !important;
+    font-size: 13pt !important;
+  }
+  .docletterhead span {
+    color: #333 !important;
+    font-size: 10pt !important;
+  }
+  .doc-dates {
+    display: flex !important;
+    border: 1px solid #777 !important;
+    background: #fafafa !important;
+  }
+  .doc-dates > div {
+    border-inline-end: 1px solid #777 !important;
+    padding: 5px 8px !important;
+  }
+  .doc-dates b {
+    color: #000 !important;
+  }
+
+  .chksign {
+    display: flex !important;
+    justify-content: space-between !important;
+    margin-top: 26px !important;
+    padding-top: 10px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  .chksign > div {
+    width: 46% !important;
+    text-align: center !important;
+    font-size: 10.5pt !important;
+  }
+  .chksign i {
+    display: block !important;
+    height: 50px !important;
+    border-bottom: 1px dotted #555 !important;
+    margin-top: 8px !important;
+  }
+
+  /* برنامه‌ی ماهانه‌ی شیفت — چاپ فوق‌دقیق و استاندارد A4 افقی */
+  body.ss-printing {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  #ssPrintRoot {
+    display: block !important;
+  }
+  .ss-print-fit {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    overflow: hidden !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .ss-print-fit.ss-page-break {
+    break-after: page !important;
+    page-break-after: always !important;
+  }
+  .ss-print-fit:last-child {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+  }
+  .ss-print-table td, .ss-print-table th {
+    font-size: 8.5pt !important;
+    padding: 2px 3px !important;
+    white-space: nowrap !important;
+    border: 1px solid #666 !important;
+    color: #000 !important;
+  }
+  .ss-shiftcell {
+    font-size: 8.5pt !important;
+    font-weight: 700 !important;
+  }
+
+  /* فرم‌ساز سازمانی — چاپ تمیز فیلدها */
+  .ef-field-group {
+    margin-bottom: 12px !important;
+    border-bottom: 1px solid #e0e0e0 !important;
+    padding-bottom: 8px !important;
+    break-inside: avoid !important;
+  }
+  .ef-label {
+    color: #000 !important;
+    font-weight: 700 !important;
+    font-size: 10.5pt !important;
+  }
+  .ef-input, .ef-textarea, .ef-select {
+    background: #fff !important;
+    color: #000 !important;
+    border: 1px solid #999 !important;
+    font-size: 10pt !important;
+    box-shadow: none !important;
+  }
+
+  /* اسناد استاندارد مدال در اعتباربخشی */
+  body.std-form-printing #accStandardDocModal {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+  body.std-form-printing .standard-form-overlay {
+    position: static !important;
+    background: transparent !important;
+    padding: 0 !important;
+  }
+  body.std-form-printing .standard-form-dialog {
+    max-width: 100% !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: #fff !important;
+  }
+  body.std-form-printing .standard-form-header,
+  body.std-form-printing .standard-form-footer {
+    display: none !important;
+  }
+}

@@ -1,0 +1,162 @@
+/* ==========================================================================
+   components.css - UI Components (Buttons, Inputs, Cards, Tables, etc.)
+   ========================================================================== */
+
+/* --- Buttons --- */
+.btn {
+  height: 44px;
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  font-size: var(--text-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  transition: all var(--duration-fast) var(--ease-out);
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary, .btn-g {
+  background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-bright)) !important;
+  color: var(--text-on-gold) !important;
+  box-shadow: var(--shadow-sm);
+  border: none !important;
+}
+
+.btn-primary:hover, .btn-g:hover:not(:disabled) {
+  box-shadow: var(--shadow-glow-gold);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active, .btn-g:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-o, .btn-ghost {
+  background: transparent !important;
+  border: 1px solid var(--accent-gold-dim) !important;
+  color: var(--accent-gold) !important;
+}
+
+.btn-o:hover:not(:disabled) {
+  background: var(--accent-gold-dim) !important;
+  color: var(--accent-gold-bright) !important;
+}
+
+.btn-danger {
+  background: var(--danger) !important;
+  color: #fff !important;
+}
+
+/* --- Inputs --- */
+input, select, textarea {
+  width: 100%;
+  min-height: 44px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-normal);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 0 var(--space-3);
+  font-size: var(--text-base);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid var(--accent-gold-bright);
+  outline-offset: 2px;
+  border-color: var(--accent-gold);
+  box-shadow: var(--shadow-glow-gold);
+  background: var(--bg-primary);
+}
+
+textarea {
+  padding: var(--space-3);
+  resize: vertical;
+}
+
+/* --- Cards --- */
+.card, .panel, .dcard, .ccard {
+  background: linear-gradient(180deg, var(--bg-tertiary), var(--bg-secondary)) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: var(--space-6) !important;
+  box-shadow: var(--shadow-md) !important;
+  transition: all var(--duration-normal) var(--ease-out);
+  backdrop-filter: blur(12px);
+}
+
+.card:hover, .panel:hover, .dcard:hover, .ccard:hover {
+  box-shadow: var(--shadow-lg) !important;
+  border-color: var(--border-strong) !important;
+  transform: translateY(-2px);
+}
+
+/* --- Tables --- */
+table, .table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: right;
+}
+
+th {
+  background: var(--bg-tertiary) !important;
+  color: var(--text-secondary) !important;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: var(--space-3) var(--space-4) !important;
+  border-bottom: 2px solid var(--border-normal) !important;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+td {
+  padding: var(--space-3) var(--space-4) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+  background: transparent !important;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+tr:hover td {
+  background: var(--accent-gold-dim) !important;
+}
+
+/* --- Modals / Drawer --- */
+.modal-backdrop, .overlay {
+  backdrop-filter: blur(12px) !important;
+  background: var(--bg-overlay) !important;
+}
+
+.modal-content, .drawer {
+  background: var(--bg-elevated) !important;
+  border: 1px solid var(--border-normal) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* --- Toasts --- */
+#toast-container {
+  bottom: 24px;
+  right: auto;
+  left: 24px; /* RTL placement */
+}
+
+.toast {
+  background: rgba(21,26,34,0.95) !important;
+  backdrop-filter: blur(8px);
+  border-right: 4px solid var(--accent-emerald) !important;
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-4);
+}

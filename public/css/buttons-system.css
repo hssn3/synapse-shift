@@ -1,0 +1,120 @@
+/* ==========================================================================
+ * Design System دکمه‌ها — buttons-system.css
+ * --------------------------------------------------------------------------
+ * چرا این فایل ساخته شد: ۱۷ دکمه sn-btn-act با استایل inline در
+ * public/js/hassan-hubs.js پراکنده بودند و هیچ سیستم یکپارچه‌ای
+ * (btn--primary/secondary/...) وجود نداشت. این فایل ۹ نوع، ۴ اندازه و
+ * ۶ حالت را متمرکز می‌کند تا مهاجرت A-1 ممکن شود و حداقل ارتفاع لمسی
+ * ۴۴px رعایت شود. با .btn قدیمی سازگار است (می‌توان class="btn btn--x").
+ * RTL کامل، فونت وزیرمتن، بدون استایل inline در JS.
+ * ========================================================================== */
+
+/* پایه مشترک — حداقل لمسی ۴۴px برای md به بالا */
+.btn--primary,.btn--secondary,.btn--outline,.btn--ghost,.btn--danger,
+.btn--success,.btn--warning,.btn--info,.btn--link{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  font-family:inherit;font-weight:800;line-height:1.6;cursor:pointer;
+  border-radius:10px;border:1px solid transparent;
+  transition:transform .15s ease,box-shadow .2s ease,background .2s ease,border-color .2s ease;
+  user-select:none;white-space:nowrap;text-decoration:none;
+  min-height:44px;padding:10px 22px;font-size:14px;
+}
+.btn--primary svg,.btn--secondary svg,.btn--outline svg,.btn--ghost svg,
+.btn--danger svg,.btn--success svg,.btn--warning svg,.btn--info svg{flex:none}
+
+/* ---- ۹ نوع ---- */
+.btn--primary{background:var(--sn-gold,#d4af5a);color:#0d131c;border-color:transparent;box-shadow:0 4px 14px rgba(212,175,90,.35)}
+.btn--secondary{background:rgba(255,255,255,.08);color:#e2e8f0;border-color:rgba(255,255,255,.12)}
+.btn--outline{background:transparent;color:var(--sn-gold-light,#f0d896);border-color:rgba(212,175,90,.45)}
+.btn--ghost{background:rgba(255,255,255,.06);color:var(--sn-gold-light,#f0d896);border-color:transparent}
+.btn--danger{background:#dc2626;color:#fff;border-color:#991b1b;box-shadow:0 4px 14px rgba(220,38,38,.35)}
+.btn--success{background:var(--sn-primary,#10a0b9);color:#091425;border-color:transparent;box-shadow:0 4px 14px rgba(16,160,185,.3)}
+.btn--warning{background:#f59e0b;color:#1c1005;border-color:#92400e}
+.btn--info{background:#2563eb;color:#fff;border-color:#1e40af;box-shadow:0 4px 14px rgba(37,99,235,.35)}
+.btn--link{background:transparent;color:var(--sn-gold-light,#f0d896);border-color:transparent;min-height:44px;padding:10px 8px;text-decoration:underline;text-underline-offset:4px}
+
+/* ---- حالت‌ها (۶ حالت) ---- */
+/* hover */
+.btn--primary:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(212,175,90,.45)}
+.btn--secondary:hover,.btn--ghost:hover{background:rgba(255,255,255,.14)}
+.btn--outline:hover{background:rgba(212,175,90,.12)}
+.btn--danger:hover{background:#b91c1c}
+.btn--success:hover{filter:brightness(1.08)}
+.btn--warning:hover{background:#d97706}
+.btn--info:hover{background:#1d4ed8}
+.btn--link:hover{color:#fff}
+/* active */
+.btn--primary:active,.btn--secondary:active,.btn--outline:active,.btn--ghost:active,
+.btn--danger:active,.btn--success:active,.btn--warning:active,.btn--info:active{transform:translateY(0) scale(.99)}
+/* focus — دسترس‌پذیری صفحه‌کلید */
+.btn--primary:focus-visible,.btn--secondary:focus-visible,.btn--outline:focus-visible,
+.btn--ghost:focus-visible,.btn--danger:focus-visible,.btn--success:focus-visible,
+.btn--warning:focus-visible,.btn--info:focus-visible,.btn--link:focus-visible{
+  outline:3px solid rgba(212,175,90,.65);outline-offset:2px;
+}
+/* disabled */
+.btn--primary:disabled,.btn--secondary:disabled,.btn--outline:disabled,.btn--ghost:disabled,
+.btn--danger:disabled,.btn--success:disabled,.btn--warning:disabled,.btn--info:disabled,
+.btn--primary[aria-disabled="true"],.btn--secondary[aria-disabled="true"],.btn--outline[aria-disabled="true"],
+.btn--ghost[aria-disabled="true"],.btn--danger[aria-disabled="true"],.btn--success[aria-disabled="true"],
+.btn--warning[aria-disabled="true"],.btn--info[aria-disabled="true"]{
+  background:#475569;color:#cbd5e1;border-color:#475569;box-shadow:none;
+  cursor:not-allowed;transform:none;opacity:.75;
+}
+/* loading */
+.btn--loading{position:relative;pointer-events:none;opacity:.85}
+.btn--loading::after{content:'';width:16px;height:16px;flex:none;border-radius:50%;
+  border:2px solid rgba(255,255,255,.35);border-top-color:currentColor;animation:btnspin .7s linear infinite}
+@keyframes btnspin{to{transform:rotate(360deg)}}
+
+/* ---- ۴ اندازه ---- */
+.btn--sm{min-height:32px;padding:6px 14px;font-size:12.5px;border-radius:8px;font-weight:700}
+.btn--md{min-height:44px;padding:10px 22px;font-size:14px;border-radius:10px}
+.btn--lg{min-height:56px;padding:14px 30px;font-size:15.5px;border-radius:12px}
+.btn--xl{min-height:64px;padding:16px 36px;font-size:16.5px;border-radius:14px}
+
+/* آیکون + متن با تراز عمودی */
+.btn--primary>span,.btn--secondary>span,.btn--outline>span,.btn--ghost>span,
+.btn--danger>span,.btn--success>span,.btn--warning>span,.btn--info>span{
+  display:inline-flex;align-items:center;gap:6px;
+}
+
+/* فاصله‌گذاری استاندارد در ردیف دکمه‌ها */
+.btn-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+
+/* کارتی‌شدن جدول‌های پهن در موبایل + هدف لمسی */
+@media (max-width:768px){
+  .btn--md,.btn--lg{width:100%;justify-content:center}
+  .btn-row .btn--md,.btn-row .btn--lg{width:auto;flex:1 1 auto}
+}
+
+/* مودال تأیید فارسی (BTN) */
+.btn-modal-backdrop{position:fixed;inset:0;background:rgba(7,13,24,.7);backdrop-filter:blur(4px);
+  display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px}
+.btn-modal{background:#101620;border:1px solid rgba(212,175,90,.35);border-radius:16px;
+  max-width:440px;width:100%;padding:22px;color:#e8eeef;box-shadow:0 20px 60px rgba(0,0,0,.5);
+  direction:rtl;text-align:right}
+.btn-modal h3{margin:0 0 8px;font-size:16px;color:var(--sn-gold-light,#f0d896)}
+.btn-modal p{margin:0 0 18px;font-size:13.5px;line-height:1.9;color:#cbd5e1}
+.btn-modal-actions{display:flex;gap:10px;justify-content:flex-start;flex-wrap:wrap}
+.btn-modal-danger{border-color:#7f1d1d}
+
+/* A-3: کارتی‌شدن جدول‌های پهن در موبایل (BSC/شیفت/rpg-t) + هدف لمسی ۴۴px */
+@media (max-width:768px){
+  table.rpg-t,table.sn-table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table.rpg-t tbody,table.sn-table tbody{display:flex;flex-direction:column;gap:10px}
+  table.rpg-t tr,table.sn-table tbody tr{display:grid;grid-template-columns:1fr auto;gap:6px;
+    background:rgba(255,255,255,.03);border:1px solid var(--bd,#243447);border-radius:12px;padding:10px 12px}
+  table.rpg-t td,table.sn-table td{border:0;padding:6px 4px;min-height:44px;display:flex;align-items:center}
+  table.rpg-t td[data-l]::before,table.sn-table td[data-l]::before{content:attr(data-l);font-size:11.5px;
+    color:var(--mut,#8fa0b3);margin-inline-end:8px;min-width:90px}
+  table.rpg-t .btn,table.sn-table .btn{min-height:44px}
+}
+/* A-5: راست‌چین نوارهای پیشرفت CRM در RTL + کنتراست چیپ‌ها */
+[dir="rtl"] .bar,[dir="rtl"] .progress,[dir="rtl"] .crm-progress{direction:rtl}
+[dir="rtl"] .bar > *,[dir="rtl"] .progress > *{float:right}
+.chip{font-weight:700}
+html[data-theme="light"] .chip{filter:contrast(1.15) saturate(1.1)}
+/* A-4: هایلایت فیلد خطادار + فوکوس */
+.rpg-invalid{border-color:#dc2626 !important;box-shadow:0 0 0 2px rgba(220,38,38,.35) !important}
+.rpg-invalid:focus{outline:3px solid rgba(220,38,38,.55);outline-offset:1px}

@@ -1,0 +1,30 @@
+# secrets
+.env
+cloudflare/credentials.env
+.env.*
+!.env.example
+
+# dependencies / build
+node_modules/
+.wrangler/
+.tools/
+.tmp-*
+
+# local runtime
+*.log
+*.db-wal
+*.db-shm
+*.backup
+*.backup-*
+uploads/tmp/
+
+# OS/editor
+.DS_Store
+Thumbs.db
+
+# credentials / local dumps (not for GitHub)
+CREDENTIALS.md
+BACKUP-INFO.txt
+database/*.db
+database/*.db-*
+

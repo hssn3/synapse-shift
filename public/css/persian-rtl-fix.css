@@ -1,0 +1,83 @@
+/* ============================================================================
+   persian-rtl-fix.css  —  لایه‌ی نهاییِ سخت‌سازیِ فارسی/RTL
+   ----------------------------------------------------------------------------
+   چرا این فایل آخر از همه لود می‌شود: قاعده‌های قبلی (app.css, design-system.css و …)
+   مخصوصِ نسخه‌ی لاتینِ طراحی نوشته شده‌اند و چند قرارداد ESLint‌گونه را می‌شکنند.
+   به‌جای دست‌زدن به ۱۴۳ قاعده‌ی پراکنده، اینجا با specificity بالا و !important
+   فقط آن‌هایی را اصلاح می‌کنیم که واقعاً روی متنِ فارسی اثر می‌گذارند.
+
+   قواعد این لایه:
+   1) متن فارسی هرگز letter-spacing نمی‌گیرد (حروف فارسی به هم چسبیده‌اند و
+      فاصله‌گذاریِ بین‌حرفی، کلمات را می‌شکند). جز جزیره‌های لاتین/عددی.
+   2) متن فارسی راست‌چین می‌ماند (text-align: start) و هرگز left/right فیزیکی نمی‌گیرد.
+   3) فونت فارسی همیشه Vazirmatn محلی است (بدون وابستگی به CDN خارجی).
+   4) کلمات فارسیِ طولانی می‌شکنند، نه با break-all بلکه با break-word.
+   ========================================================================== */
+
+:root {
+  /* فونت محلی — بدون درخواست به fonts.googleapis.com */
+  --pfa-font: 'Vazirmatn', 'Shabnam', 'IRANSansX', 'IRANSans', Tahoma, sans-serif;
+}
+
+html, body {
+  font-family: var(--pfa-font) !important;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ---- ۱) حذف letter-spacing برای متن فارسی ---------------------------------- */
+/* انتخابگر عامِ «هر عنصری که letter-spacing ارثی دارد، و جزیره‌ی لاتین نیست» */
+body :where(
+  h1, h2, h3, h4, h5, h6, p, span, label, b, strong, i, em, small, li, td, th,
+  button, a, legend, figcaption, blockquote, option, optgroup, summary, caption
+):not(.num):not(.ltr):not(.en):not(code):not(pre):not(kbd):not(samp):not(.ss-c-code):not([dir="ltr"]) {
+  letter-spacing: normal !important;
+}
+
+/* کلاس‌هایی که مستقیماً روی متن فارسی اثر گذاشته‌اند */
+.leyebrow,
+.gftr-col b,
+.gwid-phase-hd,
+.role-tx,
+.roleband-t,
+.svcbar,
+.lcard,
+.usertile {
+  letter-spacing: normal !important;
+}
+
+/* جزیره‌های لاتین/عددی: tabular-nums تا عددها روی هم می‌نشینند */
+.num, .mono, .ss-c-code, code, pre, kbd {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: normal !important;
+}
+
+/* ---- ۲) چیدمانِ منطقی به‌جای فیزیکی -------------------------------------- */
+/* در RTL، «شروع» یعنی راست. هر جایی که قبلاً left/right روی متن فارسی آمده،
+   این دو خط رفتار را به سمت درست برمی‌گردانند. */
+body :where(p, li, td, th, label, figcaption):not(.num):not(.ltr):not([dir="ltr"]) {
+  text-align: start;
+}
+
+/* ورودی‌های متنی فارسی باید راست‌چین باشند */
+input:where([type="text"], [type="search"], [type="tel"]):not(.ltr):not(.num),
+textarea:not(.ltr) {
+  text-align: start;
+  direction: rtl;
+}
+
+/* ---- ۳) تایپوگرافیِ فارسی‌پسند ------------------------------------------- */
+body {
+  line-height: 1.85;          /* فارسی به ارتفاع سطرِ more-than-latin نیاز دارد */
+  word-spacing: normal;
+  overflow-wrap: break-word;  /* کلمات فارسیِ طولانی نشکنند به‌صورت ناخواسته */
+  -webkit-tap-highlight-color: rgba(99, 102, 241, .18);
+}
+
+/* تیترهای فارسی: بدون فاصله‌ی کلماتیِ لاتین */
+h1, h2, h3, h4, h5, h6 {
+  word-spacing: normal;
+}
+
+/* ---- ۴) دیباگِ ناخواسته: هیچ عنصری نباید dev-tools ظاهر کند --------------- */
+[data-rtl-debug="1"] * { outline: 1px dashed rgba(239, 68, 68, .35); }

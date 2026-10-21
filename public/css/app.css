@@ -1,0 +1,3188 @@
+/* ===== فونت وزیرمتن — خودمیزبان، بدون وابستگی به CDN (کار آفلاین) =====
+   وزیرمتن (SIL OFL) استاندارد عملی نرم‌افزارهای فارسی است: ارتفاع ایکس بلند،
+   دو چشمی باز و یکنواخت، و بازه‌ی وزن ۱۰۰..۹۰۰ در یک فایل متغیر.
+   قبلاً --sf روی 'Noto Serif' بود که هیچ گلیف فارسی ندارد؛ یعنی همه‌ی
+   تیترهای فارسی در عمل به تاهوما/فونت سیستم می‌افتادند. */
+@font-face{font-family:'Vazirmatn';src:url('/fonts/Vazirmatn-Variable.woff2') format('woff2-variations'),url('/fonts/Vazirmatn-Variable.woff2') format('woff2');
+font-weight:100 900;font-style:normal;font-display:swap}
+
+:root{
+/* پالت برگرفته از موکاپ گوگل اسنیچِ کارفرما: سرمه‌ای/اسلیت تخت (navy-slate) + طلایی،
+   جایگزینِ کاملِ پالت زمردیِ قبلی (نه فقط رنگ کنش). نگاشت جدید: em9=ink سرمه‌ای
+   (بک‌گراند صفحه)، em8/em7=سطوح شیشه‌ای روی آن (surface-container)، em6/em5=آبیِ
+   روشن‌ترِ گرادیان (هم‌خانواده‌ی --pri)، gd=gold بدون تغییر، th/tm/td=on-surface
+   (متن ۱/۲/۳) با پایه‌ی خاکستری-آبیِ اسلیت به‌جای کرمِ قبلی، gb/gbs=glass/glass-strong
+   با پایه‌ی --em6 (به‌جای کرمِ قبلی) طبق «glass-border: rgba(148,163,184,...)» موکاپ. */
+--em9:#0b1120;--em8:#1e293b;--em7:#334155;--em6:#94a3b8;--em5:#38bdf8;
+--ry9:#0a1a3d;--ry8:#122a5c;--ry7:#1c3f85;--ry6:#2a56b0;
+--gd:#c9a84c;--gdl:#e7cd86;--gdd:#a8863a;--gdx:#fff8e2;
+--jw:#8d6bff;--jwl:#b6a3ff;--tl:#2fb8b0;--rs2:#d968a0;
+--gb:rgba(148,163,184,.09);--gbs:rgba(148,163,184,.16);
+--bd:rgba(148,163,184,.22);--bds:rgba(148,163,184,.38);
+--th:#f8fafc;--tm:#cbd5e1;--td:#94a3b8;
+--ok:#34bbd3;--wr:#e0b84e;--dn:#d97a6a;
+/* زیرپنل‌ها: کادرهای فرورفته‌ی داخل پنل‌ها (فرم زمان‌بندی جلسه، ورودی‌های
+   سوپرادمین و …). پیش‌تر مستقیم rgba(0,0,0,.16/.2/.25) داخل style اینلاین
+   نوشته می‌شد؛ روی تم روشن این‌ها خاکستریِ کدر روی سفید می‌شدند و با بقیه‌ی
+   صفحه نمی‌خواندند. حالا توکن‌اند تا هر تم مقدار خودش را بدهد. */
+--subpanel:rgba(0,0,0,.16);--subpanel-2:rgba(0,0,0,.25);
+/* رنگ کنش تمِ تیره: آبی — خواسته‌ی صریح کارفرما بر اساس موکاپِ گوگل اسنیچ
+   (رنگ‌بندی آبی+طلایی به‌جای زمرد+طلایی). فقط تمِ تیره؛ تمِ روشن مقدار خودش را
+   در design-system.css بازنویسی می‌کند و دست‌نخورده می‌ماند (خواسته‌ی صریح
+   کارفرما: «فعلاً نسخه‌ی روشن نذار»). */
+--pri:#38bdf8;--pri-h:#0ea5e9;--pri-d:#0284c7;
+--pri-soft:rgba(56,189,248,.14);--pri-soft-b:rgba(56,189,248,.32);
+--r:18px;--rs:10px;--rl:26px;
+/* --sf = تیتر/نمایشی، --sn = متن. هر دو وزیرمتن‌اند؛ تمایز از راه «وزن» است نه
+   عوض‌کردن خانواده — در خط فارسی تغییر خانواده‌ی متصل‌نویس بین تیتر و متن
+   بیش از آنکه لوکس دیده شود، ناهمگون دیده می‌شود. */
+--sf:'Vazirmatn',-apple-system,'Segoe UI',Tahoma,sans-serif;
+--sn:'Vazirmatn',-apple-system,'Segoe UI',Tahoma,sans-serif;
+--shine:linear-gradient(115deg,transparent 24%,rgba(255,255,255,.55) 38%,rgba(255,255,255,.08) 48%,transparent 62%);
+--glow-gd:0 0 24px rgba(212,175,90,.5),0 0 64px rgba(212,175,90,.15);
+--glow-ok:0 0 18px rgba(63,172,191,.45);
+--glow-dn:0 0 18px rgba(217,122,106,.4);
+--ghdrh:0px;
+/* توکن‌های زنده‌ی قابل‌تنظیم با کشوی تنظیمات (بخش ۳ مگاپرامپت) — پیش‌فرض‌ها
+   کم‌تر از قبل شدند: خواسته‌ی صریح کارفرما «شاینِ زیاد چشم را می‌زند»؛ کاربر
+   هنوز می‌تواند از کشوی تنظیمات بالاتر ببرد. */
+--shine-i:.32;--bg-speed:1;--glow-i:.28;
+}
+/* ===== تم روشن — کنتراست AA (بخش ۴ مگاپرامپت) =====
+   پیش‌فرض سامانه همچنان تیره است (data-theme غایب یا "dark")؛ این بلوک فقط با
+   data-theme="light" روی <html> فعال می‌شود و همان توکن‌های معنایی موجود
+   (--gb/--bd/--th/--tm/--td/--gd/--gdl و...) را با مقادیر روشن جایگزین می‌کند
+   تا کل اپ (که همه‌جا از همین متغیرها استفاده می‌کند) خودکار retheme شود. */
+html[data-theme="light"]{
+  --em9:#eef2f3;--gb:rgba(255,255,255,.55);--gbs:rgba(255,255,255,.78);
+  --bd:rgba(17,37,68,.28);--bds:rgba(17,37,68,.42);
+  --th:#091324;--tm:#1d3a44;--td:#3d5963;
+  --gd:#8a6b12;--gdl:#6b4e07;--gdd:#5a3f06;
+  --sheen-rgb:255,255,255;
+  --subpanel:#eef2f3;--subpanel-2:#e5ebec;
+}
+html[data-theme="light"] body{color:var(--tm);
+  background:radial-gradient(1100px 720px at 82% -8%,rgba(24,88,111,.20) 0%,transparent 62%),
+  radial-gradient(900px 620px at 8% 12%,rgba(201,168,76,.22) 0%,transparent 60%),
+  radial-gradient(1200px 900px at 50% 108%,rgba(52,187,211,.20) 0%,transparent 65%),
+  linear-gradient(180deg,#f3f6f7 0%,#eaf1f2 45%,#f5f2e8 100%);background-attachment:fixed}
+html[data-theme="light"] body::before{opacity:.08}
+html[data-theme="light"] #ghdr .ghdr-in{background:rgba(255,255,255,.86)}
+html[data-theme="light"] #gftr{background:rgba(255,255,255,.5)}
+html[data-theme="light"] .btn-g,html[data-theme="light"] .btn-gold{color:#fff}
+:root:not([data-theme]){--sheen-rgb:245,240,224}
+html[data-theme="dark"]{--sheen-rgb:245,240,224}
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-size:calc(16px * var(--fs-scale, 1))}
+/* اکثر متن‌های این فایل با px مطلق نوشته شده‌اند، نه rem/em — پس تغییر font-size روی
+   html بیشتر آن‌ها را عوض نمی‌کند (این همان چیزی بود که «کاربردی نیست» را باعث می‌شد).
+   راه‌حل عملی با توجه به حجم بالای px سراسری فایل: zoom روی body، که کل چیدمان و
+   متن صفحه (نه فقط ریشه) را واقعاً و قابل‌اندازه‌گیری با getComputedStyle بزرگ/کوچک
+   می‌کند. --fs-scale همان مقدار پلکانی موجود (۰.۹ تا ۱.۲۶) است، هیچ مکانیزم جدیدی نیست. */
+body{zoom:var(--fs-scale, 1)}
+/* خط فارسی متصل‌نویس است: letter-spacing مثبت اتصال حروف را می‌شکند. قاعده‌های
+   قدیمیِ این فایل که .2px تا 1.2px می‌گذاشتند، سرِ جای خودشان اصلاح شده‌اند
+   (نه با یک قاعده‌ی سراسری — ارث‌بری در برابر اعلانِ مستقیم می‌بازد، حتی با
+   important). این کلاس برای تکه‌های عمداً لاتین است. */
+.ltr{direction:ltr;unicode-bidi:isolate}
+body{font-family:var(--sn);color:var(--tm);font-weight:500;min-height:100vh;line-height:1.7;overflow-x:hidden;
+background:radial-gradient(1100px 720px at 82% -8%,rgba(56,189,248,.16) 0%,transparent 62%),
+radial-gradient(900px 620px at 8% 12%,rgba(201,168,76,.14) 0%,transparent 60%),
+radial-gradient(1200px 900px at 50% 108%,rgba(30,41,59,.65) 0%,transparent 65%),
+linear-gradient(180deg,#0b1120 0%,#0f172a 45%,#0b1120 100%);background-attachment:fixed}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.05;
+background-image:radial-gradient(circle,var(--gd) 1px,transparent 1px);background-size:26px 26px}
+::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(212,175,90,.32);border-radius:6px}
+::-webkit-scrollbar-thumb:hover{background:rgba(212,175,90,.6)}
+.g{--mx:50%;--my:0%;background:var(--gb);backdrop-filter:blur(22px) saturate(140%);-webkit-backdrop-filter:blur(22px) saturate(140%);
+border:1px solid var(--bd);border-radius:var(--r);box-shadow:0 8px 32px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.06);
+transition:box-shadow .25s,border-color .25s,transform .5s cubic-bezier(.2,.7,.3,1);position:relative;overflow:hidden}
+.gs{background:var(--gbs);border-color:var(--bds)}
+.hide{display:none!important}
+
+/* ===== شیشه/شاین مشترک کارت‌ها — نسخه‌ی v4: بوردر گرادیانی با mask-composite (::before)
+   که حالا محل نشانگر را دنبال می‌کند (--mx/--my)، به‌علاوه‌ی یک .sheen داخلی نرم که با
+   pointermove در app.js (initGlassShine) ست می‌شود، و پرتوی مورب عبوری روی hover (::after).
+   شدت هرسه با اسلایدرهای کشوی تنظیمات از طریق --shine-i/--glow-i زنده تنظیم می‌شوند. */
+.g::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;
+  background:radial-gradient(420px circle at var(--mx) var(--my),rgba(231,205,134,var(--shine-i)),transparent 60%),
+    linear-gradient(140deg,rgba(var(--sheen-rgb,245,240,224),.16),transparent 38%,transparent 70%,rgba(201,168,76,.10));
+  -webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);-webkit-mask-composite:xor;
+  mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);mask-composite:exclude;padding:1px}
+.g::after{content:'';position:absolute;top:-60%;right:-25%;width:60%;height:200%;pointer-events:none;z-index:1;
+  background:linear-gradient(90deg,transparent,rgba(var(--sheen-rgb,245,240,224),calc(.16 * var(--shine-i) * 2)),rgba(231,205,134,.10),transparent);
+  transform:rotate(18deg);transition:transform .9s ease}
+.g:hover::after{transform:rotate(18deg) translateX(-240%)}
+.g .sheen{position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .45s;z-index:1;
+  background:radial-gradient(520px circle at var(--mx) var(--my),rgba(var(--sheen-rgb,245,240,224),calc(.22 * var(--shine-i))),rgba(52,211,153,calc(.10 * var(--shine-i))) 40%,transparent 66%)}
+.g:hover .sheen,.g:focus-within .sheen{opacity:1}
+.g:hover,.g:focus-within{border-color:rgba(201,168,76,.45);
+  box-shadow:0 8px 32px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.06),
+    0 0 0 1px rgba(201,168,76,calc(.30 * var(--glow-i))),
+    0 30px 80px -50px rgba(56,189,248,var(--glow-i)),
+    0 0 calc(60px * var(--glow-i)) -18px rgba(231,205,134,calc(.55 * var(--glow-i)))}
+/* محتوای داخلی کارت‌ها باید بالای شبه‌المنت‌ها بنشیند */
+.g>*{position:relative;z-index:2}
+
+/* ===== دسترس‌پذیری: لینک پرش + focus-visible طلایی (بخش ۱۰ مگاپرامپت) ===== */
+.skip{position:absolute;right:16px;top:-100px;z-index:9999;background:var(--gd);color:#131a25;
+  font-weight:700;padding:12px 20px;border-radius:0 0 14px 14px;text-decoration:none;transition:top .25s}
+.skip:focus{top:0}
+:focus-visible{outline:3px solid var(--gdl);outline-offset:3px;border-radius:10px}
+
+/* ===== پس‌زمینه‌ی زنده (بخش ۵ مگاپرامپت) — فقط داخل صفحه‌ی ورود/لندینگ تزریق می‌شود ===== */
+.bgfx-bg{position:fixed;inset:0;z-index:-3;pointer-events:none;
+  background:radial-gradient(1100px 720px at 82% -8%,rgba(56,189,248,.16),transparent 62%),
+    radial-gradient(900px 620px at 8% 12%,rgba(201,168,76,.14),transparent 60%),
+    radial-gradient(1200px 900px at 50% 108%,rgba(30,41,59,.65),transparent 65%);
+  background-size:180% 180%,170% 170%,200% 200%;
+  animation:bgfxDrift calc(34s / var(--bg-speed)) ease-in-out infinite alternate}
+html[data-theme="light"] .bgfx-bg{
+  background:radial-gradient(1100px 720px at 82% -8%,rgba(24,88,111,.20),transparent 62%),
+    radial-gradient(900px 620px at 8% 12%,rgba(201,168,76,.22),transparent 60%),
+    radial-gradient(1200px 900px at 50% 108%,rgba(52,187,211,.20),transparent 65%);
+  background-size:180% 180%,170% 170%,200% 200%}
+@keyframes bgfxDrift{0%{background-position:82% -8%,8% 12%,50% 108%}50%{background-position:64% 6%,26% 2%,38% 96%}100%{background-position:92% 2%,0% 22%,62% 112%}}
+.bgfx-grid{position:fixed;inset:0;z-index:-3;pointer-events:none;opacity:.32;
+  background-image:linear-gradient(rgba(245,240,224,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(245,240,224,.045) 1px,transparent 1px);
+  background-size:72px 72px;mask-image:radial-gradient(circle at 50% 30%,#000 0%,transparent 78%);
+  animation:bgfxGridPan calc(42s / var(--bg-speed)) linear infinite}
+html[data-theme="light"] .bgfx-grid{background-image:linear-gradient(rgba(13,28,53,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(13,28,53,.06) 1px,transparent 1px)}
+@keyframes bgfxGridPan{to{background-position:72px 144px,144px 72px}}
+.bgfx-aurora{position:fixed;inset:-20% -10%;z-index:-3;pointer-events:none;filter:blur(60px);opacity:.5;mix-blend-mode:screen;
+  background:conic-gradient(from 120deg at 30% 40%,rgba(56,189,248,.28),transparent 30%,rgba(201,168,76,.22) 55%,transparent 78%),
+    conic-gradient(from -40deg at 72% 62%,rgba(30,41,59,.5),transparent 42%,rgba(231,205,134,.16) 70%,transparent 92%);
+  animation:bgfxAuroraSpin calc(48s / var(--bg-speed)) linear infinite}
+html[data-theme="light"] .bgfx-aurora{mix-blend-mode:multiply;opacity:.28}
+@keyframes bgfxAuroraSpin{to{transform:rotate(360deg) scale(1.08)}}
+.bgfx-beam{position:fixed;top:-30%;width:38vw;height:170%;z-index:-3;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(231,205,134,.10),transparent);filter:blur(14px);transform:rotate(14deg);opacity:.65;
+  animation:bgfxBeamSweep calc(26s / var(--bg-speed)) ease-in-out infinite}
+.bgfx-beam.b2{animation-duration:calc(38s / var(--bg-speed));animation-delay:-11s;background:linear-gradient(90deg,transparent,rgba(52,187,211,.10),transparent)}
+@keyframes bgfxBeamSweep{0%{right:-45vw}50%{right:100vw}100%{right:-45vw}}
+.bgfx-orb{position:fixed;border-radius:50%;filter:blur(90px);z-index:-3;opacity:.5;pointer-events:none;
+  animation:bgfxFloat calc(18s / var(--bg-speed)) ease-in-out infinite,bgfxPulse calc(11s / var(--bg-speed)) ease-in-out infinite}
+.bgfx-orb.a{width:420px;height:420px;background:rgba(56,189,248,.4);top:-90px;left:-80px}
+.bgfx-orb.b{width:360px;height:360px;background:rgba(201,168,76,.28);bottom:6%;right:-60px;animation-delay:-7s}
+.bgfx-orb.c{width:300px;height:300px;background:rgba(30,41,59,.6);top:42%;left:38%;animation-delay:-4s;opacity:.35}
+@keyframes bgfxFloat{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(30px,-40px,0)}}
+@keyframes bgfxPulse{0%,100%{opacity:.42}50%{opacity:.62}}
+#bgfx-fx{position:fixed;inset:0;z-index:-3;pointer-events:none;opacity:.7}
+@media(max-width:720px){.bgfx-beam,.bgfx-orb.c{display:none}.bgfx-aurora{filter:blur(40px);opacity:.4}}
+html[data-anim="off"] .bgfx-bg,html[data-anim="off"] .bgfx-grid,html[data-anim="off"] .bgfx-aurora,html[data-anim="off"] .bgfx-orb{animation:none!important}
+html[data-anim="off"] .bgfx-beam,html[data-anim="off"] #bgfx-fx{display:none!important}
+html[data-anim="off"] *{animation-duration:.001ms!important}
+@media(prefers-reduced-motion:reduce){.bgfx-bg,.bgfx-grid,.bgfx-aurora,.bgfx-orb,.bgfx-beam{animation:none!important}}
+
+/* ===== دکل شناور واحد پایین-چپ =====
+   عمداً left صریح، نه inset-inline-start: این اپ RTL است (dir=rtl) و inset-inline-start
+   در RTL معادل «راست بصری» می‌شود، نه چپ — همان اشکالی که باعث می‌شد این دکمه‌ها سمت
+   راست دیده شوند با اینکه قرار بود «سمت چپ صفحه» باشند.
+   طبق درخواست کاربر، همه‌ی دکمه‌های شناور (راهنما، تنظیمات نمایش، خانه) در یک ستون
+   واحد پایین-چپ جمع شده‌اند تا نه با هم و نه با محتوای صفحه تداخل نداشته باشند —
+   از بالا به پایین: راهنما (طلایی) → تنظیمات نمایش (پالت) → خانه. */
+.floatdock{position:fixed;left:18px;bottom:18px;z-index:9990;display:flex !important;flex-direction:column;gap:10px;align-items:flex-start}
+#guideDockBtn, #guidePanel {display:none !important}
+.dock-btn{width:46px;height:46px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;position:relative;
+  cursor:pointer;font-family:inherit;font-size:18px;background:rgba(6,13,24,.9);border:1px solid var(--bd);
+  color:var(--gdl);box-shadow:0 18px 40px -22px rgba(0,0,0,.7)}
+.dock-btn:hover{color:var(--gd);border-color:var(--gd)}
+html[data-theme="light"] .dock-btn{background:rgba(255,255,255,.9)}
+/* دکمه‌ی طلاییِ گوشه‌ی چپ‌پایین (دستیار «دانا») — قبلاً یک درخشش ثابت و پررنگ
+   داشت («انگار چراغی از پشتش روشن است»)؛ حالا یک تنفسِ آرام و کم‌نورتر دارد،
+   مستقل از --glow-gd مشترک (که جاهای دیگر هاور/نشان‌ها از آن استفاده می‌کنند
+   و نباید همه‌شان کم‌نور شوند). data-anim="off" همین را هم خاموش می‌کند
+   (قاعده‌ی سراسری موجود). */
+.dock-btn.gold{background:linear-gradient(135deg,var(--em7),var(--gd));color:#1a1200;border-color:transparent;
+  animation:dockGoldPulse 3.6s ease-in-out infinite}
+@keyframes dockGoldPulse{
+  0%,100%{box-shadow:0 0 9px rgba(212,175,90,.22),0 0 24px rgba(212,175,90,.07)}
+  50%{box-shadow:0 0 15px rgba(212,175,90,.38),0 0 36px rgba(212,175,90,.13)}
+}
+.dock-badge{position:absolute;top:-4px;left:-4px;background:var(--dn);color:#fff;font-size:10px;font-weight:800;
+  min-width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0 3px}
+.dock-badge:empty{display:none}
+/* بالای کل دکل باز می‌شود (نه فقط بالای دکمه‌ی خودش وسط ستون) تا هرگز دکمه‌های دکل را نپوشاند.
+   دکل حالا فقط دو دکمه دارد: راهنما (بالا) و منو (پایین) — همین‌جا هم آفست بر همان مبنا حساب شده. */
+.settdrawer{position:fixed;left:18px;bottom:calc(18px + 2*46px + 1*10px + 14px);z-index:970;width:min(320px,calc(100vw - 36px));
+  padding:18px;display:grid;gap:14px;transform-origin:bottom left;background:rgba(11,17,32,.97);
+  backdrop-filter:blur(16px) saturate(140%);-webkit-backdrop-filter:blur(16px) saturate(140%);
+  border:1px solid var(--bd);border-radius:18px;box-shadow:0 18px 40px -22px rgba(0,0,0,.7);
+  transform:translateY(12px) scale(.96);opacity:0;visibility:hidden;pointer-events:none;transition:.3s, visibility 0s .3s;
+  max-height:calc(100vh - 150px);overflow-y:auto}
+/* پاپ‌آور دکمه‌ی «منو»: خانه/پروفایل/تنظیمات ظاهری — درست بالای همان دکمه، ستون‌مانند مثل settdrawer */
+.dockmenu{position:absolute;left:0;bottom:calc(100% + 10px);z-index:971;width:180px;display:grid;gap:4px;padding:8px;
+  background:rgba(11,17,32,.97);backdrop-filter:blur(16px) saturate(140%);-webkit-backdrop-filter:blur(16px) saturate(140%);
+  border:1px solid var(--bd);border-radius:14px;box-shadow:0 18px 40px -22px rgba(0,0,0,.7);
+  transform:translateY(8px) scale(.96);opacity:0;visibility:hidden;pointer-events:none;transition:.2s, visibility 0s .2s}
+html[data-theme="light"] .dockmenu{background:rgba(255,255,255,.97)}
+.dockmenu.open{transform:none;opacity:1;visibility:visible;pointer-events:auto;transition:.2s}
+.dockmenu-item{display:flex;align-items:center;gap:8px;width:100%;text-align:right;font-family:inherit;font-size:13px;
+  padding:9px 10px;border-radius:9px;cursor:pointer;background:none;border:0;color:var(--th)}
+.dockmenu-item:hover{background:rgba(231,205,134,.12);color:var(--gdl)}
+.dockmenu-item .ic{width:16px;display:inline-grid;place-items:center;flex:0 0 auto}
+#dockMenuBtn{position:relative}
+html[data-theme="light"] .settdrawer{background:rgba(255,255,255,.96)}
+.settdrawer.open{transform:none;opacity:1;visibility:visible;pointer-events:auto;transition:.3s}
+.settdrawer h4{font-size:13px;color:var(--th);margin:0}
+.sd-row{display:grid;gap:6px}
+.sd-row .lbl{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--tm)}
+.sd-row .lbl output{font-weight:700;color:var(--gdl);font-size:11.5px}
+.settdrawer input[type=range]{width:100%;accent-color:var(--gd);height:20px;cursor:pointer}
+.sd-toggle{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px;color:var(--tm)}
+.sd-tgl{position:relative;width:46px;height:26px;flex:0 0 auto;border-radius:99px;cursor:pointer;
+  background:rgba(255,255,255,.12);border:1px solid var(--bd);transition:.25s}
+.sd-tgl::after{content:'';position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:50%;background:var(--td);transition:.25s}
+.sd-tgl[aria-pressed="true"]{background:linear-gradient(135deg,var(--em7),var(--gd))}
+.sd-tgl[aria-pressed="true"]::after{right:calc(100% - 22px);background:#fff}
+.settdrawer .sd-reset{justify-self:start;font-size:11.5px;color:var(--td);background:none;border:0;cursor:pointer;font-family:inherit;text-decoration:underline;min-height:30px;padding:4px 8px;display:inline-flex;align-items:center}
+.sd-fs-steps{display:flex;gap:6px;flex-wrap:wrap}
+.sd-fs-btn{flex:1 1 auto;font-family:inherit;font-size:11px;padding:6px 4px;border-radius:9px;cursor:pointer;
+  background:rgba(255,255,255,.06);border:1px solid var(--bd);color:var(--tm)}
+.sd-fs-btn.on{background:linear-gradient(135deg,var(--em7),var(--gd));color:#111;border-color:transparent;font-weight:700}
+/* .sd-num-btn («۱۲۳ لاتین»/«۱۲۳ فارسی») کلاسِ کاملاً جدایی از .sd-fs-btn بود
+   و هیچ استایلی نداشت — دکمه‌ی خامِ سفیدِ مرورگر می‌گرفت، وسط بقیه‌ی کشوی
+   تیره‌ی تنظیمات. همان الگوی .sd-fs-btn را می‌گیرد. */
+.sd-num-btn{flex:1 1 auto;font-family:inherit;font-size:11px;padding:6px 4px;border-radius:9px;cursor:pointer;
+  background:rgba(255,255,255,.06);border:1px solid var(--bd);color:var(--tm)}
+.sd-num-btn.on{background:linear-gradient(135deg,var(--em7),var(--gd));color:#111;border-color:transparent;font-weight:700}
+.themebtn{display:inline-grid;place-items:center;width:38px;height:38px;border-radius:12px;cursor:pointer;
+  background:rgba(245,240,224,.06);border:1px solid var(--bd);color:var(--th);font-size:16px}
+html[data-theme="light"] .themebtn{background:rgba(9,19,36,.06)}
+@media(max-width:700px){
+  .floatdock{left:10px;bottom:10px;gap:8px}
+  .dock-btn{width:40px;height:40px;font-size:16px}
+  .settdrawer{left:10px;bottom:calc(10px + 2*40px + 1*8px + 12px);width:calc(100vw - 20px)}
+  .dockmenu{width:min(200px,calc(100vw - 20px))}
+}
+
+/* ===== شاین/درخشش پرمیوم ===== */
+.shine{position:relative;overflow:hidden}
+.shine::after{content:'';position:absolute;inset:0;background:var(--shine);background-size:220% 100%;
+background-position:120% 0;pointer-events:none;mix-blend-mode:overlay;opacity:.9}
+.shine.anim::after{animation:shineSweep 3.6s ease-in-out infinite}
+@keyframes shineSweep{0%{background-position:130% 0}55%,100%{background-position:-40% 0}}
+.glow-gd{box-shadow:var(--glow-gd)!important}
+.glow-ok{box-shadow:var(--glow-ok)!important}
+
+/* ===== هدر/فوتر سراسری — بیرون از #root، روی هر صفحه (ورود و پس از ورود) یکسان =====
+   الگو از رفرنس مِدسِنتر: نوار شیشه‌ای شناور با گوشه‌ی گرد، نه یک نوار تمام‌عرض. */
+#ghdr{position:sticky;top:0;z-index:950;padding:14px 18px 0;transition:transform .28s ease}
+#ghdr.hdr-hide{transform:translateY(-130%)}
+.ghdr-in{max-width:1180px;margin:0 auto;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;
+  gap:14px;flex-wrap:wrap;border-radius:20px;background:rgba(6,13,24,.86);border:1px solid var(--bd);
+  backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);
+  box-shadow:0 18px 40px -22px rgba(0,0,0,.7)}
+.ghdr-brand{display:flex;align-items:center;gap:9px;cursor:pointer}
+.ghdr-brand b{font-family:var(--sf);font-size:14px;color:var(--th);font-weight:700}
+.ghdr-nav{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.ghdr-nav a{font-size:12.5px;color:var(--tm);text-decoration:none;padding:8px 14px;border-radius:12px;transition:.2s}
+.ghdr-nav a:hover{color:var(--th);background:rgba(245,240,224,.06)}
+.ghdr-cta{display:flex;align-items:center;gap:8px}
+@media(max-width:640px){#ghdr{padding:10px 10px 0}.ghdr-in{padding:8px 12px}.ghdr-cta{display:none}}
+#gftr{background:rgba(11,17,32,.55);border-top:1px solid var(--bd);position:relative;z-index:2;padding-top:8px}
+.gftr-in{max-width:1180px;margin:0 auto;padding:30px 22px 20px;display:grid;
+  grid-template-columns:1.4fr 1fr 1fr;gap:26px}
+.gftr-brand{display:flex;align-items:flex-start;gap:10px}
+.gftr-brand b{display:block;font-size:13px;color:var(--th);font-weight:700;margin-bottom:4px}
+.gftr-brand span{display:block;font-size:11.5px;color:var(--td);max-width:340px;line-height:1.8}
+.gftr-col b{display:block;font-size:11.5px;color:var(--gdl);letter-spacing:.3px;margin-bottom:12px}
+.gftr-col{display:flex;flex-direction:column;gap:9px}
+.gftr-col a{font-size:12px;color:var(--td);text-decoration:none;transition:.2s;min-height:32px;display:inline-flex;align-items:center;padding:2px 4px}
+.gftr-col a:hover{color:var(--th)}
+.gftr-cr{max-width:1180px;margin:16px auto 0;padding:16px 22px 22px;border-top:1px solid var(--bd);
+  display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;font-size:11px;color:var(--td)}
+@media(max-width:760px){.gftr-in{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.gftr-in{grid-template-columns:1fr;text-align:center}.gftr-brand{flex-direction:column;align-items:center}.gftr-cr{flex-direction:column;text-align:center}}
+
+/* ===== صفحه‌ی خانه‌ی عمومی — امکانات سامانه ===== */
+.pfgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-top:14px}
+.pfcard{padding:16px;display:flex;flex-direction:column;gap:6px;transition:transform .35s,border-color .35s;border-radius:var(--rl)}
+.pfcard:hover{transform:translateY(-4px);border-color:var(--gd)}
+.pfic{font-size:20px;color:var(--gdl)}
+.pfcard b{font-size:13.5px;color:var(--th)}
+.pfcard span{font-size:11.5px;color:var(--td);line-height:1.7}
+
+/* لَندینگ — سبک برگرفته از رفرنس مِدسِنتر: پیل، چشم‌انداز، مراحل فرآیند */
+.lpill{display:inline-flex;align-items:center;gap:9px;padding:7px 15px;border-radius:999px;
+  background:rgba(201,168,76,.12);border:1px solid var(--bd);font-size:11.5px;color:var(--gdl)}
+.lpill .ldot{width:7px;height:7px;border-radius:50%;background:var(--em5);box-shadow:0 0 10px var(--em5)}
+.leyebrow{display:block;color:var(--gdl);font-size:11px;letter-spacing:3px;font-weight:700;margin-bottom:8px}
+.lsteps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;list-style:none;counter-reset:step}
+.lstep{padding:20px;counter-increment:step}
+.lstep b{font-size:26px;font-weight:800;color:rgba(201,168,76,.42);display:block;line-height:1}
+.lstep h4{margin:9px 0 6px;font-size:13.5px;color:var(--th)}
+.lstep p{font-size:11.5px;color:var(--tm);line-height:1.8}
+@media(max-width:900px){.lsteps{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.lsteps{grid-template-columns:1fr}}
+.lcta-band{padding:38px 30px;text-align:center;
+  background:linear-gradient(150deg,rgba(24,88,111,.28),rgba(201,168,76,.10))}
+.lgrad{background:linear-gradient(110deg,var(--gdl),var(--gd) 35%,#fff8e2 60%,var(--gd));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* ===== LOGIN ===== */
+#login{position:fixed;inset:0;z-index:900;display:flex;align-items:center;justify-content:center;padding:24px}
+.lwrap{width:100%;max-width:920px;display:grid;grid-template-columns:1.05fr 1fr;overflow:hidden}
+.lfeat{padding:40px 36px;background:linear-gradient(160deg,rgba(212,175,90,.12),rgba(255,255,255,.02));
+border-left:1px solid var(--bd);display:flex;flex-direction:column;justify-content:center}
+.lfeat h2{font-family:var(--sf);font-size:19px;color:var(--th);margin-bottom:6px}
+.lfeat>p{font-size:12.5px;color:var(--td);margin-bottom:22px}
+.lflist{display:flex;flex-direction:column;gap:12px}
+.lfitem{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--rs);
+background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);transition:.2s}
+.lfitem:hover{background:rgba(212,175,90,.09);border-color:var(--bd);transform:translateX(-3px)}
+.lfico{width:36px;height:36px;border-radius:10px;flex:none;display:flex;align-items:center;justify-content:center;
+background:linear-gradient(135deg,var(--gdl),var(--gd) 60%,var(--gdd));font-size:16px;color:var(--em9)}
+.lfitem b{font-size:13.5px;color:var(--th);display:block}
+.lfitem span{font-size:11.5px;color:var(--td)}
+.lcard{width:100%;max-width:420px;padding:38px 34px}
+.lwrap .lcard{max-width:none;display:flex;flex-direction:column;justify-content:center}
+.lbrand{text-align:center;margin-bottom:26px}
+.lmark{width:60px;height:60px;border-radius:16px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;
+background:linear-gradient(135deg,var(--gdl),var(--gd) 55%,var(--gdd));font-size:28px;color:var(--em9);
+box-shadow:0 6px 26px rgba(212,175,90,.42)}
+.lbrand h1{font-family:var(--sf);font-size:21px;color:var(--th);margin-bottom:4px;font-weight:700;
+line-height:1.6}
+.lbrand p{font-size:13px;color:var(--gdl)}
+.fg{margin-bottom:15px}
+.fg label{display:block;font-size:13px;color:var(--tm);margin-bottom:6px;font-weight:600}
+.fg input,.fg select,.fg textarea{width:100%;padding:11px 15px;border-radius:var(--rs);background:rgba(0,0,0,.25);
+border:1px solid var(--bd);color:var(--th);font-family:inherit;font-size:14.5px}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--gd)}
+.fg select option{background:#0a1a3d;color:var(--th)}
+/* رفع باگ سراسری: ده‌ها <select> در سرتاسر اپ بدون کلاس (نه .sel، نه داخل .fg)
+   نوشته شده بودند و بدون این قاعده، استایل خامِ مرورگر (پس‌زمینه‌ی سفید/متن
+   سیاه) می‌گرفتند — روی تمِ تیره به‌شدت به چشم می‌آمد (مثلاً دراپ‌داون انتصاب
+   در صفحه‌ی «حوزه‌ی مدیریت»). اختصاصیتِ این قاعده از .sel/.fg select/.ysel select
+   کمتر است، پس همه‌جا که آن‌ها هم هستند دست‌نخورده می‌مانند. */
+select{background:rgba(0,0,0,.25);border:1px solid var(--bd);color:var(--th);
+font-family:inherit;font-size:13px;padding:8px 12px;border-radius:var(--rs);cursor:pointer}
+select:focus{outline:none;border-color:var(--gd)}
+select option{background:#0a1a3d;color:var(--th)}
+html[data-theme="light"] select option{background:#fff;color:var(--th)}
+/* همان باگ، همان دلیل: ده‌ها <input> متنی بدون کلاس (نه .fg، نه هیچ کلاس دیگر)
+   در سرتاسر اپ نوشته شده بودند و استایل خامِ مرورگر می‌گرفتند. چک‌باکس/رادیو/
+   رنج/فایل عمداً بیرون گذاشته شدند چون ظاهر بومی خودشان لازم است یا از قبل
+   جدا استایل خورده‌اند (input[type=file] بالاتر). */
+:where(input:not([type]),input[type="text"],input[type="search"],input[type="email"],
+input[type="tel"],input[type="url"],input[type="password"],input[type="number"],
+input[type="date"]){background:rgba(0,0,0,.25);border:1px solid var(--bd);color:var(--th);
+font-family:inherit;font-size:13px;padding:8px 12px;border-radius:var(--rs)}
+:where(input:not([type]),input[type="text"],input[type="search"],input[type="email"],
+input[type="tel"],input[type="url"],input[type="password"],input[type="number"],
+input[type="date"]):focus{outline:none;border-color:var(--gd)}
+input::placeholder{color:var(--td);opacity:1}
+/* input[type=file]: مرورگر برای دکمه‌ی «Choose File»/متن «No file chosen» رنگ‌بندی
+   بومی سیستم‌عامل را می‌گذارد که روی تمِ تیره یک بلوکِ سفیدِ ناهمخوان از آب درمی‌آید
+   (مثلاً «عکس پروفایل» در صفحه‌ی پروفایل). color-scheme به مرورگر می‌گوید کنترل‌های
+   خودش (ازجمله همین متن، که چون از UI مرورگر می‌آید با CSS/ترجمه قابل تغییر نیست)
+   را با پالت تیره بکشد؛ ::file-selector-button هم ظاهرِ خودِ دکمه را با تمِ اپ هماهنگ می‌کند. */
+:root:not([data-theme="light"]) input[type="file"],
+html[data-theme="dark"] input[type="file"]{color-scheme:dark;color:var(--tm);font-size:12.5px}
+input[type="file"]::file-selector-button{background:var(--subpanel);border:1px solid var(--bd);color:var(--th);
+border-radius:var(--rs);padding:7px 14px;font-family:inherit;font-size:12.5px;cursor:pointer;margin-left:10px;transition:.2s}
+input[type="file"]::file-selector-button:hover{border-color:var(--gd)}
+.btn{padding:11px 22px;border-radius:22px;border:none;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:.2s;position:relative;overflow:hidden}
+.btn-g{background:linear-gradient(135deg,var(--gdl),var(--gd) 55%,var(--gdd));color:var(--em9);background-size:180% 180%;background-position:0 0}
+.btn-g::after{content:'';position:absolute;inset:0;background:var(--shine);background-size:220% 100%;background-position:130% 0;transition:background-position .55s ease}
+.btn-g:hover{transform:translateY(-1px);box-shadow:var(--glow-gd);background-position:60% 40%}
+.btn-g:hover::after{background-position:-30% 0}
+.btn-g:active{transform:translateY(0)}
+.btn-o{background:none;color:var(--td);border:1px solid var(--bd)}
+.btn-o:hover{color:var(--th);border-color:var(--gd)}
+.btn-ok{background:rgba(62,185,207,.12);color:var(--ok,#3eb9cf);border:1px solid rgba(62,185,207,.4)}
+.btn-ok:hover{background:rgba(62,185,207,.2);border-color:var(--ok,#3eb9cf)}
+.btn-sm{padding:6px 14px;font-size:12.5px}
+.btn-full{width:100%}
+.demo-users{margin-top:18px;padding-top:16px;border-top:1px solid var(--bd)}
+.demo-users .dtitle{font-size:11.5px;color:var(--td);margin-bottom:9px;text-align:center}
+.duser{display:flex;justify-content:space-between;padding:7px 12px;border-radius:8px;font-size:13px;
+cursor:pointer;transition:.15s;margin-bottom:4px;background:rgba(0,0,0,.18)}
+.duser:hover{background:rgba(212,175,90,.12)}
+.duser b{color:var(--gdl);font-weight:600}
+/* جست‌وجو + کارت مستقل برای هر بیمارستان در فهرست ورود سریع */
+.dsearch{width:100%;padding:8px 12px;border-radius:9px;font-size:12.5px;font-family:inherit;
+background:rgba(0,0,0,.25);border:1px solid var(--bd);color:var(--th);margin-bottom:10px}
+.dsearch:focus{outline:none;border-color:var(--gd)}
+.dhosp-ic{color:var(--gdl);font-size:13px}
+/* موزاییک: کاشی‌های جمع‌شده در شبکه؛ کاشی باز تمام عرض ردیف را می‌گیرد */
+.dmosaic{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
+.dtile{border:1px solid var(--bd);border-radius:11px;background:rgba(0,0,0,.10);overflow:hidden}
+.dtile.open{grid-column:1/-1;border-color:var(--gd);background:rgba(0,0,0,.20)}
+.dtile-hd{display:flex;align-items:center;gap:7px;width:100%;padding:10px 11px;cursor:pointer;
+background:none;border:none;font-family:inherit;text-align:right;transition:.15s}
+.dtile-hd:hover{background:rgba(212,175,90,.10)}
+.dtile.open .dtile-hd{border-bottom:1px solid var(--bd)}
+.dtile-hd b{color:var(--th);font-size:12.5px;font-weight:700;flex:1}
+.dtile-cv{color:var(--gdl);font-size:10px}
+.dtile-bd{padding:8px 9px 5px}
+.dempty{font-size:12px;color:var(--td);text-align:center;padding:14px}
+
+/* ===== صفحه‌ی ورودی عمومی + صفحه‌ی اختصاصی هر مرکز ===== */
+/* صفحه‌ی ورودی بلند است، پس برخلاف کارت ورود ساده باید اسکرول بخورد */
+#login.lscroll{position:relative;inset:auto;min-height:100vh;display:block;padding:0}
+.lpage{max-width:1020px;margin:0 auto;padding:26px 22px 56px}
+/* صفحه‌ی اختصاصی مرکز. تا وقتی یک ستونِ عمودیِ سمت‌ها بود، ۶۰۰ پیکسل درست بود؛
+   حالا که هم خدمات و هم سمت‌ها شبکه‌ای و کنارِ هم‌اند، در ۶۰۰ پیکسل بیشتر از دو
+   ستون جا نمی‌شد و «کنارِ هم» عملاً معنایی نداشت. */
+.lpage.narrow{max-width:880px}
+.lpage .lcard{max-width:none;margin:0 auto}
+
+/* صفحه‌ی اختصاصی مرکز درمانی — نمایش متعادل و بدون فضای خالی نامطلوب */
+#login.hosp-portal{
+  position:relative;
+  inset:auto;
+  min-height:calc(100dvh - var(--ghdrh, 78px));
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  padding:24px 18px 48px;
+  box-sizing:border-box;
+  transition:padding .3s ease;
+}
+#login.hosp-portal.has-roles{
+  justify-content:flex-start;
+  padding-top:16px;
+  padding-bottom:70px;
+}
+#login.hosp-portal .lpage.narrow{
+  width:100%;
+  max-width:880px;
+  padding:0;
+  margin:0 auto;
+}
+#login.hosp-portal .lcard{
+  width:100%;
+  max-width:100%;
+  padding:32px 30px;
+  margin:0 auto;
+  box-sizing:border-box;
+}
+#loginZone{
+  scroll-margin-top:calc(var(--ghdrh, 78px) + 20px);
+}
+/* قاب طلایی شاخص روی کارت‌های کلیدی — نه حاشیه‌ی محو پیش‌فرض */
+.gold{border:1.5px solid var(--gd)!important;
+box-shadow:0 10px 40px rgba(0,0,0,.42),0 0 0 1px rgba(212,175,90,.14),inset 0 1px 0 rgba(255,255,255,.07)!important}
+.ltop{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:22px;flex-wrap:wrap}
+.ltop-brand{display:flex;align-items:center;gap:11px}
+.ltop-brand b{display:block;font-family:var(--sf);font-size:15px;color:var(--th);font-weight:700}
+.ltop-brand span{display:block;font-size:11.5px;color:var(--gdl)}
+.ltop-lnk{font-size:12.5px;color:var(--td);text-decoration:none;padding:6px 12px;border-radius:20px;
+border:1px solid var(--bd);transition:.2s}
+.ltop-lnk:hover{color:var(--gdl);border-color:var(--gd)}
+.lmark.sm{width:42px;height:42px;border-radius:12px;margin:0;font-size:20px}
+/* لوگوی خودِ بیمارستان جای نشان طلایی می‌نشیند؛ زمینه‌ی روشن تا لوگوهای تیره دیده شوند */
+.lmark.img{background:#fff;padding:7px}
+.lmark.img img{width:100%;height:100%;object-fit:contain}
+.lhero{padding:34px 32px;margin-bottom:30px;text-align:center}
+.lhero h1{font-family:var(--sf);font-size:27px;line-height:1.55;color:var(--th);font-weight:700;
+margin-bottom:10px}
+.lhero p{font-size:13.5px;color:var(--tm);max-width:640px;margin:0 auto;line-height:1.9}
+.lsec{margin-bottom:30px}
+.lsec-t{font-family:var(--sf);font-size:18.5px;color:var(--th);font-weight:700;margin-bottom:5px;
+display:flex;align-items:center;gap:9px}
+.lsec-t::before{content:'';width:4px;height:19px;border-radius:3px;flex:none;
+background:linear-gradient(180deg,var(--gdl),var(--gdd))}
+.lsec-s{font-size:12.5px;color:var(--td);margin-bottom:15px;line-height:1.85}
+/* کارت‌های خدمات بدون احراز هویت */
+.svcgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:12px}
+.svccard{display:block;width:100%;text-align:right;font-family:inherit;cursor:pointer;
+padding:17px 15px;border-radius:var(--rs);background:rgba(255,255,255,.045);
+border:1.5px solid var(--bds);transition:.22s;text-decoration:none}
+.svccard:hover{border-color:var(--gd);background:rgba(212,175,90,.09);transform:translateY(-3px);
+box-shadow:0 10px 26px rgba(0,0,0,.35)}
+.svccard-ic{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+background:linear-gradient(135deg,var(--gdl),var(--gd) 60%,var(--gdd));font-size:17px;color:var(--em9);margin-bottom:11px}
+.svccard b{display:block;font-size:13.5px;color:var(--th);font-weight:700;line-height:1.6;margin-bottom:3px}
+.svccard span{display:block;font-size:11.5px;color:var(--td);line-height:1.7}
+/* انتخاب مرکز */
+.hpick-card{padding:20px 18px}
+.hpgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:9px;max-height:430px;overflow-y:auto}
+.hpitem{display:flex;align-items:center;gap:10px;width:100%;padding:11px 12px;cursor:pointer;text-align:right;
+border-radius:11px;background:rgba(0,0,0,.16);border:1.5px solid var(--bds);font-family:inherit;transition:.18s}
+.hpitem:hover{border-color:var(--gd);background:rgba(212,175,90,.10);transform:translateY(-2px)}
+.hpitem b{font-size:12.5px;color:var(--th);font-weight:700;line-height:1.6;flex:1}
+.hplogo{width:34px;height:34px;flex:none;border-radius:8px;background:#fff;display:flex;align-items:center;
+justify-content:center;color:var(--gdd);font-size:15px;overflow:hidden;padding:3px}
+.hplogo img{width:100%;height:100%;object-fit:contain}
+@media(max-width:640px){
+  .lpage{padding:18px 14px 40px}
+  .lhero{padding:26px 20px}
+  .lhero h1{font-size:21px}
+  #login.hosp-portal{padding:12px 10px 36px;min-height:calc(100dvh - var(--ghdrh, 64px))}
+  #login.hosp-portal .lcard{padding:20px 14px;border-radius:20px}
+  #login.hosp-portal .lbrand{margin-bottom:18px}
+  #login.hosp-portal .lbrand h1{font-size:18px;margin-bottom:2px}
+  #login.hosp-portal .lbrand p{font-size:12px}
+  #login.hosp-portal .lmark{width:50px;height:50px;font-size:24px;border-radius:14px;margin-bottom:10px}
+  #login.hosp-portal .svcbar{grid-template-columns:repeat(2,1fr);gap:9px}
+  #login.hosp-portal .svcbar-item{padding:11px 9px;font-size:11.5px;min-height:50px;border-radius:14px;gap:8px}
+  #login.hosp-portal .svcbar-ic{width:28px;height:28px;font-size:13px}
+  #login.hosp-portal .lcard-sep{margin:18px 0 14px;font-size:12px}
+  #login.hosp-portal .rolecard-hd{padding:14px 12px;gap:6px}
+  #login.hosp-portal .rolecard-hd b{font-size:12.5px}
+  #login.hosp-portal .rolecard-hd span{font-size:11px}
+  #login.hosp-portal .role-ic{width:32px;height:32px;font-size:14px}
+  #login.hosp-portal .usermosaic{grid-template-columns:repeat(2,1fr);gap:6px;padding:0 12px 12px}
+  #login.hosp-portal .usertile{padding:8px 10px;font-size:11.5px}
+}
+@media(max-width:360px){
+  #login.hosp-portal .svcbar{grid-template-columns:1fr;gap:8px}
+}
+
+/* موزاییکِ سمت‌ها — ردیف‌ها بر اساس سلسله‌مراتب زیر هم؛ داخل هر ردیف، در صورت چندنفره بودن،
+   کاربران به‌صورت موزاییکی کنار هم باز می‌شوند. */
+/* موزاییک سمت‌ها — دقیقاً همان استایل کارت‌های ویژگی (pfgrid/pfcard) صفحه‌ی اصلی: کنار هم، نه زیر هم */
+.rolegrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media (max-width:900px){ .rolegrid{grid-template-columns:repeat(2,1fr)} }
+@media (max-width:520px){ .rolegrid{grid-template-columns:1fr} }
+.rolecard{overflow:hidden;transition:transform .35s cubic-bezier(.2,.7,.3,1),border-color .35s,box-shadow .35s;border-radius:var(--rl)}
+.rolecard:hover{transform:translateY(-5px);border-color:var(--gd);box-shadow:0 14px 34px -12px rgba(0,0,0,.5),var(--glow-gd)}
+.rolecard.open{grid-column:1/-1;border-color:var(--gd);box-shadow:var(--glow-gd)}
+.rolecard-hd{display:flex;flex-direction:column;align-items:flex-start;gap:8px;width:100%;padding:18px 16px;
+  cursor:pointer;background:none;border:none;font-family:inherit;text-align:right}
+.rolecard-hd b{color:var(--th);font-size:13.5px;font-weight:700}
+.rolecard-hd span{font-size:11.5px;color:var(--td);line-height:1.7}
+/* نشان دایره‌ای طلایی دور آیکون سمت — همان سطح پرداخت شاین/گلوی کارت‌های اصلی، فقط روی خودِ آیکون */
+.role-ic{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;
+  font-size:17px;color:var(--gdl);background:radial-gradient(circle at 35% 30%,rgba(231,205,134,.22),rgba(201,168,76,.06));
+  border:1px solid var(--bd);transition:transform .35s,box-shadow .35s}
+.rolecard:hover .role-ic{transform:scale(1.08);box-shadow:0 0 16px rgba(212,175,90,.35)}
+.usermosaic{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;padding:0 16px 16px}
+.usertile{padding:10px 12px;border-radius:10px;background:rgba(0,0,0,.06);border:1px solid var(--bd);
+  font-family:inherit;font-size:12.5px;color:var(--th);cursor:pointer;transition:.15s;text-align:center}
+.usertile:hover{border-color:var(--gd);background:rgba(224,171,46,.14);transform:translateY(-2px)}
+.pwprompt{padding:6px 2px}
+.pwprompt-t{font-size:13.5px;font-weight:700;color:var(--th);margin-bottom:14px}
+
+/* نوار افقی خدمات بدون احراز هویت — زیر صفحه‌ی اختصاصی هر مرکز.
+   کاربر این باکس را «توذوق» (نامنسجم/خام) توصیف کرد — پرداخت‌شده‌تر شد: عنوان با خط
+   تزئینی طلایی هم‌سطح lsec-t، آیکون‌ها دایره‌ای هم‌سطح role-ic، wrap صحیح روی موبایل
+   به‌جای white-space:nowrap (که زیر ۳۹۰px می‌توانست سرریز افقی بدهد). */
+.svcbar-wrap{margin-top:26px;padding:24px 22px}
+.svcbar-t{font-size:13.5px;color:var(--th);font-weight:700;margin-bottom:16px;text-align:center;
+  display:flex;align-items:center;gap:12px}
+.svcbar-t::before,.svcbar-t::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--bd),transparent)}
+.svcbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.svcbar-item{position:relative;overflow:hidden;display:flex;align-items:center;gap:11px;padding:13px 16px;border-radius:18px;
+  background:var(--gb);backdrop-filter:blur(14px) saturate(140%);-webkit-backdrop-filter:blur(14px) saturate(140%);
+  border:1.5px solid var(--bd);text-decoration:none;color:var(--th);
+  font-size:12.5px;font-weight:600;white-space:normal;line-height:1.5;transition:transform .25s,border-color .25s,box-shadow .25s}
+.svcbar-item::after{content:'';position:absolute;top:-60%;right:-25%;width:60%;height:200%;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(245,240,224,.16),transparent);
+  transform:rotate(18deg);transition:transform .8s ease}
+.svcbar-item:hover::after{transform:rotate(18deg) translateX(-240%)}
+.svcbar-item:hover{border-color:var(--gd);background:rgba(224,171,46,.14);transform:translateY(-3px);box-shadow:0 10px 26px -10px rgba(0,0,0,.5),0 0 14px rgba(212,175,90,.25)}
+.svcbar-ic{font-size:16px;flex:0 0 auto;width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+  border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(231,205,134,.22),rgba(201,168,76,.06));
+  border:1px solid var(--bd);color:var(--gdl);transition:transform .35s,box-shadow .35s}
+.svcbar-item:hover .svcbar-ic{transform:scale(1.08);box-shadow:0 0 14px rgba(212,175,90,.3)}
+.svcbar-item>*{position:relative;z-index:2}
+/* همان نوار، ولی داخلِ کارتِ ورودِ مرکز: کارفرما خواست خدماتِ همگانی بالا
+   بنشیند و کاشی‌های سمت زیرِ آن. چون دیگر یک کارتِ مستقل نیست، حاشیه/پدینگِ کارتی
+   خودش را نمی‌خواهد — وگرنه داخلِ .lcard دو قابِ تودرتو دیده می‌شد. */
+.lcard .svcbar-wrap{margin-top:0;padding:0}
+/* کارتِ «ورود کارکنان» در همان شبکه‌ی خدمات می‌نشیند ولی طلایی است، تا در نگاهِ
+   اول از خدماتِ همگانی جدا دیده شود بی‌آنکه به یک بلوکِ جداگانه نیاز باشد.
+   وقتی باز است (کلاس on) قابش پررنگ می‌ماند تا کاربر بداند چه چیزی را باز کرده. */
+.svcbar-item.svc-login{border-color:var(--gd);background:rgba(224,171,46,.12);
+  font-weight:700;cursor:pointer;font-family:inherit;font-size:12.5px;text-align:start}
+.svcbar-item.svc-login .svcbar-ic{color:var(--gdl);border-color:var(--gd)}
+.svcbar-item.svc-login.on{background:rgba(224,171,46,.2);box-shadow:var(--glow-gd)}
+/* جداکننده‌ی «اینجا دیگر ورود می‌خواهد» — مرزِ بصری بینِ خدماتِ همگانی و کاشی‌های سمت. */
+.lcard-sep{display:flex;align-items:center;gap:12px;margin:26px 0 18px;
+  font-size:13.5px;font-weight:700;color:var(--th)}
+.lcard-sep::before,.lcard-sep::after{content:'';flex:1;height:1px;
+  background:linear-gradient(90deg,transparent,var(--bd),transparent)}
+
+/* سوییچ سوپرادمین — پسورد اجباری */
+.pwtoggle-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 16px;
+  border-radius:var(--rs);background:rgba(212,175,90,.08);border:1px solid var(--bd);margin-bottom:18px}
+.pwtoggle-row b{display:block;font-size:13.5px;color:var(--th);margin-bottom:3px}
+.pwtoggle-row span{display:block;font-size:11.5px;color:var(--td);line-height:1.7;max-width:520px}
+.swtoggle{position:relative;flex:none;width:44px;height:25px;display:inline-block}
+.swtoggle input{opacity:0;width:0;height:0}
+.swtoggle span{position:absolute;inset:0;background:rgba(0,0,0,.28);border-radius:20px;transition:.2s;cursor:pointer}
+.swtoggle span::before{content:'';position:absolute;width:19px;height:19px;left:3px;top:3px;background:#fff;
+  border-radius:50%;transition:.2s}
+.swtoggle input:checked+span{background:linear-gradient(135deg,var(--gdl),var(--gd))}
+.swtoggle input:checked+span::before{transform:translateX(-19px)}
+
+/* ===== APP ===== */
+/* ارتفاع بر حسب dvh (نه vh): روی مرورگرهای موبایل، 100vh همیشه برابرِ بزرگ‌ترین حالتِ
+   viewport است (وقتی نوار آدرس مخفی است)، پس تا وقتی نوار آدرس دیده می‌شود انتهای این
+   ناحیه زیر آن می‌افتد؛ و چون اسکرولِ صفحه روی .main است نه body، آن بخش اصلاً قابل
+   دسترسی نمی‌ماند (دکمه‌ی ذخیره/ثبت پایین فرم‌ها کلیک‌ناپذیر می‌شد). dvh با ارتفاعِ
+   واقعیِ لحظه‌ای تغییر می‌کند. ردیف vh پیش از آن، فالبک مرورگرهای قدیمی است. */
+#app{display:flex;height:calc(100vh - var(--ghdrh));min-height:calc(100vh - var(--ghdrh));position:relative;z-index:1}
+#app{height:calc(100dvh - var(--ghdrh));min-height:calc(100dvh - var(--ghdrh))}
+.side{width:326px;flex-shrink:0;margin:16px 0 16px 16px;display:flex;flex-direction:column;overflow:hidden;position:relative;transition:width .28s cubic-bezier(0.16,1,0.3,1),margin .28s cubic-bezier(0.16,1,0.3,1)}
+
+/* دکمه جمع‌کردن سایدبار در گوشه هدر منو */
+.side-collapse-toggle{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;
+background:rgba(255,255,255,.06);border:1px solid var(--bd);color:var(--gdl);cursor:pointer;margin-right:auto;
+font-size:15px;line-height:1;transition:all .2s ease}
+.side-collapse-toggle:hover{background:rgba(212,175,90,.18);border-color:var(--gd);color:#fff;transform:scale(1.05)}
+
+/* حالت فشرده/جمع‌شده سایدبار در دسکتاپ (Collapsible Sidebar) */
+.side.collapsed{width:76px!important}
+.side.collapsed .brand-info,
+.side.collapsed .hosp-chip b,
+.side.collapsed .hosp-chip .hosp-fallback,
+.side.collapsed .act-txt,
+.side.collapsed .ntxt,
+.side.collapsed .nlock,
+.side.collapsed .ngt,
+.side.collapsed .cnt,
+.side.collapsed .chev,
+.side.collapsed .ssearch,
+.side.collapsed .tree,
+.side.collapsed .nbadge{display:none!important}
+.side.collapsed .shead{padding:16px 8px 12px;align-items:center}
+.side.collapsed .brand{justify-content:center;position:relative;width:100%}
+.side.collapsed .side-collapse-toggle{position:absolute;top:-8px;left:0;width:24px;height:24px;font-size:12px;margin:0}
+.side.collapsed .hosp-chip{padding:6px 2px;justify-content:center;width:100%}
+.side.collapsed .side-actions{flex-direction:column;gap:6px;width:100%}
+.side.collapsed .side-act{padding:8px 0;justify-content:center}
+.side.collapsed .snav{padding:10px 6px}
+.side.collapsed .nitem{justify-content:center;padding:12px 0;gap:0;position:relative}
+.side.collapsed .nitem .ic{font-size:16px;margin:0}
+.side.collapsed .navgroup-hd{justify-content:center;padding:12px 0}
+.side.collapsed .navgroup-hd .ic{font-size:16px;margin:0}
+.side.collapsed .navgroup-bd{display:none!important}
+
+/* نور طلایی محیطی پشت پنل شیشه‌ای سایدبار — حس لوکس/پرمیوم */
+.side::before{content:'';position:absolute;top:-15%;left:-30%;right:-30%;height:60%;z-index:0;pointer-events:none;
+background:radial-gradient(ellipse at 50% 0%,rgba(212,175,90,.4) 0%,rgba(212,175,90,.12) 42%,transparent 72%);
+filter:blur(2px)}
+.side::after{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;border-radius:var(--r);
+box-shadow:inset 0 1px 0 rgba(255,248,230,.14),inset 0 0 60px rgba(212,175,90,.05)}
+.side>*{position:relative;z-index:1}
+
+.shead{padding:22px 20px 16px;border-bottom:1px solid var(--bd)}
+.brand{display:flex;align-items:center;gap:11px}
+.bmark{width:42px;height:42px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+background:linear-gradient(135deg,var(--gdl),var(--gd) 55%,var(--gdd));font-size:19px;color:var(--em9);font-weight:800;
+box-shadow:0 4px 18px rgba(212,175,90,.38)}
+.brand h1{font-family:var(--sf);font-size:17px;color:var(--th);font-weight:700}
+.brand p{font-size:11.5px;color:var(--gdl);margin-top:2px}
+.hosp-chip{margin-top:12px;padding:8px 12px;border-radius:9px;background:rgba(0,0,0,.22);border:1px solid var(--bd);
+font-size:12.5px;display:flex;align-items:center;gap:7px}
+.hosp-chip b{color:var(--gdl)}
+/* لوگوی بیمارستان: اگر ثبت نشده باشد تصویر با onerror حذف می‌شود و نماد ⌂ سر جایش می‌ماند */
+.hosp-logo{height:24px;max-width:56px;object-fit:contain;background:#fff;border-radius:4px;padding:2px}
+.hosp-logo+.hosp-fallback{display:none}
+/* پروفایل/خروج — کنار سایدبار، بالای منو، کنار هم */
+.side-actions{margin-top:12px;display:flex;gap:8px}
+.side-act{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 10px;border-radius:9px;
+  background:rgba(0,0,0,.22);border:1px solid var(--bd);color:var(--tm);font-family:var(--sn);font-size:12px;
+  cursor:pointer;transition:background .2s,border-color .2s,color .2s}
+.side-act:hover{border-color:var(--gd);color:var(--th)}
+.side-act.out:hover{border-color:var(--dn);color:var(--dn)}
+.side-act .ic{font-size:13px}
+/* سربرگ سند — در نمای چاپ هم می‌آید (بخشی از .docprint است) */
+.docletterhead{display:flex;align-items:center;gap:12px;padding-bottom:11px;margin-bottom:13px;
+border-bottom:2px solid var(--gdl)}
+.docletterhead img{height:46px;max-width:120px;object-fit:contain;background:#fff;border-radius:5px;padding:3px}
+.docletterhead b{display:block;color:var(--th);font-size:14px}
+.docletterhead span{display:block;color:var(--td);font-size:11.5px;margin-top:3px}
+.snav{padding:12px;border-bottom:1px solid var(--bd)}
+.nitem{display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:9px;font-size:14px;
+cursor:pointer;color:var(--tm);margin-bottom:2px;transition:.15s}
+.nitem:hover{background:rgba(255,255,255,.05);color:var(--th)}
+.nitem.on{background:linear-gradient(90deg,rgba(212,175,90,.2),rgba(212,175,90,.04));color:var(--gdl);font-weight:700;
+box-shadow:inset 0 0 0 1px rgba(212,175,90,.22),0 2px 14px rgba(212,175,90,.14)}
+.nitem .ic{width:18px;text-align:center}
+/* آیتم منوی «بخش خریداری‌نشده» — همچنان دیده و کلیک‌پذیر است (تجربه‌ی upsell)، فقط کم‌رنگ‌تر با قفل */
+.nitem-locked{opacity:.55}
+.nitem-locked:hover{opacity:.85}
+.nlock{font-size:11px;opacity:.85}
+/* گروه‌های جمع‌شونده‌ی ناوبری */
+.navgroup{margin-top:6px}
+.navgroup-hd{display:flex;align-items:center;gap:10px;padding:9px 13px;border-radius:9px;cursor:pointer;
+font-size:12.5px;font-weight:700;color:var(--td);transition:.15s;user-select:none}
+.navgroup-hd:hover{background:rgba(255,255,255,.05);color:var(--th)}
+.navgroup-hd.on{color:var(--gdl)}
+.navgroup-hd .ic{width:18px;text-align:center;color:var(--gd)}
+.navgroup-hd .ngt{flex:1}
+.navgroup-hd .chev{transform:rotate(0)}
+.navgroup-hd.on .chev{transform:rotate(-90deg)}
+.navgroup-bd{display:none;padding-right:11px;margin-top:2px;
+border-right:1px solid var(--bd);margin-right:8px}
+.navgroup-bd.on{display:block}
+.navgroup-bd .nitem{font-size:13.5px;padding:8px 11px}
+/* شمارنده‌ی «جدید» کنار مورد منو — تا وقتی عددی نیست هیچ فضایی نمی‌گیرد */
+.nbadge{margin-right:auto;font-size:10.5px;font-weight:800;line-height:1;padding:0;border-radius:20px;
+color:#1a1200;background:transparent;min-width:0;transition:.15s}
+.nbadge.on{padding:3px 7px;background:linear-gradient(135deg,var(--gd),var(--gdl));
+box-shadow:0 2px 8px rgba(212,175,90,.3)}
+.navfoot{margin-top:10px;padding-top:8px;border-top:1px dashed var(--bd)}
+.navfoot .nitem{font-size:13px;color:var(--td)}
+.ssearch{padding:12px 16px}
+.ssearch input{width:100%;padding:10px 14px;border-radius:9px;background:rgba(0,0,0,.24);border:1px solid var(--bd);
+color:var(--th);font-family:inherit;font-size:13.5px}
+.ssearch input:focus{outline:none;border-color:var(--gd)}
+.tree{flex:1;overflow-y:auto;padding:0 10px 18px}
+.sec{margin-bottom:5px}
+.sechd{display:flex;align-items:center;gap:10px;padding:11px 12px;cursor:pointer;border-radius:9px;transition:.15s}
+.sechd:hover{background:rgba(255,255,255,.05)}
+.sechd.on{background:rgba(212,175,90,.09)}
+.secl{width:25px;height:25px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+background:linear-gradient(135deg,var(--ry7),var(--ry8));border:1px solid var(--gd);color:var(--gdl);font-weight:800;font-size:12px}
+.sect{font-size:14px;font-weight:700;color:var(--th);flex:1}
+.cnt{font-size:10.5px;color:var(--td);background:rgba(0,0,0,.26);padding:1px 7px;border-radius:20px}
+.chev{color:var(--gd);font-size:10px;transition:transform .22s}
+.sechd.on .chev{transform:rotate(-90deg)}
+.axl{display:none;padding-right:12px;margin-top:2px}
+.axl.on{display:block}
+.axi{padding:9px 12px;margin:2px 0;cursor:pointer;border-radius:8px;font-size:13.5px;color:var(--tm);
+border-right:2px solid transparent;transition:.15s;display:flex;align-items:center;gap:8px}
+.axi:hover{background:rgba(255,255,255,.05);color:var(--th)}
+.axi.on{background:linear-gradient(90deg,rgba(212,175,90,.15),transparent);border-right-color:var(--gd);color:var(--gdl);font-weight:700}
+.axi .anm{flex:1}
+.rolechip{font-size:10px;padding:2px 7px;border-radius:20px;background:rgba(63,172,191,.12);
+color:var(--ok);border:1px solid rgba(63,172,191,.28);margin:2px 0 4px 0;margin-right:34px;display:inline-block}
+
+/* همان استدلال dvh در #app — این ناحیه خودش اسکرول‌کانتینرِ صفحه است، پس اگر ارتفاعش از
+   ارتفاعِ واقعیِ دیده‌شده بیشتر شود، انتهای محتوا زیر نوار مرورگر قفل می‌ماند. */
+.main{flex:1;padding:16px 24px;height:calc(100vh - var(--ghdrh));overflow-y:auto}
+.main{height:calc(100dvh - var(--ghdrh))}
+/* overflow:visible و z-index لازم‌اند وگرنه پنجره‌ی نتایجِ جست‌وجو زیرِ لبه‌ی
+   همین نوار بریده می‌شد — روی اسکرین‌شاتِ واقعی دیده شد، نه با خواندنِ CSS. */
+.top{display:flex;align-items:center;gap:14px;padding:17px 24px;margin-bottom:16px;
+  overflow:visible;position:relative;z-index:40}
+.top h2{font-family:var(--sf);font-size:18px;color:var(--th);flex:1;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.uchip{display:flex;align-items:center;gap:10px}
+.uchip .un{font-size:13px;color:var(--th);font-weight:700;text-align:left}
+.uchip .ur{font-size:11px;color:var(--gdl);text-align:left}
+.av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gdl),var(--gdd));
+display:flex;align-items:center;justify-content:center;color:var(--em9);font-weight:800;font-size:14px}
+
+/* دکمه منوی ناوبری (جمع/باز کردن در دسکتاپ، کشو در موبایل) */
+.mbtn{display:flex;width:40px;height:40px;border-radius:11px;border:1px solid var(--bd);background:rgba(0,0,0,.24);
+color:var(--gdl);font-size:16px;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .2s ease}
+.mbtn:hover{border-color:var(--gd);background:rgba(212,175,90,.12);color:var(--th)}
+.soverlay{display:none;position:fixed;inset:0;background:rgba(7,13,24,.6);backdrop-filter:blur(2px);z-index:590}
+.soverlay.on{display:block}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:13px;margin-bottom:16px}
+.st{padding:17px 19px}
+.st .l{font-size:12px;color:var(--td);margin-bottom:7px}
+.st .v{font-size:26px;font-weight:800;color:var(--th);font-family:var(--sf)}
+
+/* ---- کارت سمت در نمودار سازمانی ---- */
+/* این کارت‌ها از .st (کارت آمار) وام گرفته شده‌اند، اما محتوایشان عدد نیست: یک نام
+   فارسیِ بلند است. با تنظیمات .st (فونت ۲۶ و بدون کنترل سرریز) نام‌ها از لبه‌ی کارت
+   بیرون می‌زدند و انتخاب‌گرِ زیرشان بریده می‌شد. این‌جا تایپوگرافی و شکستِ خط مخصوص
+   خودش تعریف می‌شود، نه با style درون‌خطی روی هر کارت. */
+.oc-card{display:flex;flex-direction:column;gap:7px;min-width:0}
+.oc-card-l{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--gdl);
+letter-spacing:.1px;min-width:0}
+.oc-card-v{font-size:14px;font-weight:800;color:var(--th);line-height:1.75;
+overflow-wrap:anywhere;word-break:break-word;min-width:0}
+.oc-card-none{font-weight:600;color:var(--td)}
+.oc-card-empty{font-size:11.5px;color:var(--td);line-height:1.7}
+.oc-card-undef{opacity:.72}
+/* انتخاب‌گر باید دقیقاً به عرض کارت بچسبد؛ پیش از این عرض ذاتیِ طولانی‌ترین گزینه را
+   می‌گرفت و از کارت بیرون می‌زد. */
+.oc-card-sel{margin-top:auto;min-width:0}
+.oc-card-sel select{width:100%;max-width:100%;box-sizing:border-box;
+text-overflow:ellipsis;font-size:12px;padding:8px 10px}
+.st.gold .v{color:var(--gdl)}
+.bar{height:6px;border-radius:6px;background:rgba(0,0,0,.3);overflow:hidden;margin-top:9px}
+.bar>i{display:block;height:100%;border-radius:6px;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.bf-ok{background:linear-gradient(90deg,#1c7e8f,var(--ok))}
+.bf-gd{background:linear-gradient(90deg,var(--gdd),var(--gdl))}
+
+.panel{overflow:hidden;margin-bottom:16px}
+.phd{padding:18px 24px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:13px;flex-wrap:wrap}
+.abadge{width:36px;height:36px;border-radius:10px;flex-shrink:0;background:linear-gradient(135deg,var(--ry7),var(--ry9));
+border:1px solid var(--gd);display:flex;align-items:center;justify-content:center;color:var(--gdl);font-weight:800;font-size:12px}
+.phd h3{font-family:var(--sf);font-size:16.5px;color:var(--th);font-weight:700}
+.phd .sub{font-size:12px;color:var(--td);margin-top:2px}
+.pbody{padding:14px 24px 24px}
+
+/* year selector گوشه صفحه */
+/* نوار میانبرهای شخصی در هدر — عمداً یک نوار باریک، نه پنل دوم */
+.scut{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;overflow-x:auto;max-width:44%;
+scrollbar-width:none}
+.scut::-webkit-scrollbar{display:none}
+.scut-i{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;cursor:pointer;
+padding:6px 11px;border-radius:20px;font-family:inherit;font-size:12px;font-weight:700;
+color:var(--tm);background:rgba(0,0,0,.2);border:1px solid var(--bd);transition:.15s}
+.scut-i:hover{color:var(--gdl);border-color:rgba(212,175,90,.4);background:rgba(212,175,90,.09)}
+.scut-i .ic{font-size:12px;color:var(--gd)}
+.scut-i .x{font-style:normal;font-size:14px;line-height:1;color:var(--td);opacity:.5;padding:0 1px}
+.scut-i .x:hover{opacity:1;color:var(--dn)}
+.scut-add{color:var(--gd);border-style:dashed}
+@media(max-width:1100px){.scut{display:none}}
+.ysel{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:20px;background:rgba(0,0,0,.26);
+border:1px solid var(--bd);flex-shrink:0}
+.ysel label{font-size:11.5px;color:var(--td)}
+.ysel select{background:none;border:none;color:var(--gdl);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer}
+.ysel select:focus{outline:none}
+.ysel select option{background:#0a1a3d;color:var(--th)}
+
+/* accordion standard */
+.stdblk{margin-bottom:11px;border:1px solid rgba(212,175,90,.16);border-radius:var(--rs);overflow:hidden;
+background:rgba(0,0,0,.13)}
+.stdhd{display:flex;align-items:flex-start;gap:11px;padding:14px 17px;cursor:pointer;transition:.15s;
+border-right:3px solid var(--gd)}
+.stdhd:hover{background:rgba(212,175,90,.06)}
+.stdc{font-size:11.5px;color:var(--gdl);background:rgba(212,175,90,.13);padding:2px 9px;border-radius:20px;
+flex-shrink:0;margin-top:2px;font-weight:700}
+.stdt{font-size:14.5px;color:var(--th);font-weight:600;line-height:1.75;flex:1}
+.stdmeta{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-top:2px}
+.mini-bar{width:52px;height:5px;border-radius:5px;background:rgba(0,0,0,.35);overflow:hidden}
+.mini-bar>i{display:block;height:100%;background:linear-gradient(90deg,#1c7e8f,var(--ok))}
+.stdbody{display:none;padding:4px 15px 15px}
+.stdbody.on{display:block}
+
+.mcard{padding:15px 17px;margin-bottom:9px;border-radius:var(--rs);background:rgba(255,255,255,.045);
+border:1px solid rgba(212,175,90,.14);transition:.2s}
+.mcard:hover{border-color:var(--bds)}
+.mtop{display:flex;align-items:flex-start;gap:10px;margin-bottom:7px;flex-wrap:wrap}
+.mc{font-size:11px;color:var(--td);background:rgba(0,0,0,.28);padding:2px 8px;border-radius:20px;flex-shrink:0;margin-top:2px}
+.bdg{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700;white-space:nowrap}
+.b1{background:rgba(63,172,191,.14);color:var(--ok)}
+.b2{background:rgba(224,184,78,.14);color:var(--wr)}
+.b3{background:rgba(217,122,106,.14);color:var(--dn)}
+.bsf{background:rgba(212,175,90,.17);color:var(--gdl);border:1px solid var(--gd)}
+.brole{background:rgba(28,63,133,.35);color:#9ec5f5;border:1px solid rgba(120,170,240,.3)}
+.mst{font-size:14px;color:var(--th);line-height:1.8;margin-bottom:10px}
+
+/* ==== tooltip help (gold ?) ==== */
+.hlp{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;
+background:rgba(212,175,90,.16);border:1px solid var(--gd);color:var(--gdl);font-size:11.5px;font-weight:800;
+cursor:help;position:relative;flex-shrink:0;vertical-align:middle;margin-right:5px}
+.hlp:hover{background:var(--gd);color:var(--em9)}
+.hlp .tip{display:none;position:absolute;bottom:calc(100% + 9px);right:-8px;width:290px;padding:13px 15px;
+background:rgba(6,20,34,.97);backdrop-filter:blur(14px);border:1px solid var(--bds);border-radius:12px;
+box-shadow:0 12px 40px rgba(0,0,0,.6);z-index:200;text-align:right;cursor:auto}
+.hlp:hover .tip,.hlp.pinned .tip{display:block;animation:tipIn .18s ease}
+@keyframes tipIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+/* .tt/.tx خودشان <span> هستند؛ بدون display:block، عنوان و متن پشت‌سرهم روی یک خط
+   می‌افتادند و margin-bottom عنوان هم بی‌اثر بود. */
+.tip .tt{display:block;font-size:12px;color:var(--gdl);font-weight:800;margin-bottom:7px}
+.tip .tx{display:block;font-size:13px;color:var(--tm);line-height:1.85;font-weight:400}
+.tip .tx b{color:var(--th)}
+/* راهنمای فیلد: دکمه «پر کردن نمونه» داخل تولتیپ + حالت پس‌از‌پرشدن */
+.hlp.fgh{cursor:pointer}
+.hlp.fgh.done{opacity:.45}
+.hlp .tip{white-space:normal}
+.fgbtn{display:block;width:100%;margin-top:11px;padding:8px 10px;border-radius:9px;cursor:pointer;
+font-family:inherit;font-size:12px;font-weight:700;color:var(--em9);border:none;
+background:linear-gradient(135deg,var(--gdl),var(--gd) 55%,var(--gdd))}
+.fgbtn:hover{box-shadow:var(--glow-gd)}
+/* تولتیپ فیلدهای انتهای فرم نباید از کادر بزند */
+.fg .hlp .tip{width:min(320px,72vw)}
+
+/* ===== پورتال تولتیپ سراسری =====
+   پیش‌تر تولتیپ داخل کارت‌های overflow:hidden (.panel/.fsec/.stdblk/.drop) بریده می‌شد.
+   حالا JS گره‌ی .tip را هنگام هاور به این عنصر ثابتِ چسبیده به <body> منتقل می‌کند
+   تا هیچ والدِ برنده‌ای نتواند آن را قیچی کند. */
+.tipfloat{position:fixed;z-index:9999;display:none;width:min(320px,calc(100vw - 24px));
+padding:13px 15px;background:rgba(6,20,34,.97);backdrop-filter:blur(14px);
+border:1px solid var(--bds);border-radius:12px;box-shadow:0 18px 50px rgba(0,0,0,.65);
+text-align:right;cursor:auto;animation:tipIn .18s ease}
+/* داخل پورتال دیگر والدِ .hlp وجود ندارد، پس قواعد «.hlp .tip» اعمال نمی‌شوند و
+   .tip به‌صورت span درون‌خطی و نامرئی درمی‌آمد — این‌جا صریحاً بازنشانی می‌شود. */
+.tipfloat .tip{display:block;position:static;width:auto;padding:0;background:none;
+border:none;box-shadow:none;backdrop-filter:none;white-space:normal;text-align:right}
+
+/* ==== نشان بزرگ «نمونه فرم» ==== */
+.exbanner{display:flex;gap:12px;align-items:flex-start;margin:0 0 16px;padding:13px 16px;border-radius:12px;
+background:linear-gradient(135deg,rgba(212,175,90,.17),rgba(212,175,90,.05));
+border:1px solid var(--gd);box-shadow:var(--glow-gd)}
+.exbanner .exb-ic{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+background:linear-gradient(135deg,var(--gdl),var(--gd) 55%,var(--gdd));color:var(--em9);font-size:14px;font-weight:800}
+.exbanner b{display:block;font-size:13.5px;color:var(--gdl);margin-bottom:4px}
+.exbanner span{font-size:12px;color:var(--tm);line-height:1.9}
+.exbanner.inrow{flex-basis:100%;margin:0 0 10px}
+.exglow{border-color:var(--gd)!important;box-shadow:var(--glow-gd)!important}
+tr.exrow>td{background:rgba(212,175,90,.07);box-shadow:inset 3px 0 0 var(--gd)}
+
+.mctl{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.tgl{font-size:12.5px;color:var(--gdl);background:none;border:1px solid var(--bd);padding:6px 12px;
+border-radius:20px;cursor:pointer;font-family:inherit;transition:.2s}
+.tgl:hover{background:rgba(212,175,90,.11);border-color:var(--gd)}
+.sel{padding:7px 13px;border-radius:20px;border:1px solid var(--bd);background:rgba(0,0,0,.26);
+color:var(--th);font-family:inherit;font-size:13px;cursor:pointer}
+.sel:focus{outline:none;border-color:var(--gd)}
+.sel option{background:#0a1a3d}
+.sel.s-f{border-color:var(--ok);color:var(--ok)}
+.sel.s-p{border-color:var(--wr);color:var(--wr)}
+.sel.s-n{border-color:var(--dn);color:var(--dn)}
+.lockmsg{font-size:11.5px;color:var(--td);font-style:italic}
+
+.drop{display:none;margin-top:11px;border-radius:var(--rs);overflow:hidden}
+.drop.on{display:block;animation:tipIn .2s ease}
+.dsec{padding:13px 16px;border:1px solid rgba(212,175,90,.2);border-radius:var(--rs);margin-bottom:8px}
+.dsec.guide{background:rgba(63,172,191,.05);border-color:rgba(63,172,191,.25)}
+.dsec.book{background:rgba(212,175,90,.045);border-style:dashed}
+.dl{font-size:11.5px;font-weight:800;margin-bottom:9px;display:flex;align-items:center;gap:6px}
+.dsec.guide .dl{color:var(--ok)}
+.dsec.book .dl{color:var(--gdl)}
+.acts{list-style:none}
+.acts li{font-size:13px;color:var(--tm);line-height:1.8;padding:5px 0 5px 0;padding-right:22px;position:relative}
+.acts li::before{content:'◂';position:absolute;right:6px;color:var(--gd);font-size:9px;top:9px}
+.evrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;padding-top:9px;border-top:1px dashed rgba(212,175,90,.2)}
+.ev{font-size:10.5px;padding:3px 9px;border-radius:20px;background:rgba(28,63,133,.3);color:#9ec5f5;border:1px solid rgba(120,170,240,.25)}
+/* پرونده‌ی الکترونیکی شواهد — فایل واقعی مدرک، جایگزین نوشتنِ «محل نگهداری» */
+.evbox{margin-bottom:6px;padding:9px 11px;border-radius:9px;background:rgba(0,0,0,.18);border:1px solid var(--bd)}
+.evlist{display:flex;flex-direction:column;gap:6px}
+.evfile{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:11px}
+.evfile a{color:var(--gdl);text-decoration:none}
+.evfile a:hover{text-decoration:underline}
+.evft{color:var(--tm)}
+.evfm{color:var(--td);font-size:10px}
+.evup{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:9px;padding-top:9px;border-top:1px dashed var(--bd)}
+.booktext{font-size:13px;color:var(--tm);line-height:1.95;white-space:pre-line;max-height:280px;overflow-y:auto;padding-left:6px}
+
+/* charts */
+/* بخش‌های جمع‌شونده‌ی فرم — افشای تدریجی فیلدهای اختیاری */
+.fsec{border:1px solid var(--bd);border-radius:var(--rs);margin:12px 0;overflow:hidden}
+.fsec-hd{display:flex;align-items:center;gap:10px;padding:11px 15px;cursor:pointer;user-select:none;
+font-size:13px;font-weight:700;color:var(--tm);background:rgba(0,0,0,.16);transition:.15s}
+.fsec-hd:hover{color:var(--th);background:rgba(255,255,255,.05)}
+.fsec-hd.on{color:var(--gdl)}
+.fsec-hd .ngt{flex:1}
+.fsec-hd .chev{transform:rotate(0)}
+.fsec-hd.on .chev{transform:rotate(-90deg)}
+.fsec-bd{padding:15px}
+.formactions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;padding-top:16px;border-top:1px solid var(--bd)}
+.moretoggle{display:flex;justify-content:center;margin:2px 0 16px}
+.moretoggle .btn{font-size:12.5px;padding:7px 20px}
+.chartwrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:16px}
+.chart{padding:19px 22px}
+.chart h4{font-family:var(--sf);font-size:15px;color:var(--th);margin-bottom:15px;display:flex;align-items:center;gap:7px}
+.hbar{margin-bottom:11px}
+/* نوارِ «پیشرفت به تفکیک محور» روی داشبورد حالا خودش دکمه است و به همان محور می‌برد */
+.hbar-go{cursor:pointer;padding:6px 8px;margin:0 -8px 5px;border-radius:9px;
+  border:1px solid transparent;transition:background .16s,border-color .16s}
+.hbar-go:hover,.hbar-go:focus-visible{background:rgba(212,175,90,.08);
+  border-color:rgba(212,175,90,.28);outline:none}
+.hbar-go:hover .hl span:first-child,.hbar-go:focus-visible .hl span:first-child{color:var(--gdl)}
+.hbar .hl{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px}
+.hbar .hl span:first-child{color:var(--tm)}
+.hbar .hl span:last-child{color:var(--gdl);font-weight:700}
+.hbt{height:7px;border-radius:6px;background:rgba(0,0,0,.32);overflow:hidden}
+.hbt>i{display:block;height:100%;border-radius:6px;transition:width .7s cubic-bezier(.2,.8,.2,1)}
+.donut{display:flex;align-items:center;gap:22px;justify-content:center;padding:6px 0}
+.dring{width:132px;height:132px;border-radius:50%;position:relative;flex-shrink:0;
+display:flex;align-items:center;justify-content:center}
+.dring::after{content:'';position:absolute;inset:17px;border-radius:50%;background:#071527}
+.dctr{position:relative;z-index:2;text-align:center}
+.dctr .dv{font-size:24px;font-weight:800;color:var(--gdl);font-family:var(--sf)}
+.dctr .dl2{font-size:10.5px;color:var(--td)}
+.leg{display:flex;flex-direction:column;gap:8px}
+.lg{display:flex;align-items:center;gap:8px;font-size:13px}
+.lg .dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.lg b{color:var(--th);margin-right:auto;padding-right:12px}
+
+/* ===== گیج نیم‌دایره (رتبه/امتیاز) ===== */
+.gauge{position:relative;width:190px;height:108px;margin:6px auto 2px;overflow:hidden}
+.gauge .gtrack{position:absolute;top:0;right:0;left:0;width:190px;height:190px;border-radius:50%;
+background:conic-gradient(from -90deg,var(--dn) 0deg 81deg,var(--wr) 81deg 135deg,var(--ok) 135deg 180deg,transparent 180deg 360deg)}
+.gauge .gmask{position:absolute;top:14px;right:14px;left:14px;width:162px;height:162px;border-radius:50%;background:#071527;
+box-shadow:inset 0 2px 10px rgba(0,0,0,.5)}
+.gauge .gneedle{position:absolute;bottom:0;right:50%;width:3px;height:82px;background:linear-gradient(var(--gdx),var(--gd));
+transform-origin:bottom center;transform:translateX(1.5px) rotate(var(--deg,0deg));border-radius:3px;
+box-shadow:0 0 8px rgba(212,175,90,.7);transition:transform 1s cubic-bezier(.2,.8,.2,1)}
+.gauge .gpin{position:absolute;bottom:-7px;right:50%;width:16px;height:16px;transform:translateX(8px);border-radius:50%;
+background:radial-gradient(circle at 35% 30%,var(--gdx),var(--gd) 60%,var(--gdd));box-shadow:0 0 10px rgba(212,175,90,.6)}
+.gauge .gtext{position:absolute;bottom:6px;left:0;right:0;text-align:center}
+.gauge .gval{font-family:var(--sf);font-size:23px;font-weight:800;color:var(--gdl)}
+.gauge .glabel{font-size:11px;color:var(--td);margin-top:1px}
+
+/* ===== کارت کمیته (رنگ اختصاصی هر کمیته) ===== */
+.ccard{--ccolor:#d4af5a;padding:13px 16px;display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--th);
+border-right:3px solid var(--ccolor);cursor:pointer;transition:.2s;min-width:190px}
+.ccard:hover{background:rgba(255,255,255,.05);transform:translateX(-2px)}
+.ccard .cdot{width:11px;height:11px;border-radius:50%;flex-shrink:0;background:var(--ccolor);box-shadow:0 0 9px var(--ccolor)}
+
+/* ===== مدارک کنترل‌شده (خط‌مشی/روش اجرایی/دستورالعمل) ===== */
+.docfilters{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px;padding:14px 16px;
+border-radius:var(--rs);background:rgba(0,0,0,.16);border:1px solid var(--bd)}
+.docfilters .fg{min-width:150px}
+/* زبانه‌های «مدارک کنترل‌شده» / «کتابخانه دیجیتال» در یک صفحه */
+.doctabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--bd)}
+.docgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;align-items:end}
+.fg.fg-date,.fg:has(.jdatepicker-wrap){min-width:240px}
+.jdatepicker-wrap{display:grid!important;grid-template-columns:56px 1fr 78px!important;gap:6px;width:100%;min-width:235px;align-items:center;box-sizing:border-box}
+.jdatepicker-wrap select.sel{padding:6px 6px!important;font-size:13px!important;text-align:center;border-radius:10px;width:100%;box-sizing:border-box}
+.jdatepicker-wrap .jdate-m{min-width:92px}
+.jdatepicker-wrap .jdate-y{min-width:72px}
+.jdatepicker-wrap .jdate-d{min-width:50px}
+.rpg-fsec{transition:all .2s ease}
+.rpg-fsec:hover{border-color:rgba(212,175,90,.3)!important}
+.docdates{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:14px;
+padding:14px 16px;border-radius:var(--rs);background:rgba(212,175,90,.055);border:1px solid var(--bd)}
+.dochead{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.dochead>div{flex:1;min-width:190px;padding:11px 15px;border-radius:var(--rs);background:rgba(0,0,0,.2);
+border:1px solid var(--bd)}
+.docl{display:block;font-size:11px;color:var(--td);margin-bottom:4px}
+.dochead b{font-size:14px;color:var(--th)}
+.docribbons{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:11px}
+.docrib{padding:11px 15px;border-radius:var(--rs);text-align:center;
+background:linear-gradient(160deg,rgba(212,175,90,.15),rgba(255,255,255,.02));border:1px solid var(--bds)}
+.docrib span{display:block;font-size:11px;color:var(--td);margin-bottom:4px}
+.docrib b{font-size:14.5px;color:var(--gdl);font-family:var(--sf)}
+.docsec{padding:13px 16px;margin-top:9px;border-radius:var(--rs);background:rgba(255,255,255,.04);
+border:1px solid rgba(212,175,90,.16)}
+.docsl{font-size:11.5px;font-weight:800;color:var(--gdl);margin-bottom:7px}
+.docsv{font-size:13.5px;color:var(--tm);line-height:1.95;white-space:pre-line}
+
+@media print{
+.side,.top,.noprint,.no-print,.toast,.ovl,#copilot-trigger,#copilot-panel,#cp-spotlight-mask,#cp-tour-card,#floatDock,.floatdock,#ent-assistant-drawer,#ent-assistant-trigger,#dockMenuBtn,#dockMenuPop,#themeDrawer,#guidePanel,#guideDockBtn,#bgVideo,#bgCanvas,.bgx-stage,.phd{display:none!important}
+body{background:#fff!important;color:#000!important}
+body::before{display:none!important}
+.main{padding:0;height:auto;overflow:visible}
+.panel,.g{background:#fff!important;border:1px solid #999!important;box-shadow:none!important;backdrop-filter:none!important}
+.docsv,.docsl,.dochead b,.docrib b,.docl,td,th{color:#000!important}
+.docrib,.docsec,.dochead>div,.dsec{background:#fff!important;border:1px solid #999!important}
+/* خودِ سربرگ جا مانده بود: نام بیمارستان با var(--th) (سفیدِ تمِ تیره) چاپ می‌شد و
+   روی کاغذِ سفید تقریباً محو بود — روی هر سندی که چاپ می‌شد، نه فقط چک‌لیست.
+   نوار تاریخ‌ها و برچسب‌های وضعیت هم همین مشکل را داشتند. */
+.docletterhead b{color:#000!important}
+.docletterhead span{color:#333!important}
+.docletterhead{border-bottom-color:#666!important}
+.doc-dates b{color:#000!important}
+.doc-dates span{color:#333!important}
+.doc-dates,.doc-dates>div{border-color:#999!important}
+.bdg{color:#000!important;background:#f0f0f0!important;border:1px solid #999!important}
+}
+
+/* ===== جدول‌ها — ریتم و ترازبندی یکسان در کل برنامه =====
+   line-height بدنه ۱.۷ است که برای متن روان خوب و برای جدول زیادی هواداراست؛
+   داخل جدول به ۱.۶ می‌آید تا ردیف‌ها جمع‌تر و قابل اسکن‌تر شوند. */
+table{width:100%;border-collapse:collapse;font-size:13.5px;line-height:1.6}
+/* tabular-nums: ارقام هم‌عرض می‌شوند، پس ستون عددی واقعاً روی هم می‌افتد.
+   روی ارقام فارسی (۰۱۲۳) هم مثل لاتین کار می‌کند. */
+th,td{font-variant-numeric:tabular-nums;font-feature-settings:'tnum' 1}
+/* وسط‌چین در همه‌ی جدول‌های سامانه — خواسته‌ی صریح کارفرما: «هر جایی در هر
+   جدولی بود نوشته‌ها وسط باشه، چسبیده به سمت راست نباشه». پیش از این th
+   راست‌چین بود و td هم جهتِ شروع (راست در RTL) را ارث می‌برد، پس نام‌ها به
+   لبه می‌چسبیدند و ستون‌ها ناهم‌تراز دیده می‌شدند. */
+th{text-align:center;padding:9px 13px;background:rgba(212,175,90,.09);color:var(--gdl);font-weight:700;
+border-bottom:1px solid var(--bd);white-space:nowrap;font-size:12px}
+/* unicode-bidi:plaintext جهت هر خانه را از اولین حرفِ خودش می‌گیرد.
+   یعنی «QM-PR-001» و «ERR-B708-1405-12» چپ‌به‌راست و درست خوانده می‌شوند،
+   بدون اینکه بایدی متن فارسی اطراف تکه‌های لاتین را جابه‌جا کند. */
+td{padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.05);color:var(--tm);
+unicode-bidi:plaintext;text-align:center;vertical-align:middle}
+/* استثنا: برگه‌های چاپیِ تک‌سلولی (.psheet) کلِ سند را داخل یک <td> دارند؛
+   وسط‌چین‌کردنِ آن یعنی وسط‌چین‌شدنِ کلِ متنِ سند. متنِ سند باید روان و
+   راست‌چین بماند. */
+.psheet>thead>tr>td,.psheet>tbody>tr>td,.psheet>tfoot>tr>td{text-align:right}
+/* راه‌راه ملایم: در جدول‌های پهن و بلند چشم ردیف را گم نمی‌کند */
+tbody tr:nth-child(even):not(.drow){background:rgba(255,255,255,.018)}
+tbody tr:hover{background:rgba(255,255,255,.045)}
+/* ستون «عملیات» همیشه آخرین ستون است؛ دکمه‌ها نباید بشکنند یا کش بیایند.
+   استثنا: برگه‌های چاپی (.psheet) یک جدولِ تک‌سلولی‌اند که کلِ سند داخلش است، پس
+   آن سلول هم «آخرین ستون» حساب می‌شد و nowrap را به همه‌ی متنِ سند به ارث
+   می‌داد — متنِ توضیحات یک خطِ بلند می‌شد و از دو لبه‌ی کاغذ بیرون می‌زد.
+   در رندرِ واقعیِ چاپِ فلوچارت دیده شد و همه‌ی اسناد چاپی را درگیر می‌کرد. */
+td:last-child{white-space:nowrap}
+.psheet>thead>tr>td,.psheet>tbody>tr>td,.psheet>tfoot>tr>td{white-space:normal}
+td:last-child .tgl{vertical-align:middle}
+.tbl-wrap{overflow-x:auto;border-radius:var(--rs)}
+/* ورودی/انتخاب داخل سلولِ جدول (مثلاً «سلسله‌مراتب پرستاری») — قبلاً هرکدام
+   با پدینگ/گردیِ کامل خودشان (مثل دکمه‌ی مستقل) وسط سلول می‌نشستند و ردیف را
+   کیسه‌ای/نامرتب نشان می‌دادند. اینجا کوچک‌تر و هم‌قدِ ردیف می‌شوند تا با بقیه‌ی
+   جدول یکدست باشند؛ عرض را هم به کل سلول می‌دهیم تا هم‌ترازیِ ستون‌ها به‌هم نریزد. */
+td>input,td>select{width:100%;padding:6px 10px;font-size:12.5px;border-radius:7px;min-width:0}
+td>input:not([type=checkbox]):not([type=radio]),td>select{box-sizing:border-box}
+td>input[type=checkbox],td>input[type=radio]{width:auto;padding:0}
+
+/* ردیف جزئیات جمع‌شونده — ستون‌های کم‌اهمیت از عرض جدول به اینجا منتقل شده‌اند */
+.drow.hide{display:none}
+.drow>td{background:rgba(212,175,90,.045);padding:11px 16px;border-bottom:1px solid var(--bd)}
+.dpairs{display:flex;flex-wrap:wrap;gap:7px 22px}
+.dpair{font-size:11.5px;color:var(--td);line-height:1.9}
+.dpair>span{opacity:.8}
+.dpair>b{color:var(--tm);font-weight:600;margin-right:5px}
+.dacts{margin-top:9px;display:flex;gap:6px;flex-wrap:wrap}
+.drow-t{min-width:27px;text-align:center}
+/* کنش اصلی هر سطر پررنگ‌تر از کنش‌های فرعی است تا با هم رقابت نکنند */
+.tgl.prim{border-color:var(--gd);color:var(--gdl);font-weight:700}
+.tgl.dngr{color:var(--dn)}
+.b-ex{background:rgba(212,175,90,.16);color:var(--gdl);border:1px solid rgba(212,175,90,.4)}
+.tsub{display:block;font-size:10.5px;color:var(--td);margin-top:2px;font-weight:400}
+
+.empty{padding:56px 24px;text-align:center;color:var(--td)}
+.empty .ei{font-size:34px;margin-bottom:12px;opacity:.55}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:12px 26px;border-radius:22px;
+background:rgba(6,20,34,.96);border:1px solid var(--gd);color:var(--gdl);font-size:14px;z-index:800;
+box-shadow:0 10px 34px rgba(0,0,0,.5);animation:tipIn .25s}
+
+/* onboarding */
+.ovl{position:fixed;inset:0;background:rgba(7,13,24,.75);backdrop-filter:blur(7px);z-index:950;
+display:flex;align-items:center;justify-content:center;padding:22px}
+.ocard{max-width:580px;width:100%;overflow:hidden}
+.obody{padding:30px 32px 22px}
+.oeb{font-size:11.5px;color:var(--gdl);font-weight:700;margin-bottom:7px}
+.obody h2{font-family:var(--sf);font-size:21px;color:var(--th);margin-bottom:14px}
+.ovis{height:168px;margin-bottom:16px;border-radius:var(--rs);background:rgba(0,0,0,.24);
+border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;position:relative;padding:16px}
+.obody p{font-size:14px;color:var(--tm);line-height:1.9}
+.odots{display:flex;gap:5px;padding:0 32px 16px}
+.odots i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.18)}
+.odots i.on{background:var(--gd);width:20px;border-radius:4px}
+.ofoot{display:flex;justify-content:space-between;padding:15px 32px;border-top:1px solid var(--bd)}
+.spot{border:2px solid var(--gd);border-radius:9px;padding:9px 15px;font-size:13.5px;color:var(--gdl);
+animation:pg 1.9s ease-in-out infinite;background:rgba(212,175,90,.06)}
+@keyframes pg{0%,100%{box-shadow:0 0 11px rgba(212,175,90,.32)}50%{box-shadow:0 0 26px rgba(212,175,90,.68)}}
+
+@media(max-width:1000px){
+.mbtn{display:flex}
+.side{position:fixed;right:-340px;top:var(--ghdrh);bottom:0;z-index:600;transition:right .3s;margin:0;border-radius:0}
+.side.mo{right:0}
+.main{padding:16px}.chartwrap{grid-template-columns:1fr}
+.top{padding:14px 16px;gap:10px}
+.top h2{font-size:17px}
+.uchip .un,.uchip .ur{display:none}
+.stats{grid-template-columns:1fr 1fr}
+}
+@media(max-width:760px){
+.lwrap{grid-template-columns:1fr;max-width:420px}
+.lfeat{display:none}
+}
+@media(max-width:520px){
+.stats{grid-template-columns:1fr}
+.lcard{padding:28px 20px}
+.chart{padding:16px}
+.gauge{width:170px;height:98px}
+.gauge .gtrack{width:170px;height:170px}
+.gauge .gmask{width:144px;height:144px}
+}
+
+/* ---- BSC: کارت امتیازی متوازن ---- */
+.bsc-lg{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:14px;font-size:12px;color:var(--tm)}
+.bsc-lg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-left:5px;vertical-align:-1px}
+.bsc-p{margin-bottom:20px}
+.bsc-ph{display:flex;align-items:center;gap:9px;font-weight:800;color:var(--th);font-size:14px;
+  padding:9px 12px;border-radius:9px;background:rgba(255,255,255,.045);margin-bottom:8px}
+.bsc-t th,.bsc-t td{white-space:nowrap;text-align:center}
+/* تنها جدول پهن برنامه (۱۷ ستون: ۱۲ ماه + میانگین). ستون «عنوان شاخص» می‌چسبد
+   تا هنگام اسکرول افقی معلوم بماند کدام سطر را می‌خوانی. */
+.bsc-t th:first-child,.bsc-t td:first-child{text-align:center;position:sticky;right:0;z-index:2;
+min-width:190px;white-space:normal}
+/* لبه‌ی روشن تا مرزِ ستونِ چسبیده عمدی به‌نظر برسد نه یک وصله‌ی رنگی */
+.bsc-t td:first-child,.bsc-t th:first-child{border-left:1px solid var(--bd)}
+.bsc-t td:first-child{background:#0b1a2e}
+.bsc-t th:first-child{background:#14243a;z-index:3}
+.bsc-t tbody tr:hover td:first-child{background:#132338}
+.bsc-t th{font-size:11px;padding:7px 6px}
+.bsc-c{font-variant-numeric:tabular-nums;min-width:52px}
+/* روی گوشی، ستونِ چسبیده نباید بیش از این عرض بگیرد. توجه: در چیدمانِ auto
+   جدول، width/max-width روی خانه فقط راهنماست و الگوریتم زیرِ عرضِ محتوا
+   نمی‌رود — این‌جا فقط با کوچک‌کردنِ خودِ محتوا (قلم و پدینگ) عرض کم می‌شود. */
+@media(max-width:560px){
+.bsc-t th:first-child,.bsc-t td:first-child{min-width:0;font-size:11.5px;padding:7px 8px}
+.bsc-t td:first-child .tsub{font-size:10px}
+}
+.bsc-c:hover{background:rgba(255,255,255,.06)}
+
+/* ---- ساختار سازمانی: زبانه‌ها و فرم درون‌صفحه ---- */
+.orgtabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.orgtab{display:flex;align-items:center;gap:7px;padding:9px 14px;border-radius:10px;cursor:pointer;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--tm);
+  font-family:inherit;font-size:13px;font-weight:600;transition:.15s}
+.orgtab:hover{background:rgba(255,255,255,.08);color:var(--th)}
+.orgtab.on{background:rgba(255,255,255,.10);color:var(--th);border-color:rgba(255,255,255,.22)}
+.orgtab .ic{opacity:.8}
+.orgform{padding:14px;border-radius:11px;background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);margin-bottom:14px}
+
+/* ==== راهنمای نقش («راهنمای من») — عمداً بزرگ‌تر و بازتر از بقیه‌ی رابط ====
+   مخاطب این صفحه کسی است که تازه پشت سیستم نشسته و چیزی از اعتباربخشی نمی‌داند؛
+   بنابراین اینجا خوانایی بر تراکم اطلاعات ترجیح داده شده: پایه ۱۷px به‌جای ۱۲–۱۳px. */
+.rg{max-width:980px;margin:0 auto;font-size:17px;line-height:2.05}
+.rg p{font-size:17px;line-height:2.05;color:var(--tm)}
+.rg b{color:var(--th)}
+.rg-hero{padding:30px 30px 26px;border-radius:16px;margin-bottom:18px;
+  background-image:linear-gradient(135deg,rgba(212,175,90,.10),transparent 60%)}
+.rg-eb{display:inline-block;font-size:13px;font-weight:700;color:var(--em9);
+  background:linear-gradient(135deg,var(--gdl),var(--gd) 55%,var(--gdd));padding:5px 13px;border-radius:20px}
+.rg-hero h1{font-family:var(--sf);font-size:31px;line-height:1.6;color:var(--th);margin:14px 0 6px}
+.rg-sub{font-size:19px!important;color:var(--tm)}
+.rg-sub b{color:var(--gdl)}
+.rg-lead{margin-top:12px;font-size:17px!important;color:var(--td)!important}
+.rg-s{padding:26px 30px;border-radius:16px;margin-bottom:16px}
+.rg-s h2{font-family:var(--sf);font-size:24px;line-height:1.7;color:var(--th);
+  display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.rg-n{flex:none;width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+  font-size:17px;font-weight:800;color:var(--em9);background:linear-gradient(135deg,var(--gdl),var(--gd) 55%,var(--gdd))}
+.rg-h{margin-top:18px;color:var(--gdl)!important;font-weight:700}
+.rg-note{font-size:16px;color:var(--td);padding:14px 16px;border-radius:11px;background:rgba(255,255,255,.04)}
+.rg-axes{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-top:10px}
+.rg-ax{padding:13px 15px;border-radius:11px;background:rgba(255,255,255,.045);
+  border:1px solid rgba(255,255,255,.08);font-size:16px;color:var(--tm);line-height:1.85;
+  cursor:pointer;transition:background .16s,border-color .16s,transform .16s}
+.rg-ax:hover,.rg-ax:focus-visible{background:rgba(212,175,90,.09);border-color:rgba(212,175,90,.34);
+  transform:translateY(-1px);outline:none}
+.rg-ax b{color:var(--gdl);margin-left:6px}
+.rg-ax i{display:block;font-style:normal;font-size:13.5px;color:var(--td);margin-top:3px}
+.rg-axgo{display:block;margin-top:7px;font-size:12.5px;font-weight:700;color:var(--gdl);opacity:.62;
+  transition:opacity .16s}
+.rg-ax:hover .rg-axgo,.rg-ax:focus-visible .rg-axgo{opacity:1}
+.rg-st{display:grid;gap:12px;margin-top:12px}
+.rg-sti{padding:16px 18px;border-radius:12px;background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.09);border-right:4px solid var(--td)}
+.rg-sti.ok{border-right-color:var(--ok)}
+.rg-sti.wr{border-right-color:var(--wr)}
+.rg-sti.dn{border-right-color:var(--dn)}
+.rg-stt{font-size:19px;font-weight:800;color:var(--th);margin-bottom:6px}
+.rg-std{font-size:16.5px;line-height:2;color:var(--tm)}
+.rg-ste{font-size:15px;line-height:1.95;color:var(--td);margin-top:7px;padding-top:7px;
+  border-top:1px dashed rgba(255,255,255,.10)}
+.rg-ex{margin-top:8px;padding:15px 17px;border-radius:11px;font-size:16px;line-height:1.95;
+  color:var(--gdx);background:rgba(212,175,90,.08);border:1px solid rgba(212,175,90,.30)}
+.rg-warn{margin-top:16px;padding:16px 18px;border-radius:12px;font-size:16.5px;line-height:2;
+  color:var(--th);background:rgba(224,184,78,.09);border:1px solid rgba(224,184,78,.32)}
+.rg-steps{display:grid;gap:14px}
+.rg-step{display:flex;gap:14px;align-items:flex-start;padding:16px 18px;border-radius:12px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+.rg-sn{flex:none;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:800;color:var(--gdl);background:rgba(212,175,90,.14);border:1px solid rgba(212,175,90,.35)}
+.rg-sb{flex:1}
+.rg-sb b{display:block;font-size:18.5px;color:var(--th);line-height:1.75;margin-bottom:5px}
+.rg-sb span{display:block;font-size:16px;line-height:2;color:var(--tm)}
+.rg-sb .btn{margin-top:11px;font-size:15px;padding:9px 18px}
+.rg-abc{display:grid;gap:12px}
+.rg-abci{padding:15px 17px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+.rg-abci b{display:block;font-size:18px;color:var(--gdl);line-height:1.75;margin-bottom:4px}
+.rg-abci span{display:block;font-size:16px;line-height:2;color:var(--tm)}
+.rg-act{display:flex;gap:11px;flex-wrap:wrap;margin-top:14px}
+.rg-act .btn{font-size:15.5px;padding:11px 20px}
+.rg-foot{display:flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:space-between;
+  padding:20px 26px;border-radius:16px;font-size:16.5px;line-height:1.9;color:var(--tm)}
+.rg-foot .btn{font-size:15.5px;padding:11px 20px}
+.rg-ok{color:var(--ok)}
+/* نشانگر پیشرفت بخش‌های راهنما — همان نقطه‌های ویزارد راه‌اندازی (.odots) بازاستفاده شده */
+.rg-prog{display:flex;align-items:center;gap:12px;margin:0 4px 14px}
+.rg-dots{padding:0}
+.rg-cnt{font-size:15px;color:var(--td)}
+.rg-navb{display:flex}
+@media(max-width:700px){
+  .rg{font-size:16px}
+  .rg-hero,.rg-s,.rg-foot{padding:20px 17px}
+  .rg-hero h1{font-size:24px}
+  .rg-s h2{font-size:20px}
+}
+
+/* ---- تقویم ماهانه شمسی ---- */
+/* ۷ ستون مساوی؛ چون صفحه RTL است ستون اول (شنبه) خودبه‌خود سمت راست می‌افتد */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:0 16px 16px}
+.cal-head{padding-bottom:6px}
+.cal-dow{text-align:center;font-size:11.5px;font-weight:700;color:var(--gdl);padding:6px 0}
+.cal-cell{min-height:88px;border:1px solid var(--bd);border-radius:var(--rs);padding:5px 6px;cursor:pointer;
+  background:var(--gb);transition:border-color .15s,background .15s;overflow:hidden}
+.cal-cell:hover{border-color:var(--gd)}
+.cal-off{background:transparent;border-color:transparent;cursor:default}
+.cal-off:hover{border-color:transparent}
+.cal-dn{font-size:12.5px;font-weight:700;color:var(--td);margin-bottom:4px}
+.cal-today{border-color:var(--gd);box-shadow:inset 0 0 0 1px var(--gd)}
+.cal-today .cal-dn{color:var(--gd)}
+.cal-sel{background:rgba(212,175,90,.14);border-color:var(--gd)}
+.cal-ev{font-size:10.5px;line-height:1.5;padding:1px 4px;margin-bottom:2px;border-radius:4px;
+  background:rgba(128,128,128,.16);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* جلسه‌ی کمیته از رویداد عمومی متمایز می‌شود */
+.cal-ev-mt{background:rgba(212,175,90,.26);color:var(--gdl);font-weight:700}
+
+/* ماه‌های تقویم شمسی: آیکن + نام باستانی زیر نام رسمی */
+.cal-mname{display:flex;flex-direction:column;line-height:1.3}
+.cal-mancient{font-size:10.5px;color:var(--gdl);font-weight:400;opacity:.85}
+
+/* ---- پنل «راهنمای مسیر اعتباربخشی» — با کلیک روی دکمه‌ی طلایی بالای دکل شناور باز می‌شود ---- */
+.gwid-panel{position:fixed;left:18px;bottom:calc(18px + 3*46px + 2*10px + 14px);z-index:930;max-width:320px;
+  width:min(320px,calc(100vw - 36px));transform:translateY(10px) scale(.97);opacity:0;pointer-events:none;transition:.22s}
+.gwid-panel.open{transform:none;opacity:1;pointer-events:auto}
+.gwid{background:linear-gradient(160deg,rgba(10,26,61,.94),rgba(8,17,31,.94));
+  border:1px solid var(--bds);border-radius:var(--r);box-shadow:var(--glow-gd),0 10px 30px rgba(0,0,0,.4);
+  padding:14px 16px;backdrop-filter:blur(10px);animation:gwidIn .3s ease}
+/* در تم روشن این پنل تیره می‌ماند و متن‌هایش (که برای زمینه‌ی تیره تنظیم شده‌اند) عملاً
+   ناخوانا می‌شوند — پس کل پنل هم‌رنگ بقیه‌ی تم روشن می‌شود، نه یک جزیره‌ی تیره. */
+html[data-theme="light"] .gwid{background:linear-gradient(160deg,rgba(255,255,255,.97),rgba(240,246,247,.97));
+  box-shadow:0 10px 30px rgba(13,28,53,.16)}
+html[data-theme="light"] .gwid-tab{background:rgba(13,28,53,.05);border-color:rgba(13,28,53,.14)}
+html[data-theme="light"] .gwid-tab:hover{background:rgba(212,175,90,.16)}
+html[data-theme="light"] .gwid-tab.on{background:var(--pri-soft);border-color:var(--pri-soft-b);color:var(--pri-d)}
+html[data-theme="light"] .gwid-row{background:rgba(13,28,53,.045);border-color:rgba(13,28,53,.12)}
+html[data-theme="light"] .assist-then-n{background:rgba(13,28,53,.08)}
+@keyframes gwidIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.gwid-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.gwid-hd b{flex:1;font-size:13px;color:var(--th)}
+.gwid-ic{color:var(--gd);font-size:15px}
+.gwid-x{background:transparent;border:1px solid var(--bd);color:var(--tm);border-radius:8px;
+  width:22px;height:22px;line-height:1;cursor:pointer;font-size:14px}
+.gwid-x:hover{border-color:var(--gd);color:var(--gd)}
+.gwid-bar{height:5px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden;margin-bottom:6px}
+.gwid-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gd),var(--gdl))}
+.gwid-sub{font-size:11px;color:var(--td);margin-bottom:10px}
+.gwid-intro{background:rgba(255,203,90,.08);border:1px solid rgba(255,203,90,.25);border-radius:12px;padding:10px 12px;margin-bottom:10px}
+.gwid-intro-t{font-size:12.5px;font-weight:700;color:var(--gdl);margin-bottom:4px}
+.gwid-intro-d{font-size:11.5px;color:var(--tm);line-height:1.8;margin-bottom:8px}
+.gwid-phase-hd{font-size:10.5px;font-weight:700;color:var(--gdl);letter-spacing:.2px;
+  padding:6px 2px 2px;margin-top:2px;border-top:1px dashed rgba(255,255,255,.1)}
+.gwid-full .gwid-phase-hd:first-child{border-top:none;margin-top:0}
+.gwid-done .gwid-sub{margin-bottom:0}
+.gwid-step{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px 12px}
+.gwid-phase{font-size:10.5px;color:var(--gdl);font-weight:700;margin-bottom:3px}
+.gwid-title{font-size:13.5px;color:var(--th);font-weight:700;margin-bottom:4px;line-height:1.6}
+.gwid-desc{font-size:11.5px;color:var(--tm);line-height:1.7;margin-bottom:6px}
+.gwid-prog{font-size:11px;color:var(--gdl);margin-bottom:6px}
+.gwid-actions{display:flex;gap:8px;flex-wrap:wrap}
+.gwid-more{font-size:10.5px;color:var(--td);margin-top:8px;text-align:center;cursor:pointer}
+.gwid-more:hover{color:var(--gdl)}
+.gwid-viewall{font-size:11px;color:var(--gdl);margin-top:10px;text-align:center;cursor:pointer;
+  border-top:1px solid rgba(255,255,255,.08);padding-top:8px}
+.gwid-viewall:hover{color:var(--gd)}
+.gwid-full{max-height:min(58vh,420px);overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-inline-end:2px}
+.gwid-row{display:flex;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+  border-radius:10px;padding:8px 10px}
+.gwid-row.done{opacity:.55}
+.gwid-row-ck{flex:0 0 auto;font-size:13px;color:var(--gdl);line-height:1.6}
+.gwid-row.done .gwid-row-ck{color:var(--ok,#3eb9cf)}
+.gwid-row-b{flex:1;min-width:0}
+.gwid-row-t{font-size:12.5px;color:var(--th);font-weight:700;line-height:1.6}
+.gwid-row-d{font-size:11px;color:var(--tm);line-height:1.7;margin:4px 0 6px}
+
+/* ---- دستیار هوشمند: تب‌های سرِ پنل و نماهای پاسخ ---- */
+/* قبلاً یک «منوی خانه» جدا بود که کاربر باید اول رویش کلیک می‌کرد تا به جواب برسد.
+   حالا که «از دانا بپرس» موقتاً کنار گذاشته شده فقط دو گزینه می‌ماند، پس به‌جای یک
+   صفحه‌ی واسط، همان دو گزینه تبِ بالای پنل‌اند — یک کلیک به‌جای دو کلیک. */
+.gwid-tabs{display:flex;gap:6px;margin-bottom:10px}
+.gwid-tab{flex:1;text-align:center;padding:7px 8px;border-radius:9px;font-size:11.5px;font-weight:700;
+cursor:pointer;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);
+color:var(--tm);font-family:inherit;transition:.15s}
+.gwid-tab:hover{border-color:var(--gd);color:var(--th)}
+.gwid-tab.on{background:rgba(212,175,90,.14);border-color:var(--gd);color:var(--th)}
+/* ---- نمای «از دانا بپرس»: لیست پیام + ورودی ---- */
+.gwid-chat{max-width:340px}
+.chat-list{max-height:min(50vh,380px);overflow-y:auto;display:flex;flex-direction:column;gap:8px;
+  padding-inline-end:2px;margin-bottom:8px}
+.chat-msg{display:flex}
+.chat-msg.me{justify-content:flex-start}
+.chat-msg.ai{justify-content:flex-end}
+.chat-bub{max-width:82%;padding:9px 12px;border-radius:13px;font-size:12.5px;line-height:1.8;
+  white-space:pre-wrap;word-break:break-word}
+.chat-msg.me .chat-bub{background:rgba(212,175,90,.14);border:1px solid rgba(212,175,90,.3);color:var(--th)}
+.chat-msg.ai .chat-bub{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);color:var(--tm)}
+.chat-src{display:block;margin-top:5px;font-size:9.5px;color:var(--gdl);opacity:.8}
+.chat-input-row{display:flex;gap:6px}
+.chat-input{flex:1;min-width:0;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);
+  border-radius:10px;padding:8px 10px;font-size:12.5px;color:var(--th);font-family:inherit}
+.chat-input:focus{outline:none;border-color:var(--gd)}
+html[data-theme="light"] .chat-msg.ai .chat-bub{background:rgba(13,28,53,.05);border-color:rgba(13,28,53,.12)}
+html[data-theme="light"] .chat-input{background:rgba(13,28,53,.05);border-color:rgba(13,28,53,.14);color:var(--th)}
+/* فلشِ بازگشت در RTL رو به راست است (›)، پس چرخشی لازم ندارد */
+.assist-back{background:transparent;border:1px solid var(--bd);color:var(--tm);border-radius:8px;
+width:24px;height:24px;line-height:1;cursor:pointer;font-size:14px;flex:0 0 auto}
+.assist-back:hover{border-color:var(--gd);color:var(--gd)}
+.assist-now{background:rgba(212,175,90,.07);border:1px solid rgba(212,175,90,.25);
+border-radius:11px;padding:12px 13px;margin-bottom:10px}
+.assist-then{margin-bottom:10px}
+.assist-then-hd{font-size:10.5px;font-weight:700;color:var(--td);margin-bottom:5px}
+.assist-then-row{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--tm);
+padding:5px 0;border-top:1px dashed var(--bd)}
+.assist-then-n{flex:0 0 auto;width:17px;height:17px;border-radius:50%;font-size:10px;font-weight:800;
+display:grid;place-items:center;background:rgba(255,255,255,.07);color:var(--gdl)}
+.assist-gcount{float:left;color:var(--td);font-weight:800}
+/* نشانِ تواتر وظیفه (ماهانه/فصلی/سالانه). بدون این، کاربر نمی‌داند کاری که تیک زده
+   دوباره برمی‌گردد یا برای همیشه تمام شده است. */
+.duty-cad{display:inline-block;margin-inline-start:6px;padding:1px 7px;border-radius:20px;
+font-size:9.5px;font-weight:800;vertical-align:middle;color:var(--gdl);
+background:rgba(212,175,90,.14);border:1px solid rgba(212,175,90,.3)}
+html[data-theme="light"] .duty-cad{background:rgba(212,175,90,.2)}
+.assist-empty{text-align:center;padding:14px 6px}
+.assist-empty-t{font-size:13px;font-weight:800;color:var(--th);margin-bottom:6px}
+.assist-empty-d{font-size:11.5px;color:var(--tm);line-height:1.8;margin-bottom:10px}
+
+@media(max-width:700px){ .gwid-panel{left:10px;right:10px;max-width:none;width:auto;bottom:calc(10px + 3*40px + 2*8px + 12px)} }
+/* فلاش سرتیتر صفحه هنگام «برو به آنجا» — امتداد سطح‌صفحه‌ی الگوی «؟» فیلدی */
+@keyframes gwidFlash{0%{text-shadow:0 0 0 rgba(212,175,90,0)}30%{text-shadow:0 0 22px rgba(212,175,90,.9)}100%{text-shadow:0 0 0 rgba(212,175,90,0)}}
+.gwid-flash{animation:gwidFlash 1.4s ease}
+@keyframes gfieldFlash{0%{box-shadow:0 0 0 0 rgba(212,175,90,0);background:rgba(212,175,90,0)}20%{box-shadow:0 0 0 4px rgba(212,175,90,.55);background:rgba(212,175,90,.14)}100%{box-shadow:0 0 0 0 rgba(212,175,90,0);background:rgba(212,175,90,0)}}
+.gfield-flash{animation:gfieldFlash 2.2s ease;border-radius:8px}
+.cal-more{font-size:10px;color:var(--td)}
+@media(max-width:760px){
+  .cal-cell{min-height:62px;padding:3px 4px}
+  .cal-ev{font-size:9px}
+  .cal-dow{font-size:10px}
+}
+
+/* ---- گوشه‌ی چرخ‌دنده‌ی «مدیر داخلی» (نقش admin) ---- */
+.admin-gear{position:fixed;left:18px;bottom:18px;z-index:60;width:44px;height:44px;border-radius:50%;
+  border:1px solid var(--bds);background:linear-gradient(160deg,rgba(10,26,61,.94),rgba(8,17,31,.94));
+  color:var(--gdl);font-size:19px;cursor:pointer;box-shadow:var(--glow-gd);transition:transform .2s}
+.admin-gear:hover{transform:rotate(35deg) scale(1.05)}
+.admin-gear-panel{position:fixed;left:18px;bottom:70px;z-index:60;width:270px;padding:12px;
+  display:flex;flex-direction:column;gap:6px}
+.agp-t{font-size:12px;color:var(--gdl);font-weight:700;margin-bottom:2px}
+.agp-sub{font-size:10.5px;color:var(--td);margin:2px 0 -2px}
+.agp-sep{height:1px;background:var(--bd);margin:4px 0}
+.agp-i{display:flex;align-items:center;gap:10px;text-align:right;background:transparent;
+  border:1px solid transparent;border-radius:10px;padding:8px 8px;cursor:pointer;color:var(--tm)}
+.agp-i:hover{background:rgba(245,240,224,.06);border-color:var(--bd)}
+.agp-i .ic{font-size:16px;color:var(--gdl);width:20px;text-align:center;flex-shrink:0}
+.agp-i b{display:block;font-size:12.5px;color:var(--th)}
+.agp-i span{display:block;font-size:10.5px;color:var(--td);margin-top:2px;line-height:1.5}
+@media(max-width:700px){ .admin-gear{left:12px;bottom:12px} .admin-gear-panel{left:12px;bottom:62px;width:calc(100vw - 24px);max-width:300px} }
+
+/* ---- پرسنل و برنامه‌ی شیفت (public/js/shift-schedule.js) ---- */
+.ss-grid-wrap{overflow-x:auto;max-width:100%}
+table.ss-grid{border-collapse:collapse;font-size:11.5px;white-space:nowrap}
+table.ss-grid th,table.ss-grid td{border:1px solid var(--bd);padding:4px 6px;text-align:center}
+table.ss-grid th.ss-sticky,table.ss-grid td.ss-sticky{position:sticky;right:0;background:var(--bg);
+  text-align:center;min-width:58px;z-index:1}
+td.ss-cell{cursor:pointer;font-weight:700;min-width:26px}
+td.ss-cell:hover{background:rgba(212,175,90,.14)}
+/* رنگِ خانه‌ها روی صفحه باید همان مجموعه‌ی چاپ را پوشش دهد. قبلاً EN و MN فقط در
+   بلوکِ چاپ رنگ داشتند و روی مانیتور بی‌رنگ می‌ماندند — یعنی یک خانه در پیش‌نمایش
+   خاکستری بود و روی کاغذ بنفش. ترتیبِ حروف در `codes` همیشه M→E→N است (چون از
+   ترتیبِ چک‌باکس‌ها ساخته می‌شود) ولی داده‌ی قدیمی ممکن است برعکس باشد، پس هر دو
+   جهت پوشش داده می‌شود. */
+td.ss-M{color:#7fb3ff}
+td.ss-E{color:#d4af5a}
+td.ss-N{color:#b487e0}
+td.ss-ME,td.ss-EM{color:#d4af5a}
+td.ss-EN,td.ss-NE{color:#b487e0}
+td.ss-MN,td.ss-NM{color:#5eb9c9}
+td.ss-H{color:#7fc7d4}
+/* ۲۴ ساعته باید در نگاهِ اول به چشمِ سرپرستار بیاید (خطرِ خستگی، سنجه‌ی الف‑۴‑۱‑۵)،
+   و سه‌حرفی در ستونِ باریکِ روز جا نمی‌شود پس فشرده می‌شود به‌جای سرریز. */
+td.ss-MEN{color:#e05a5a;font-weight:800;background:rgba(224,90,90,.12);
+  letter-spacing:0;font-size:10px}
+.ss-hc-row td{color:var(--td);font-size:10px}
+.ss-pos{color:#e08a5a}
+.ss-neg{color:#e05a5a}
+.ss-popover{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center}
+.ss-pop-inner{background:var(--panel-bg,#101a2b);border:1px solid var(--bd);border-radius:12px;padding:16px;min-width:220px}
+.ss-pop-opt{display:flex;align-items:center;gap:8px;padding:6px 2px;font-size:13px;cursor:pointer}
+/* ستارهٔ «مسئول شیفتِ روز» و فیلتر/سطرهای گروه (پرستاران، کمک‌پرستاران…).
+   خواستهٔ کارفرما: مسئول هر روز از روی برگه معلوم باشد و برنامهٔ گروه‌ها جدا
+   دیده/وارد شود. */
+.ss-pop-lead{margin-top:6px;border-top:1px solid var(--bd);padding-top:8px;font-weight:700;color:var(--gdl)}
+.ss-lead{color:var(--gd);font-weight:800;font-size:.8em;vertical-align:super;margin-inline-start:1px}
+table.ss-grid tr.ss-group-row td{background:rgba(201,168,76,.12);color:var(--gdl);font-weight:800;
+  text-align:center;font-size:10.5px;letter-spacing:.2px}
+/* پنجرهٔ «بررسی همگنی آقا/خانم» — شیفت‌های مختلطِ هر روز قرمز می‌شوند. */
+.ss-gc-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:210;display:flex;align-items:flex-start;
+  justify-content:center;padding:30px 10px;overflow:auto}
+.ss-gc-box{background:var(--panel-bg,#101a2b);border:1px solid var(--bd);border-radius:12px;padding:16px;width:min(960px,96vw)}
+.ss-gc-bad{color:#ff8a8a;font-weight:800}
+.ss-gc-ok{color:#7fc7d4;font-weight:700}
+
+/* ---- برگه‌ی چاپیِ یک‌صفحه‌ای برنامه‌ی شیفت (public/js/shift-schedule.js) ---- */
+.ss-holiday,td.ss-holiday{background:rgba(224,90,90,.18);color:#e05a5a;font-weight:700}
+td.ss-holiday-col{background:rgba(224,90,90,.06)}
+.ss-pop-presets{display:flex;flex-wrap:wrap;gap:6px;max-width:280px}
+.ss-pop-presets .btn{display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1.3}
+.ss-pop-presets .btn i{font-style:normal;font-size:9.5px;opacity:.65}
+/* بیرون از صفحه، نه display:none: باید پیش از چاپ (روی صفحه‌ی عادی) هم
+   scrollWidth/scrollHeight واقعی‌اش قابل‌اندازه‌گیری باشد تا مقیاسِ خودکار
+   (public/js/shift-schedule.js → ssPrint) بتواند محاسبه کند؛ display:none
+   ابعاد را همیشه صفر می‌داد و مقیاس‌گیری را بی‌اثر می‌کرد. */
+.ss-print-fit{position:fixed;top:-20000px;right:-20000px;visibility:hidden}
+.ss-print-inner{width:max-content}
+
+/* ظاهرِ خودِ برگه عمداً بیرونِ @media print تعریف شده. دلیلش یک باگِ واقعی بود که
+   روی PDF خروجی دیده شد: اندازه‌گیریِ مقیاس روی رسانه‌ی «صفحه» انجام می‌شود، پس
+   اگر تایپوگرافیِ برگه فقط داخل @media print باشد، عددِ اندازه‌گیری‌شده بزرگ‌تر از
+   چیزی است که واقعاً چاپ می‌شود و برگه بی‌جهت کوچک و نصفِ کاغذ چاپ می‌شود. با
+   یکی‌بودنِ استایلِ اندازه‌گیری و چاپ، مقیاس دقیقاً همان چیزی است که روی کاغذ
+   می‌نشیند و برگه تمامِ عرض/ارتفاعِ A4 افقی را می‌گیرد. */
+/* print-color-adjust:exact یعنی مرورگر رنگ‌های پس‌زمینه/متن را در چاپ حذف
+   نکند. بدون این، کروم پیش‌فرضاً رنگ‌ها را برای صرفه‌جویی جوهر می‌اندازد و
+   برگه سیاه‌وسفید درمی‌آید — کارفرما صریح چاپِ رنگی خواست. */
+.ss-print-inner{color:#000;background:#fff;font-size:9px;padding:2px;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact}
+.ss-print-inner *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.ss-print-hd{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.ss-print-hd img{height:44px;width:auto}
+.ss-print-hd-mid{flex:1;font-size:12px}
+.ss-print-hd-mid b{display:block;font-size:13px}
+.ss-print-hd-meta{display:flex;gap:14px;font-size:9.5px;color:#333;white-space:nowrap}
+table.ss-print-table{font-size:9px;border-collapse:collapse;white-space:nowrap}
+table.ss-print-table th,table.ss-print-table td{padding:2px 4px;border:1px solid #999;
+  text-align:center;color:#000;background:transparent}
+table.ss-print-table td.ss-sticky{position:static;text-align:center;background:transparent;color:#000}
+/* چاپِ رنگی — خواسته‌ی صریح کارفرما. رنگ‌ها نسخه‌ی تیره‌ترِ رنگ‌های گرید هستند
+   تا روی کاغذِ سفید هم خوانا بمانند (رنگ‌های تمِ تیره روی سفید کم‌رنگ می‌شوند). */
+/* !important لازم است: بلوکِ چاپِ بالاتر در همین فایل `td,th{color:#000!important}`
+   دارد و بدون !important رنگ‌ها روی کاغذ سیاه می‌شدند — با اندازه‌گیریِ
+   getComputedStyle در حالت media=print دیده شد، نه حدس. */
+table.ss-print-table td.ss-M{color:#1550b8!important;font-weight:700}
+table.ss-print-table td.ss-E{color:#9a6b00!important;font-weight:700}
+table.ss-print-table td.ss-N{color:#6b2fa8!important;font-weight:700}
+table.ss-print-table td.ss-ME{color:#9a6b00!important;font-weight:700}
+table.ss-print-table td.ss-MN{color:#165268!important;font-weight:700}
+table.ss-print-table td.ss-MEN{color:#c02626!important;font-weight:800}
+table.ss-print-table td.ss-EN{color:#6b2fa8!important;font-weight:700}
+table.ss-print-table td.ss-H{color:#17576e!important;font-weight:700}
+table.ss-print-table tr.ss-hc-row td{background:#f2f4f7!important;font-size:8.5px}
+/* سطرِ گروه روی برگه (پرستار/کمک‌پرستار جدا) و ستارهٔ مسئول شیفت */
+table.ss-print-table tr.ss-group-row td{background:#eef1f6!important;font-weight:800;text-align:right;font-size:9px}
+.ss-lead-print{color:#c02626;font-weight:800;font-size:8px;vertical-align:super}
+table.ss-print-table tr.ss-hc-M td{color:#1550b8!important}
+table.ss-print-table tr.ss-hc-E td{color:#9a6b00!important}
+table.ss-print-table tr.ss-hc-N td{color:#6b2fa8!important}
+table.ss-print-table tr.ss-hc-H td{color:#17576e!important}
+.ss-print-legend{display:flex;gap:16px;font-size:9px;margin-top:6px;flex-wrap:wrap;color:#000}
+.ss-print-legend .ss-lg-M{color:#1550b8!important;font-weight:700}
+.ss-print-legend .ss-lg-E{color:#9a6b00!important;font-weight:700}
+.ss-print-legend .ss-lg-N{color:#6b2fa8!important;font-weight:700}
+.ss-print-legend .ss-lg-H{color:#17576e!important;font-weight:700}
+.ss-print-legend .ss-lg-EN{color:#6b2fa8!important;font-weight:700}
+.ss-print-legend .ss-lg-MEN{color:#c02626!important;font-weight:800}
+.ss-print-legend .ss-lg-HD{color:#c02626!important;font-weight:700}
+.ss-print-legend .ss-lg-LEAD{color:#c02626!important;font-weight:700}
+.ss-print-desc{font-size:9px;margin-top:6px;color:#000;line-height:1.8;white-space:pre-wrap}
+.ss-print-reminders{font-size:8.5px;margin-top:6px;color:#333;line-height:1.7}
+.ss-print-sign{display:flex;gap:18px;margin-top:14px}
+.ss-sign-cell{flex:1;font-size:9px;color:#000}
+.ss-sign-cell i{display:block;height:20px;border-bottom:1px solid #666;margin-top:16px}
+.ss-print-contacts{display:flex;gap:16px;font-size:8.5px;margin-top:8px;color:#444;flex-wrap:wrap}
+
+/* برگه‌ی چاپِ اقلام و نگهداشت — روی نمایشگر اصلاً دیده نمی‌شود و فقط هنگام
+   چاپ روی کاغذ می‌آید. برخلاف برگه‌ی شیفت این‌جا مقیاس‌گیری لازم نیست (جدول
+   می‌تواند چندصفحه‌ای باشد و سربرگ psheet روی هر صفحه تکرار می‌شود). */
+.fas-print-root{display:none}
+@media print{
+  body.fas-printing #root,body.fas-printing #ghdr,body.fas-printing #gftr{display:none!important}
+  body.fas-printing .fas-print-root{display:block}
+}
+
+/* شماره‌ی صفحه و نشانِ «ادامه» — بخش‌های پرپرسنل چندصفحه‌ای چاپ می‌شوند و
+   کارفرما خواست صفحه‌ها شماره بخورند تا برگه‌ها در دفتر قاطی نشوند. */
+.ss-pageno{font-weight:800;color:#000}
+.ss-print-contd{margin-top:6px;font-size:9px;color:#444;text-align:left}
+
+@media print{
+  /* هر صفحه‌ی برگه‌ی شیفت روی کاغذِ خودش. آخری این کلاس را ندارد تا صفحه‌ی
+     خالیِ اضافه بعد از آن ساخته نشود. */
+  .ss-print-fit.ss-page-break{break-after:page;page-break-after:always}
+  /* موقع چاپِ برگه‌ی شیفت، کلِ اپ از کاغذ می‌رود و فقط همین برگه می‌ماند —
+     وگرنه ارتفاعِ min-height دارِ صفحه‌ی اپ یک صفحه‌ی دومِ خالی می‌ساخت. */
+  body.ss-printing #root,body.ss-printing #ghdr,body.ss-printing #gftr,body.ss-printing #floatDock,body.ss-printing .floatdock,body.ss-printing #ent-assistant-drawer,body.ss-printing #themeDrawer,body.ss-printing .bgx-stage,body.ss-printing #bgVideo{display:none!important}
+  body.ss-printing{margin:0!important;padding:0!important}
+  /* برگه‌ی گزارشِ رسمی: همان کار، به همان دلیل — پوسته پنهان و body بلوکی، تا
+     برگه دیگر یک flex item نباشد و کروم بتواند وسطش صفحه عوض کند. حاشیه‌ی
+     افقیِ ۱۲mm عمداً می‌ماند؛ حاشیه‌ی بالا/پایین از thead/tfoot خودِ برگه
+     می‌آید و روی هر صفحه تکرار می‌شود. */
+  body.dp-printing #root,body.dp-printing #ghdr,body.dp-printing #gftr,body.dp-printing #floatDock,body.dp-printing .floatdock,body.dp-printing #ent-assistant-drawer,body.dp-printing #themeDrawer,body.dp-printing .bgx-stage,body.dp-printing #bgVideo{display:none!important}
+  body.dp-printing{display:block!important;margin:0!important}
+  /* جریانِ عادی، نه absolute: با absolute اگر یکی از والدها در چاپ ارتفاعش صفر یا
+     overflow:hidden شود، برگه بریده می‌شد. اندازه‌ی جعبه را خودِ JS روی همین
+     عنصر می‌نشاند (دقیقاً به‌اندازه‌ی فضای چاپیِ A4 افقی) و محتوای داخلش با
+     transform کوچک می‌شود، پس هرگز به صفحه‌ی دوم سرریز نمی‌کند. */
+  .ss-print-fit{position:relative;top:auto;right:auto;visibility:visible;overflow:hidden;margin:0;padding:0;
+    break-inside:avoid;page-break-inside:avoid}
+  /* فقط آخرین صفحه نباید صفحه‌ی خالیِ بعد بسازد؛ صفحه‌های میانی عمداً می‌شکنند */
+  .ss-print-fit:last-child{break-after:avoid;page-break-after:avoid}
+  .ss-print-inner{position:absolute;top:0;right:0;width:max-content}
+  .ss-print-fit .ss-holiday{background:rgba(224,90,90,.25)!important;color:#a33!important;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .ss-print-fit .ss-holiday-col{background:rgba(224,90,90,.10)!important;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+
+/* ---- ستون‌های ثابتِ برنامه‌ی شیفت + امضای کادردار + فونت کدهای شیفت ---- */
+/* کدهای شیفت (M/E/N/ME/MN) لاتین‌اند و داخل جدولِ فارسی باید یک‌دست، هم‌عرض و
+   خوانا باشند — کارفرما گفت «فونت شیفت‌ها برای چاپ و نشان‌دادن قشنگ باشد». */
+.ss-shiftcell,td.ss-cell{font-family:"Segoe UI Semibold","SF Pro Text",Inter,system-ui,sans-serif;
+  letter-spacing:.6px;font-variant-numeric:tabular-nums}
+.ss-c-num{width:58px}
+.ss-c-name{min-width:132px;white-space:normal}
+.ss-c-pos{min-width:78px}
+.ss-c-code{min-width:54px;direction:ltr}
+.ss-c-status{min-width:82px;white-space:normal}
+.ss-c-exp{width:52px}
+.ss-name-stack{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:4px;line-height:1.2;white-space:nowrap}
+.ss-name-stack span{display:inline;max-width:100%}
+.ss-drag-handle{display:inline-block;cursor:grab;color:var(--td);opacity:.65;margin-inline-end:3px;font-size:13px;user-select:none;vertical-align:middle}
+.ss-drag-handle:hover{opacity:1;color:var(--gd)}
+tr.ss-dragging{opacity:.45}
+tr.ss-drop-target td{box-shadow:inset 0 2px 0 var(--gd),inset 0 -2px 0 var(--gd)}
+.ss-inline{cursor:pointer;position:relative;padding-inline-end:12px!important}
+.ss-inline:hover{background:rgba(212,175,90,.13);box-shadow:inset 0 0 0 1px rgba(212,175,90,.35)}
+.ss-edit-pen{font-size:9px;opacity:.4;margin-inline-start:2px;vertical-align:super}
+.ss-inline:hover .ss-edit-pen{opacity:.9;color:var(--gd)}
+.ss-inline-input{width:100%;min-width:54px;max-width:110px;padding:2px 4px!important;font-size:10.5px!important;text-align:center!important;border:1px solid var(--gd)!important;border-radius:5px!important;background:var(--panel-bg,#101a2b)!important;color:var(--th)!important}
+.ss-muted{opacity:.55;font-size:9.5px}
+table.ss-print-table .ss-c-name{font-weight:600}
+/* سطرهای دلخواهِ کاربر (مرج‌شده روی کلِ عرض) */
+tr.ss-cust-row td{background:rgba(212,175,90,.10);font-size:9.5px;padding:3px 6px}
+@media print{ tr.ss-cust-row td{background:#f7f1e0!important;color:#000!important} }
+/* ویرایشگر سطر دلخواه */
+.ss-cr-row{display:flex;gap:6px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
+.ss-cr-row .ss-cr-text{flex:1;min-width:180px}
+.ss-cr-row select{max-width:150px}
+.ss-cr-bold{display:flex;align-items:center;gap:4px;font-size:12px;white-space:nowrap}
+/* امضاها: کادرِ جدا برای هرکدام — خواسته‌ی صریح کارفرما */
+.ss-print-sign{display:flex;gap:10px;margin-top:12px}
+.ss-sign-cell{flex:1;font-size:9px;color:#000;border:1px solid #999;border-radius:4px;
+  padding:6px 8px;min-height:52px;display:flex;flex-direction:column;justify-content:space-between}
+.ss-sign-cell i{display:block;height:0;border-bottom:1px dashed #999;margin-top:14px}
+
+/* ---- آپلود فرم + استخراج با AI روی ردیفِ دفترچه کدها ---- */
+.dcup{display:flex;flex-direction:column;gap:8px;padding:4px 2px}
+.dcup>.fg{margin:0}
+.dcup textarea{width:100%;font-size:12.5px;line-height:1.9}
+.dcup .tsub{font-size:11.5px;color:var(--gdl)}
+
+/* دو گزینه‌ی آپلودِ فرآیند: «تشخیص و جای‌گذاری» و «ضمیمه‌ی آماده». عمداً دو کادرِ
+   جدا با عنوانِ شماره‌دار، چون تا وقتی یک ورودیِ فایلِ بی‌برچسب بود، کاربر فکر
+   می‌کرد آپلودِ ضمیمه هم باید فلوچارت را بسازد. */
+.pfup{border:1px solid var(--bd);border-radius:10px;padding:10px 12px}
+.pfup-t{font-weight:700;font-size:13px;margin-bottom:4px;color:var(--gdl)}
+.pfup .sub{line-height:1.9}
+.pfup textarea{width:100%}
+
+/* دستیار توسعه: نوارِ ابزارِ زیرِ کادرِ پیام و نشانِ فایل‌هایی که خوانده شد.
+   نشان‌دادنِ منبع عمدی است — پاسخی که معلوم نیست از کدام فایل آمده،
+   قابلِ اعتماد نیست و کاربر مجبور می‌شود خودش دوباره بگردد. */
+.dc-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.dc-used{font-size:11.5px;color:var(--mut);margin-bottom:8px;line-height:2}
+.dc-used code{direction:ltr;display:inline-block;background:rgba(125,145,190,.12);
+  border-radius:6px;padding:1px 7px;margin:0 2px;font-size:11px}
+
+/* ==================== جست‌وجوی سراسری در نوار بالا ====================
+   کارفرما خواست از هر صفحه‌ای بشود همه‌چیز را سرچ کرد. عمداً در نوار بالا
+   نشسته نه در سایدبار: سایدبار روی موبایل بسته است و جست‌وجویی که برای
+   رسیدن به آن باید منو باز کنی، همان مشکلِ «نمی‌دانم کجاست» را حل نمی‌کند. */
+.gsearch{position:relative;flex:1;min-width:120px;max-width:420px;margin:0 10px}
+.gsearch input{width:100%;height:36px;border-radius:10px;border:1px solid var(--bd);
+  background:rgba(125,145,190,.10);color:var(--tx);padding:0 12px;font-size:13px;font-family:inherit}
+.gsearch input:focus{outline:none;border-color:var(--gdl);background:rgba(125,145,190,.16)}
+.gsres{position:absolute;top:calc(100% + 6px);inset-inline:0;z-index:60;max-height:60vh;overflow-y:auto;
+  background:var(--pan,#12203a);border:1px solid var(--bd);border-radius:12px;
+  box-shadow:0 18px 44px rgba(0,0,0,.42);padding:6px}
+.gsres.hide{display:none}
+.gs-head{font-size:11.5px;color:var(--mut);padding:6px 10px 8px}
+.gs-grp{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;
+  color:var(--gdl);font-weight:700;padding:8px 10px 4px;border-top:1px solid var(--bd);margin-top:4px}
+.gs-grp:first-of-type{border-top:0;margin-top:0}
+.gs-grp i{font-style:normal;color:var(--mut);font-weight:400}
+.gs-item{padding:7px 10px;border-radius:8px;cursor:pointer}
+.gs-item:hover,.gs-item.on{background:rgba(125,145,190,.16)}
+/* متنِ سنجه‌ها گاهی چند بند است؛ بدون این محدودیت، یک نتیجه کلِ پنجره را
+   می‌گرفت و بقیه دیده نمی‌شدند (روی اسکرین‌شات دیده شد). */
+.gs-t{font-size:13px;line-height:1.7;display:-webkit-box;-webkit-line-clamp:2;
+  -webkit-box-orient:vertical;overflow:hidden}
+.gs-t mark{background:rgba(226,183,92,.28);color:inherit;border-radius:3px;padding:0 2px}
+.gs-s{font-size:11px;color:var(--mut);margin-top:2px;display:flex;gap:6px;align-items:center}
+.gs-s code{direction:ltr;background:rgba(125,145,190,.14);border-radius:5px;padding:0 5px}
+.gs-empty{padding:14px 10px;font-size:12.5px;color:var(--mut);text-align:center}
+@media (max-width:900px){ .gsearch{order:9;flex-basis:100%;max-width:none;margin:8px 0 0} }
+@media print{ .gsearch{display:none!important} }
+
+/* ---------- «کار من» — امروز / این هفته / این ماه ----------
+   کارفرما دو چیز با هم گفت: «رابط خیلی شلوغ است» و «هر کاربر باید بداند روزانه
+   چه کار کند». این بلوک جوابِ هر دوست: به‌جای دیوارِ کارت، یک فهرستِ کوتاهِ
+   «کارِ واقعیِ همین آدم» که از داده‌ی زنده می‌آید و اگر کاری نباشد خالی می‌ماند.
+   سه بخشِ پشتِ‌هم است نه سه ستون: روی موبایل ستون‌های باریک عنوان‌ها را
+   دوخط می‌شکستند. */
+.mywork{margin:0 0 18px}
+.mw-sec{margin-bottom:14px}
+.mw-h{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:0 0 8px}
+.mw-h b{font-size:15px;font-weight:800;color:var(--th)}
+.mw-h i{font-style:normal;font-size:11.5px;color:var(--td)}
+.mw-n{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;
+  padding:0 7px;border-radius:11px;font-size:12px;font-weight:800;color:#fff}
+.mw-today .mw-n{background:#c02626}
+.mw-week  .mw-n{background:#9a6b00}
+.mw-month .mw-n{background:#1550b8}
+.mw-list{display:flex;flex-direction:column;gap:7px}
+/* هر کار یک دکمه است، نه یک کارت: کارِ سررسیدشده باید کلیک‌شدنی به‌نظر برسد */
+.mw-item{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;width:100%;
+  text-align:right;padding:11px 13px;border-radius:11px;cursor:pointer;
+  border:1px solid var(--bd);background:rgba(255,255,255,.035);
+  transition:border-color .15s,background .15s,transform .1s}
+.mw-item:hover{border-color:var(--gd);background:rgba(212,175,90,.09)}
+.mw-item:active{transform:scale(.995)}
+.mw-t{grid-column:1;font-size:13.5px;font-weight:700;color:var(--th);line-height:1.7}
+.mw-w{grid-column:1;font-size:11.5px;color:var(--td);line-height:1.7}
+.mw-cad{grid-column:1;justify-self:start;margin-top:3px;font-size:10.5px;padding:1px 7px;
+  border-radius:8px;border:1px solid var(--bd);color:var(--gdl)}
+.mw-go{grid-column:2;grid-row:1/3;font-size:11.5px;color:var(--gdl);white-space:nowrap}
+/* نوارِ رنگیِ سمت راست، شدتِ کار را بدون خواندن متن می‌گوید */
+.mw-today .mw-item{border-inline-start:3px solid #c02626}
+.mw-week  .mw-item{border-inline-start:3px solid #9a6b00}
+.mw-month .mw-item{border-inline-start:3px solid #1550b8}
+/* حالتِ «کاری نیست» عمداً یک پیامِ روشن است، نه یک جای خالی — نبودِ کار خودش خبر است */
+.mw-clear{display:flex;align-items:center;gap:14px;padding:18px 20px;border-radius:13px}
+.mw-clear-i{width:42px;height:42px;flex:none;border-radius:50%;display:grid;place-items:center;
+  font-size:22px;color:#fff;background:#17576e}
+.mw-clear b{display:block;font-size:14.5px;color:var(--th);margin-bottom:3px}
+.mw-clear span{font-size:12px;color:var(--td);line-height:1.8}
+
+/* ---------- بخش‌های جمع‌شونده‌ی صفحه‌های هاب ----------
+   «مسئولیت من» و «اعتباربخشی» هر دو به دیوارِ محتوا تبدیل شده بودند. حالا هر
+   بخشِ کم‌مصرف یک سطر است تا باز شود. summary::-webkit-details-marker حذف
+   می‌شود چون مثلثِ پیش‌فرضِ مرورگر در RTL سمت غلط می‌افتد. */
+.hub-fold{margin:0 0 10px;border:1px solid var(--bd);border-radius:12px;
+  background:rgba(255,255,255,.025);overflow:hidden}
+.hub-fold>summary,.hub-cat>summary{list-style:none;cursor:pointer;user-select:none}
+.hub-fold>summary::-webkit-details-marker,.hub-cat>summary::-webkit-details-marker{display:none}
+.hub-fold-h{display:flex;align-items:center;gap:8px;padding:12px 15px;
+  font-size:13.5px;font-weight:700;color:var(--th)}
+.hub-fold-h::before{content:'▸';color:var(--gdl);font-size:12px;transition:transform .18s}
+.hub-fold[open]>.hub-fold-h::before{transform:rotate(-90deg)}
+.hub-fold[open]>.hub-fold-h{border-bottom:1px solid var(--bd)}
+.hub-fold>*:not(summary){padding:14px 15px}
+/* دسته‌های صفحه‌ی اعتباربخشی */
+.hub-cat{margin:0 0 8px}
+summary.hub-cat-t{display:flex;align-items:center;gap:8px;padding:10px 4px;
+  font-size:13.5px;font-weight:800;color:var(--th)}
+summary.hub-cat-t::before{content:'▸';color:var(--gdl);font-size:12px;transition:transform .18s}
+.hub-cat[open]>summary.hub-cat-t::before{transform:rotate(-90deg)}
+.hub-cat-n{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;
+  padding:0 6px;border-radius:10px;font-size:11px;font-weight:700;
+  color:var(--gdl);border:1px solid var(--bd)}
+@media print{ .hub-fold,.hub-cat{display:none!important} }
+/* کارهای انجام‌شده‌ی دوره — فقط وقتی فهرستِ کار خالی است دیده می‌شود */
+.mw-done .mw-n{background:#17576e}
+.mw-done .mw-item{border-inline-start:3px solid #17576e;opacity:.82}
+.mw-done .mw-t{font-weight:600}
+
+/* ---- حضور شیفت و گزارش ۲۴ ساعته (public/js/shift-attendance.js) ----
+   چیدمان راست‌به‌چپ: فهرست بخش‌ها ستون راست (انتخابگر)، جزئیات سمت چپ. روی
+   موبایل روی هم می‌افتند و انتخابگر بالا می‌ماند — کاربر اول «کدام بخش». */
+.sa-split{display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start}
+@media (max-width:900px){.sa-split{grid-template-columns:1fr}}
+.sa-wardlist .pbody{display:flex;flex-direction:column;gap:6px}
+.sa-wardbtn{display:grid;grid-template-columns:1fr auto;gap:4px 8px;width:100%;text-align:right;
+  background:none;border:1px solid var(--bd);border-radius:12px;padding:9px 11px;cursor:pointer;
+  font-family:inherit;color:inherit;transition:.18s}
+.sa-wardbtn:hover{border-color:var(--gd);background:rgba(212,175,90,.07)}
+/* حالت انتخاب‌شده با نوارِ سمت راست مشخص می‌شود، نه چپ — جهتِ شروعِ خواندن */
+.sa-wardbtn.on{border-color:var(--gd);background:rgba(212,175,90,.12);box-shadow:inset -3px 0 0 var(--gd)}
+.sa-wardname{font-size:13px;font-weight:600}
+.sa-wardnums{font-size:11.5px;display:flex;align-items:center;gap:4px;direction:rtl}
+.sa-wardnums i{font-style:normal;opacity:.5}
+.sa-wardnums em{font-style:normal;font-size:10px;margin-right:6px}
+.sa-bar{grid-column:1/-1;height:3px;border-radius:2px;background:var(--bd);overflow:hidden}
+/* نوار پیشرفت از راست پر می‌شود؛ از چپ در فارسی «کاهش» خوانده می‌شود */
+.sa-bar i{display:block;height:100%;background:var(--gd);float:right}
+.sa-stat .v{font-size:24px;font-weight:800}
+.sa-stat.sa-big .v{font-size:34px}
+.sa-ok{color:#4ebccf}
+.sa-no{color:#e05a5a}
+.sa-late{color:#d4af5a}
+.sa-sub{color:#7fb3ff}
+.sa-unset{color:var(--td)}
+.sa-stat.sa-ok .v{color:#4ebccf}
+.sa-stat.sa-no .v{color:#e05a5a}
+.sa-stat.sa-late .v{color:#d4af5a}
+.sa-stat.sa-sub .v{color:#7fb3ff}
+.sa-stat.sa-unset .v{color:var(--td)}
+.sa-t{padding:4px 9px;font-size:11.5px}
+.sa-t.on.sa-ok{background:rgba(78,188,207,.16);border-color:#4ebccf;color:#4ebccf;font-weight:700}
+.sa-t.on.sa-no{background:rgba(224,90,90,.16);border-color:#e05a5a;color:#e05a5a;font-weight:700}
+.sa-t.on.sa-late{background:rgba(212,175,90,.16);border-color:#d4af5a;color:#d4af5a;font-weight:700}
+.sa-t.on.sa-sub{background:rgba(127,179,255,.16);border-color:#7fb3ff;color:#7fb3ff;font-weight:700}
+/* ردیفِ ثبت‌نشده باید در نگاه اول از ردیفِ ثبت‌شده جدا باشد */
+tr.sa-row-unset td{background:rgba(212,175,90,.05)}
+.sa-code{font-family:"Segoe UI Semibold","SF Pro Text",Inter,system-ui,sans-serif;
+  letter-spacing:.6px;font-weight:700;direction:ltr;display:inline-block}
+
+/* ==== RPG tables become cards on phones (progressive disclosure, no logic change) ====
+   Cells carry data-l (added in resource-page.js drawList); thead hides under 640px
+   and each row becomes a card with small caption labels. Screen-only: print keeps tables. */
+@media(max-width:640px){
+.rpg-t thead{display:none}
+.rpg-t,.rpg-t tbody,.rpg-t tr,.rpg-t td{display:block;width:100%;box-sizing:border-box}
+.rpg-t tr{border:1px solid var(--bd);border-radius:12px;margin-bottom:10px;padding:6px 12px;background:rgba(255,255,255,.02)}
+.rpg-t td{border:0;border-bottom:1px dashed rgba(255,255,255,.08);padding:8px 2px;white-space:normal!important;text-align:right}
+.rpg-t td:last-child{border-bottom:0}
+.rpg-t td[data-l]:not([data-l=""])::before{content:attr(data-l);display:block;font-size:11px;color:var(--mut);margin-bottom:2px}
+}
+
+/* ==== Dense matrices (BSC 17-col, shift-schedule 31-col) stay scrollable tables on
+   phones: card layout would destroy month-to-month comparison and tap-to-edit.
+   So only compact (smaller type/padding), keep sticky first column and >=24px taps. */
+@media(max-width:640px){
+.bsc-t th{font-size:10px;padding:5px 4px}
+.bsc-t td{font-size:11px;padding:5px 4px}
+.bsc-c{min-width:40px}
+table.ss-grid{font-size:10.5px}
+table.ss-grid th,table.ss-grid td{padding:3px 4px}
+td.ss-cell{min-width:24px}
+.ss-c-name{min-width:100px}
+}
+
+/* ==========================================================================
+   ساماندهی شاخه‌محور و کارت‌های شیک مدارک کنترل‌شده (Branch-Grouped Documents)
+   ========================================================================== */
+.lux-doc-branch-bar {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px 4px 14px 4px;
+  margin-bottom: 20px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+.lux-doc-branch-pill {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 24px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--bg-card, rgba(255,255,255,0.06));
+  color: var(--tm, #94a3b8);
+  border: 1px solid var(--bd, rgba(255,255,255,0.12));
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+.lux-doc-branch-pill:hover {
+  background: rgba(212,175,90,0.12);
+  color: var(--th, #f8fafc);
+  border-color: rgba(212,175,90,0.4);
+  transform: translateY(-1px);
+}
+.lux-doc-branch-pill.active {
+  background: linear-gradient(135deg, #e0ab2e 0%, #b88615 100%);
+  color: #0a1329 !important;
+  border-color: #f59e0b;
+  box-shadow: 0 4px 14px rgba(224,171,46,0.35);
+}
+.lux-doc-branch-pill .pill-count {
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.18);
+  font-family: monospace;
+}
+.lux-doc-branch-pill.active .pill-count {
+  background: rgba(10,19,41,0.25);
+  color: #0a1329;
+  font-weight: 800;
+}
+
+.lux-branch-section {
+  margin-bottom: 34px;
+  border: 1px solid var(--bd, rgba(255,255,255,0.08));
+  border-radius: 20px;
+  padding: 20px 22px;
+  background: linear-gradient(165deg, rgba(255,255,255,0.02) 0%, rgba(0,0,0,0.15) 100%);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+  transition: all 0.25s ease;
+}
+.lux-branch-section:hover {
+  border-color: rgba(212,175,90,0.25);
+}
+.lux-branch-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1.5px dashed var(--bd, rgba(255,255,255,0.1));
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.lux-branch-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.lux-branch-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  background: rgba(212,175,90,0.12);
+  border: 1px solid rgba(212,175,90,0.3);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.lux-branch-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--th, #f8fafc);
+}
+.lux-branch-sub {
+  font-size: 12px;
+  color: var(--tm, #94a3b8);
+  margin-top: 2px;
+}
+
+.lux-doc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
+}
+
+.lux-doc-card {
+  border-radius: 16px;
+  padding: 18px 20px;
+  background: linear-gradient(155deg, rgba(255,255,255,0.05) 0%, rgba(15,23,42,0.6) 100%);
+  border: 1.5px solid rgba(255,255,255,0.1);
+  border-top-width: 4px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+.lux-doc-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.3);
+  border-color: rgba(212,175,90,0.5);
+}
+.lux-doc-card.type-policy {
+  border-top-color: #a855f7;
+}
+.lux-doc-card.type-instruction {
+  border-top-color: #0284c7;
+}
+.lux-doc-card.type-procedure {
+  border-top-color: #10a0b9;
+}
+.lux-doc-card.type-form {
+  border-top-color: #f59e0b;
+}
+
+.lux-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.lux-doc-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11.5px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(0,0,0,0.3);
+  color: var(--gdl, #fde047);
+  border: 1px solid rgba(212,175,90,0.3);
+  direction: ltr;
+}
+.lux-type-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+.type-policy .lux-type-tag {
+  background: rgba(168,85,247,0.15);
+  color: #c084fc;
+  border: 1px solid rgba(168,85,247,0.3);
+}
+.type-instruction .lux-type-tag {
+  background: rgba(2,132,199,0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(2,132,199,0.3);
+}
+.type-procedure .lux-type-tag {
+  background: rgba(16,160,185,0.15);
+  color: #34bbd3;
+  border: 1px solid rgba(16,160,185,0.3);
+}
+.type-form .lux-type-tag {
+  background: rgba(245,158,11,0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245,158,11,0.3);
+}
+
+.lux-doc-title {
+  margin: 0 0 12px 0;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--th, #f8fafc);
+  line-height: 1.6;
+  min-height: 46px;
+}
+.lux-doc-meta {
+  background: rgba(0,0,0,0.15);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-top: 8px;
+  border: 1px solid var(--bd, rgba(255,255,255,0.05));
+  font-size: 11.5px;
+  color: var(--td, #cbd5e1);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.lux-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.lux-meta-row .lbl {
+  color: var(--tm, #94a3b8);
+}
+.lux-meta-row .val {
+  font-weight: 700;
+  color: var(--th, #f8fafc);
+}
+
+.lux-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--bd, rgba(255,255,255,0.08));
+}
+.lux-card-actions .btn {
+  font-size: 11.5px;
+  font-weight: 700;
+  border-radius: 8px;
+  padding: 6px 12px;
+}
+
+/* ==========================================================================
+   کاتالوگ شرکتی و ارائه دیجیتال سامانه (Corporate Presentation Showcase)
+   ========================================================================== */
+.cat-booklet-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 9, 22, 0.94);
+  backdrop-filter: blur(14px);
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  direction: rtl;
+}
+.cat-booklet-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  background: rgba(15, 23, 42, 0.95);
+  border-bottom: 1.5px solid rgba(212, 175, 90, 0.35);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  flex-shrink: 0;
+}
+.cat-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cat-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.cat-toc-select {
+  background: #0f172a;
+  color: var(--gdl, #fde047);
+  border: 1px solid rgba(212,175,90,0.4);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  font-weight: 700;
+  outline: none;
+  cursor: pointer;
+}
+.cat-page-counter {
+  font-size: 12.5px;
+  color: var(--th, #f8fafc);
+  font-weight: 800;
+  background: rgba(255,255,255,0.08);
+  padding: 5px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+.cat-booklet-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 20px;
+  display: flex;
+  justify-content: center;
+}
+.cat-sheet {
+  max-width: 1080px;
+  width: 100%;
+  background: linear-gradient(165deg, rgba(22, 32, 56, 0.92) 0%, rgba(10, 16, 32, 0.98) 100%);
+  border: 1.5px solid rgba(212, 175, 90, 0.3);
+  border-radius: 24px;
+  padding: 36px 40px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.cat-quote-box {
+  background: rgba(2, 132, 199, 0.08);
+  border: 2px solid #0284c7;
+  border-radius: 20px;
+  padding: 20px 26px;
+  position: relative;
+  color: var(--th, #f8fafc);
+  line-height: 1.9;
+  font-size: 13.5px;
+}
+.cat-quote-box.coral {
+  background: rgba(225, 29, 72, 0.08);
+  border-color: #e11d48;
+}
+.cat-quote-box.amber {
+  background: rgba(245, 158, 11, 0.08);
+  border-color: #f59e0b;
+}
+.cat-quote-box.emerald {
+  background: rgba(16,160,185,0.08);
+  border-color: #10a0b9;
+}
+.cat-quote-box .q-mark {
+  font-size: 32px;
+  line-height: 1;
+  color: #38bdf8;
+  font-family: Georgia, serif;
+}
+
+.cat-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+.cat-feature-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--bd, rgba(255, 255, 255, 0.08));
+  border-radius: 16px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+.cat-feature-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(212, 175, 90, 0.4);
+  background: rgba(255, 255, 255, 0.05);
+}
+.cat-feature-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.cat-steps-axis {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 12px 4px;
+  direction: rtl;
+}
+.cat-step-card {
+  flex: 1;
+  min-width: 175px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 14px 14px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.cat-step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e0ab2e, #b88615);
+  color: #0a1329;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.cat-bottom-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  background: rgba(15, 23, 42, 0.95);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+/* =========================================================================
+   صفحه لودینگ مجلل و متحرک سامانه (مطابق اسکرین‌شات مرجع ۱)
+   ========================================================================= */
+.lux-boot-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100vw;
+  background: radial-gradient(circle at center, #0b1627 0%, #080e17 100%);
+  padding: 24px;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  z-index: 9999;
+}
+
+.lux-boot-card {
+  background: rgba(9,15,25,0.92);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 28px;
+  padding: 38px 42px;
+  max-width: 620px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.75), 0 0 50px rgba(16,160,185,0.15);
+  backdrop-filter: blur(20px);
+  position: relative;
+  animation: luxFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes luxFadeIn {
+  from { opacity: 0; transform: translateY(18px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.lux-boot-logo-wrap {
+  width: 110px;
+  height: 110px;
+  margin: 0 auto 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(16,160,185,0.08);
+  border: 2px solid rgba(212, 175, 55, 0.4);
+  border-radius: 28px;
+  padding: 10px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), 0 0 25px rgba(16,160,185,0.25);
+  animation: luxFloat 4s ease-in-out infinite alternate;
+}
+
+@keyframes luxFloat {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-6px); }
+}
+
+.lux-boot-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.lux-boot-brand {
+  font-size: 1.22rem;
+  font-weight: 800;
+  color: #fdf4dc;
+  margin-bottom: 6px;
+  letter-spacing: -0.2px;
+}
+
+.lux-boot-sub {
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: #34bbd3;
+  margin-bottom: 24px;
+}
+
+.lux-boot-prog-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 26px;
+  direction: ltr;
+}
+
+.lux-boot-pct {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #f7d070;
+  min-width: 44px;
+  text-align: right;
+  font-family: monospace;
+}
+
+.lux-boot-track {
+  flex: 1;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(16,160,185,0.25);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+  position: relative;
+}
+
+.lux-boot-bar {
+  height: 100%;
+  width: 25%;
+  background: linear-gradient(90deg, #10a0b9 0%, #06b6d4 55%, #f59e0b 100%);
+  background-size: 30px 30px;
+  background-image: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.18) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.18) 50%,
+    rgba(255, 255, 255, 0.18) 75%,
+    transparent 75%,
+    transparent
+  );
+  animation: luxStripes 1.2s linear infinite, luxBarGrow 2s ease-out forwards;
+  border-radius: 12px;
+  transition: width 0.4s ease;
+}
+
+@keyframes luxStripes {
+  0% { background-position: 0 0; }
+  100% { background-position: 30px 0; }
+}
+
+.lux-boot-steps {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  position: relative;
+  padding: 0 10px;
+}
+
+.lux-boot-steps::before {
+  content: '';
+  position: absolute;
+  top: 18px;
+  left: 35px;
+  right: 35px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.12);
+  z-index: 1;
+}
+
+.lux-boot-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 2;
+}
+
+.lux-boot-step-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #070f1d;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 800;
+  transition: all 0.3s ease;
+}
+
+.lux-boot-step.done .lux-boot-step-icon {
+  background: #10a0b9;
+  border-color: #34bbd3;
+  color: #070f1c;
+  box-shadow: 0 0 14px rgba(16,160,185,0.5);
+}
+
+.lux-boot-step.active .lux-boot-step-icon {
+  background: #2563eb;
+  border-color: #60a5fa;
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(37, 99, 235, 0.6);
+  animation: luxPulse 1.8s infinite;
+}
+
+@keyframes luxPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.lux-boot-step-label {
+  font-size: 0.82rem;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.lux-boot-step.done .lux-boot-step-label,
+.lux-boot-step.active .lux-boot-step-label {
+  color: #f1f5f9;
+}
+
+.lux-boot-info-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(30, 58, 138, 0.25);
+  border: 1px solid rgba(96, 165, 250, 0.35);
+  color: #93c5fd;
+  padding: 8px 18px;
+  border-radius: 30px;
+  font-size: 0.83rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.lux-boot-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.lux-boot-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(212, 175, 55, 0.25);
+  border-top-color: #d4af37;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* =========================================================================
+   کارت بزرگ پروفایل کاربر در بالای سایدبار راست (مطابق تصویر مرجع ۲)
+   ========================================================================= */
+.side-user-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 16px 14px 14px;
+  margin-top: 10px;
+  background: rgba(0, 0, 0, 0.32);
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  border-radius: 18px;
+  position: relative;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.side-user-avatar-wrap {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.side-user-avatar {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10213b, #08101e);
+  border: 2.5px solid #d4af37;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: 800;
+  color: #fdf4dc;
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.28);
+  overflow: hidden;
+}
+
+.side-user-online-dot {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #10a0b9;
+  border: 2px solid #070f1b;
+  box-shadow: 0 0 8px #10a0b9;
+}
+
+.side-user-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 3px;
+  line-height: 1.3;
+}
+
+.side-user-role {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gdl, #f7d070);
+  margin-bottom: 10px;
+}
+
+.side-user-actions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.side.collapsed .side-user-hero {
+  padding: 8px 4px;
+  margin-top: 6px;
+  border: none;
+  background: transparent;
+}
+.side.collapsed .side-user-avatar {
+  width: 38px;
+  height: 38px;
+  font-size: 16px;
+  border-width: 1.5px;
+}
+.side.collapsed .side-user-name,
+.side.collapsed .side-user-role,
+.side.collapsed .side-user-actions {
+  display: none !important;
+}
+
+/* =========================================================================
+   کارت‌های مدرن صفحه اصلی اعتباربخشی و موتور هوشمند تصمیم‌گیرنده (مطابق تصویر ۲)
+   ========================================================================= */
+.acc-hub-container {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  width: 100%;
+  max-width: 100%;
+  padding-bottom: 40px;
+}
+
+/* نوار خوش‌آمدگویی بالا */
+.acc-welcome-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(9,16,27,0.7);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 14px;
+  padding: 12px 20px;
+  color: #e2e8f0;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.acc-welcome-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  color: #fdf4dc;
+}
+
+.acc-welcome-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+/* ویجت موتور تصمیم‌گیرنده هوشمند سنجه‌ها */
+.acc-decision-box {
+  background: linear-gradient(135deg, rgba(9,17,29,0.95), rgba(7,13,24,0.98));
+  border: 1.5px solid rgba(212, 175, 55, 0.45);
+  border-radius: 20px;
+  padding: 22px 24px;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(212, 175, 55, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.acc-decision-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, rgba(16,160,185,0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.acc-decision-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* سرشاخهٔ کرکرهٔ موتور تصمیم‌گیرنده (خواست مالک ۱۴۰۵/۰۷/۲۴): کلیک روی هدر، بدنه را جمع/باز می‌کند */
+.acc-decision-chevron {
+  color: var(--gd, #d4af37);
+  font-size: 15px;
+  line-height: 1;
+  transition: transform 0.25s ease;
+  transform: rotate(180deg); /* باز: رو به بالا (اقدامِ جمع‌کردن) */
+}
+.acc-decision-box.collapsed .acc-decision-chevron { transform: rotate(0deg); } /* جمع: رو به پایین */
+.acc-decision-box.collapsed .acc-decision-body { display: none; }
+.acc-decision-box.collapsed .acc-decision-hd { margin-bottom: 0; }
+.acc-decision-box.collapsed { padding-top: 18px; padding-bottom: 18px; }
+.acc-decision-hd:hover .acc-decision-chevron { text-shadow: 0 0 9px rgba(212, 175, 55, 0.85); }
+
+.acc-decision-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fef08a;
+}
+
+.acc-decision-badge {
+  background: rgba(16,160,185,0.15);
+  border: 1px solid #10a0b9;
+  color: #6ed5e7;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.acc-top-action-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(212, 175, 55, 0.08);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 14px;
+  padding: 16px 20px;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.acc-top-action-info {
+  flex: 1;
+  min-width: 260px;
+}
+
+.acc-top-action-tag {
+  display: inline-block;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+
+.acc-top-action-t {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+
+.acc-top-action-d {
+  font-size: 0.86rem;
+  color: #cbd5e1;
+  line-height: 1.5;
+}
+
+.acc-top-action-btn {
+  background: linear-gradient(135deg, #eab308, #ca8a04);
+  color: #0d1219;
+  font-weight: 900;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 24px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(234, 179, 8, 0.4);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.acc-top-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(234, 179, 8, 0.55);
+}
+
+/* تب‌های زمانی موتور تصمیم‌گیرنده */
+.acc-decision-tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 10px;
+  margin-bottom: 14px;
+  overflow-x: auto;
+}
+
+.acc-decision-tab {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.acc-decision-tab.active {
+  background: rgba(16,160,185,0.2);
+  border-color: #10a0b9;
+  color: #34bbd3;
+}
+
+.acc-duty-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+
+.acc-duty-item {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.acc-duty-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(212, 175, 55, 0.3);
+}
+
+.acc-duty-item.done {
+  border-color: rgba(16,160,185,0.35);
+  opacity: 0.75;
+}
+
+/* طرح دو ستونه اصلی اعتباربخشی (مطابق تصویر ۲) */
+.acc-main-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .acc-main-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ستون کارت‌های هشدار و اقدام سریع (سمت راست در RTL) */
+.acc-side-alerts {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.acc-alert-card {
+  background: rgba(9,15,25,0.9);
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  border-radius: 16px;
+  padding: 20px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+
+.acc-alert-card:hover {
+  transform: translateY(-4px);
+  border-color: #d4af37;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 20px rgba(212, 175, 55, 0.2);
+}
+
+.acc-alert-icon-box {
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  margin-bottom: 12px;
+}
+
+.acc-alert-icon-red {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #f87171;
+}
+
+.acc-alert-icon-yellow {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+}
+
+.acc-alert-icon-blue {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  color: #60a5fa;
+}
+
+.acc-alert-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #f1f5f9;
+  margin-bottom: 4px;
+}
+
+.acc-alert-badge {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+/* ستون مرکزی کارت‌ها */
+.acc-content-col {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* کارت بزرگ و شاخص کمیته‌ها (خواست قطعی کاربر: کارت کمیته‌ها هم بزرگ باشه) */
+.acc-committee-hero-card {
+  background: linear-gradient(135deg, rgba(9,16,27,0.95), rgba(16,27,44,0.92));
+  border: 1.5px solid rgba(212, 175, 55, 0.4);
+  border-radius: 18px;
+  padding: 22px 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  cursor: pointer;
+  transition: all 0.28s ease;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), 0 0 25px rgba(212, 175, 55, 0.15);
+}
+
+.acc-committee-hero-card:hover {
+  transform: translateY(-3px);
+  border-color: #d4af37;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5), 0 0 30px rgba(212, 175, 55, 0.3);
+}
+
+.acc-committee-hero-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.acc-committee-hero-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: rgba(212, 175, 55, 0.15);
+  border: 1.5px solid #d4af37;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  color: #fdf4dc;
+  flex-shrink: 0;
+}
+
+.acc-committee-hero-t {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+
+.acc-committee-hero-d {
+  font-size: 0.88rem;
+  color: #cbd5e1;
+}
+
+.acc-committee-hero-btn {
+  background: rgba(212, 175, 55, 0.18);
+  border: 1px solid #d4af37;
+  color: #fef08a;
+  font-weight: 800;
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+/* شبکه کلیدهای میانبر اصلی (مطابق تصویر ۲) */
+.acc-shortcuts-container {
+  background: rgba(9,15,25,0.88);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+
+.acc-shortcuts-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 12px;
+}
+
+.acc-shortcuts-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #fdf4dc;
+}
+
+.acc-master-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 1200px) {
+  .acc-master-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 800px) {
+  .acc-master-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .acc-master-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.acc-mcard {
+  background: rgba(7,13,24,0.85);
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  border-radius: 14px;
+  padding: 16px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  min-height: 80px;
+}
+
+.acc-mcard:hover {
+  transform: translateY(-3px);
+  border-color: #d4af37;
+  background: rgba(9,16,27,0.95);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45), 0 0 16px rgba(212, 175, 55, 0.18);
+}
+
+.acc-mcard-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.acc-mcard-t {
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.acc-mcard-sub {
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+.acc-mcard-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: #f7d070;
+  flex-shrink: 0;
+}
+
+
+
+/* === کارت‌کردن جدول‌های پهن در موبایل — مورد ۲۱ چک‌لیست (2026-09-23) ===
+   چرا اینجا: جدول‌های BSC/شیفت/ارزیابی در <700px اسکرول افقی می‌دادند.
+   هر جدولی که data-card="1" بگیرد در موبایل به کارت عمودی تبدیل می‌شود؛
+   متن هر سلول از data-l همان سطر خوانده می‌شود (الگوی resource-page.js). */
+@media (max-width: 700px) {
+  table[data-card="1"] thead { display: none; }
+  table[data-card="1"], table[data-card="1"] tbody, table[data-card="1"] tr, table[data-card="1"] td { display: block; width: 100%; }
+  table[data-card="1"] tr { border: 1px solid rgba(148,163,184,.25); border-radius: 12px; margin-bottom: 10px; padding: 8px 10px; background: rgba(15,23,42,.6); }
+  table[data-card="1"] td { border: 0; padding: 6px 4px; text-align: right; }
+  table[data-card="1"] td::before { content: attr(data-l); display: block; font-size: 11px; opacity: .6; margin-bottom: 2px; }
+}
+
+.ss-meta-box{border:1px solid rgba(148,163,184,.20);border-radius:12px;padding:10px 12px;background:rgba(148,163,184,.03)}
+.ss-meta-box>summary{cursor:pointer;font-size:12.5px;font-weight:700;color:var(--th);list-style:none}
+.ss-meta-box>summary::-webkit-details-marker{display:none}
+.ss-meta-box>summary::before{content:'▾';display:inline-block;margin-inline-end:6px;transition:transform .15s}
+.ss-meta-box[open]>summary::before{transform:rotate(180deg)}
+
+/* ---- کارت‌های بخش و تب‌های نمایش (shift-schedule.js) ---- */
+.ss-ward-groups{display:flex;flex-direction:column;gap:16px}
+.ss-ward-group{display:flex;flex-direction:column;gap:8px;width:100%;max-width:1100px;margin:0 auto}
+.ss-ward-group-title{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:700;color:var(--td);letter-spacing:.2px}
+.ss-ward-count{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:rgba(148,163,184,.14);font-size:11px}
+.ss-ward-group-title i{flex:1;height:1px;background:rgba(148,163,184,.18)}
+.ss-ward-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.ss-ward-card{display:flex;align-items:center;gap:8px;height:46px;padding:0 12px;border-radius:12px;border:1px solid rgba(148,163,184,.20);background:rgba(148,163,184,.04);color:var(--tm);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s,border-color .15s,color .15s,transform .15s}
+.ss-ward-card:hover{background:rgba(201,168,76,.10);border-color:rgba(201,168,76,.45);color:var(--th);transform:translateY(-1px)}
+.ss-ward-card.active{background:var(--gd);border-color:var(--gd);color:#081222;box-shadow:0 2px 10px rgba(201,168,76,.25)}
+.ss-ward-ico{font-size:16px;line-height:1;flex:0 0 auto}
+.ss-ward-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ss-view-tabs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+.ss-view-tab{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:132px;height:42px;padding:0 16px;border-radius:11px;border:1px solid rgba(148,163,184,.20);background:transparent;color:var(--tm);font-family:inherit;font-size:13px;font-weight:700;white-space:nowrap;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+.ss-view-tab:hover{background:rgba(201,168,76,.10);border-color:rgba(201,168,76,.40);color:var(--th)}
+.ss-view-tab.active{background:var(--gd);border-color:var(--gd);color:#081222;box-shadow:0 2px 10px rgba(201,168,76,.25)}
+@media (max-width:560px){.ss-ward-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}.ss-view-tab{flex:1 1 0;min-width:0;padding:0 6px;gap:4px;font-size:11.5px}}
+
+/* ---- تب‌های ماه، ویرایش درجا، جابه‌جایی و پایان برنامه (shift-schedule.js) ---- */
+.ss-month-tabs{position:relative;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin:0 0 16px;padding:12px 14px;border:1px solid var(--bd);border-radius:14px;background:linear-gradient(180deg,rgba(148,163,184,.10),rgba(148,163,184,.04))}
+.ss-month-list{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.ss-month-tab{font-family:inherit;font-size:17px;font-weight:800;color:var(--tm);background:transparent;border:1px solid rgba(148,163,184,.18);border-radius:14px;padding:14px 30px;min-height:58px;min-width:118px;cursor:pointer;line-height:1.4;display:inline-flex;align-items:center;justify-content:center;gap:10px;transition:background .15s,border-color .15s,transform .15s}
+.ss-month-tab .ss-micon{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;opacity:.85}
+.ss-month-tab .ss-micon svg{width:22px;height:22px;display:block}
+.ss-month-tab.active .ss-micon{opacity:1}
+.ss-month-tab:hover{background:rgba(201,168,76,.12);color:var(--th)}
+.ss-month-tab.active{background:var(--gd);color:#081222;border-color:var(--gd);box-shadow:0 2px 8px rgba(201,168,76,.25)}
+.ss-month-year{position:static;transform:none;order:2;font-size:13px;font-weight:800;color:var(--td);padding:7px 14px;border:1px solid rgba(148,163,184,.22);border-radius:999px;background:rgba(15,23,42,.35);white-space:nowrap}
+@media (max-width:760px){.ss-month-tabs{padding-top:16px}.ss-month-year{position:static;transform:none;order:2;width:100%;text-align:center;margin-top:6px}}
+.ss-settings-box{border-color:rgba(201,168,76,.45)!important}
+.ss-box-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:1px solid var(--bd);background:rgba(201,168,76,.08);border-radius:10px 10px 0 0}
+.ss-box-head>div{display:flex;flex-direction:column;gap:2px}
+.ss-box-head b{font-size:13px;color:var(--gdl)}
+.ss-box-close{width:30px;height:30px;border-radius:50%;border:1px solid var(--bd);background:transparent;color:var(--tm);font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.ss-box-close:hover{background:rgba(224,90,90,.18);color:#ff9c9c;border-color:rgba(224,90,90,.45)}
+.ss-clock-row{display:flex;align-items:center;gap:6px;direction:ltr}
+.ss-clock-input{flex:1;min-width:120px;text-align:center!important;font-variant-numeric:tabular-nums}
+.ss-hours-input{width:58px!important;min-width:58px;text-align:center!important;background:rgba(201,168,76,.08)!important;color:var(--gdl)!important;font-weight:800;border-color:rgba(201,168,76,.4)!important}
+.ss-hours-unit{font-size:10px;color:var(--td);white-space:nowrap;direction:rtl}
+.ss-settings-note{margin-top:10px;padding:8px 10px;border-radius:8px;background:rgba(148,163,184,.08);font-size:11px;color:var(--tm);line-height:1.9}
+.ss-finalize-btn{border-color:rgba(224,90,90,.45)!important;color:#ffb0b0!important}
+.ss-finalize-btn:hover{background:rgba(224,90,90,.12)!important}
+.ss-finalized-badge{display:inline-block;margin-top:4px;font-size:10.5px;color:#8ee0ab;background:rgba(46,160,90,.13);border:1px solid rgba(46,160,90,.35);border-radius:20px;padding:2px 9px}
+.ss-finalized-box{margin:0 0 10px;padding:8px 10px;border-radius:8px;background:rgba(46,160,90,.10);border:1px solid rgba(46,160,90,.3);font-size:12px;color:#9fe8b8}
+.ss-audit-num{padding:6px 8px;font-weight:800;font-size:13px}
+.ss-audit-ok{padding:12px;border-radius:9px;background:rgba(46,160,90,.1);border:1px solid rgba(46,160,90,.3);color:#8ee0ab;text-align:center;font-weight:700}
+.ss-audit-warn{margin-top:10px;font-size:11.5px;color:var(--td);line-height:1.9}
+.ss-gc-x{position:absolute;top:7px;left:8px;width:30px;height:30px;border-radius:50%;border:1px solid var(--bd);background:rgba(0,0,0,.18);color:var(--tm);font-size:20px;line-height:1;cursor:pointer;z-index:2}
+.ss-gc-x:hover{background:rgba(224,90,90,.2);color:#ff9c9c}
+.ss-gc-box{position:relative}
+
+/* جدول‌های راهنمای شیفت */
+.ss-legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-top:10px}
+.ss-legend-box{border:1px solid rgba(148,163,184,.22);border-radius:12px;overflow:hidden;background:rgba(148,163,184,.04)}
+.ss-legend-title{font-size:11.5px;font-weight:700;color:var(--td);padding:7px 10px;background:rgba(148,163,184,.08)}
+.ss-legend-box table{width:100%;border-collapse:collapse;font-size:11.5px}
+.ss-legend-box th,.ss-legend-box td{border-top:1px solid rgba(148,163,184,.12);padding:6px 10px;text-align:right}
+.ss-legend-box th{color:var(--th);font-weight:700;white-space:nowrap}
+
+
+/* تعطیلات: جمعه‌ها + تعطیلات رسمی — رنگ متفاوت */
+th.holiday, td.holiday, .ss-cd-grid th.holiday, .ss-cd-grid td.holiday { background: rgba(224,90,90,.20) !important; color: #ffd7d7 !important; }
+
+
+/* ستون نام و نام خانوادگی چسبان هنگام اسکرول افقی */
+.ss-grid th.ss-c-name, .ss-grid td.ss-c-name { position: sticky; right: 0; z-index: 3; background: #0e1b2e; box-shadow: -8px 0 10px rgba(0,0,0,.35); }
+.ss-grid thead th.ss-c-name { z-index: 4; }
+
+/* =====================================================================
+   ستون‌های چسبانِ جدول‌ها — پس‌زمینهٔ مات
+   ---------------------------------------------------------------------
+   قبلاً این سلول‌ها background:var(--bg) داشتند ولی --bg در پالت تعریف نشده
+   بود، پس رنگ به transparent می‌افتاد و هنگام اسکرول افقی، خانه‌های روز از زیر
+   نام/نقش دیده می‌شدند و متن خوانا نبود. اینجا رنگ مات صریح + ترتیب لایه‌ها
+   تعیین می‌شود: ستون «ردیف» راست‌ترین (right:0) و ستون «نام» کنارش (right:58px).
+   ===================================================================== */
+.ss-grid-wrap table.ss-grid th.ss-sticky,
+.ss-grid-wrap table.ss-grid td.ss-sticky,
+.ss-grid-wrap table.ss-grid th.ss-c-num,
+.ss-grid-wrap table.ss-grid td.ss-c-num,
+.ss-grid-wrap table.ss-grid th.ss-c-name,
+.ss-grid-wrap table.ss-grid td.ss-c-name {
+  background: #0e1b2e !important;
+  background-clip: padding-box;
+}
+.ss-grid-wrap table.ss-grid th.ss-c-num,
+.ss-grid-wrap table.ss-grid td.ss-c-num {
+  position: sticky; right: 0; z-index: 8;
+}
+.ss-grid-wrap table.ss-grid th.ss-c-name,
+.ss-grid-wrap table.ss-grid td.ss-c-name {
+  position: sticky; right: 58px; z-index: 6;
+  box-shadow: -8px 0 10px rgba(0,0,0,.45);
+}
+.ss-grid-wrap table.ss-grid thead th.ss-c-num,
+.ss-grid-wrap table.ss-grid thead th.ss-c-name { z-index: 8; }
+
+/* جدول فرم‌های کد (کد ۵۵/۹۹ و بحران): ستون نقش/نام هنگام اسکرول افقی بماند */
+.ss-cd-wrap table.ss-cd-grid th.cd-role,
+.ss-cd-wrap table.ss-cd-grid td.cd-role {
+  position: sticky; right: 0; z-index: 5;
+  background: #0e1b2e !important;
+  box-shadow: -6px 0 8px rgba(0,0,0,.40);
+}
+.ss-cd-wrap table.ss-cd-grid thead th.cd-role { z-index: 6; }
+
+/* تم روشن (اگر روزی فعال شود) */
+html[data-theme="light"] .ss-grid-wrap table.ss-grid th.ss-sticky,
+html[data-theme="light"] .ss-grid-wrap table.ss-grid td.ss-sticky,
+html[data-theme="light"] .ss-grid-wrap table.ss-grid th.ss-c-num,
+html[data-theme="light"] .ss-grid-wrap table.ss-grid td.ss-c-num,
+html[data-theme="light"] .ss-grid-wrap table.ss-grid th.ss-c-name,
+html[data-theme="light"] .ss-grid-wrap table.ss-grid td.ss-c-name,
+html[data-theme="light"] .ss-cd-wrap table.ss-cd-grid th.cd-role,
+html[data-theme="light"] .ss-cd-wrap table.ss-cd-grid td.cd-role {
+  background: #ffffff !important;
+}
+

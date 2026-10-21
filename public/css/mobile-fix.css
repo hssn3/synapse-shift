@@ -1,0 +1,238 @@
+/* =====================================================================
+   MOBILE-FIX-1405-07-20.CSS — رفع «نصفه دیده شدن» کارت‌ها و آیکون‌ها در موبایل
+   ---------------------------------------------------------------------
+   گزارش کارفرما (۱۴۰۵/۰۷/۲۰): «با سمت مدیر پرستاری در نسخه موبایل وارد شدم؛
+   آیکون‌ها و کارت‌ها نصف نشون میده یا پرونده‌ها ناقصن.»
+
+   ریشه‌یابی با اندازه‌گیری واقعی در ویوپورت 390px:
+   ۱) صفحه‌ی «اعتباربخشی»: `.secard-row` در `acc-stack.css` با `!important` روی
+      `grid-template-columns: repeat(3, 1fr)` قفل است؛ اما قاعده‌ی موبایلِ
+      تک‌ستونه در `design-system.css` (که *قبل‌تر* بار می‌شود) `!important` ندارد.
+      نتیجه: در موبایل هم ۳ ستون می‌ماند، ردیف عرض ۴۵۹px در کانتینر ۳۷۴px
+      می‌شود و کارت سوم بیرون از صفحه بریده می‌شود («نصفه»).
+   ۲) نوار مسیر (breadcrumb): افقی اسکرول‌شونده است ولی کارتِ «صفحه‌ی جاری» در
+      ابتدا بیرون از دید می‌ماند (در JS با scrollIntoView رفع شد؛ اینجا هم
+      اسکرول‌بافر و ظاهر بهتر می‌دهیم).
+   ۳) دیگر گریدهای سه‌ستونه با پهنای ثابت در صفحات نقش‌محور (مثل داشبورد
+      سرپرستار) که در موبایل فشرده می‌شوند.
+
+   این فایل عمداً آخرین فایل CSS است تا با `!important`های خودش برنده شود
+   و به فایل‌های اصلی دست نزند (اصل «فقط افزودنی» این پروژه).
+   ===================================================================== */
+
+/* --------------------------------------------------------------------------
+   ۱) کارت‌های بخش اعتباربخشی (سه شاخه الف/ب/ج) — موبایل: تک‌ستونه، تمام‌عرض
+   -------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .secard-row {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+    max-width: 100% !important;
+  }
+
+  .secard {
+    min-height: 0 !important;
+    padding: 22px 20px 20px !important;
+    border-radius: 18px !important;
+  }
+
+  .secard-t {
+    font-size: 1.15rem !important;
+    min-height: 0 !important;
+  }
+
+  .secard-ic {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 12px !important;
+  }
+
+  .secard-ic svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   ۲) نوار مسیر (breadcrumb) — نوار تمیز اسکرول‌شونده با فید لبه‌ها
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  #navcrumb .pathbar {
+    padding-inline: 4px !important;
+    scroll-padding-inline: 12px !important;
+    -webkit-mask-image: linear-gradient(to left, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%) !important;
+    mask-image: linear-gradient(to left, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%) !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   ۲.۵) نشانهٔ بصری اسکرول برای ردیف‌های افقی موبایل
+   ---------------------------------------------------------------------
+   ریشهٔ گزارش «کارت نصفه است»: ردیف‌های افقی (تب‌های تصمیم اعتباربخشی،
+   پیل‌های بخش، تب‌های هاب) اسکرول افقی دارند ولی هیچ نشانهٔ بصری نداشتند؛
+   کاربر آخرین کارتِ نیمه‌دیده را «خراب» می‌دید نه «اسکرول‌شدنی». حالا لبه‌ی
+   سمت چپ محو می‌شود (fade) — همان الگوی iOS/Android برای گالری‌های افقی.
+   mask فقط وقتی اعمال می‌شود که واقعاً سرریز وجود دارد (کمک از scroll-driven
+   hack نیست؛ سرریز ذاتی این ردیف‌ها در موبایل همیشه هست — محافظه‌کارانه).
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  /* فِید از هر دو لبه: در RTL ابتدای ردیف راست است و ادامه در چپ؛ با ماسک
+     دوطرفه، هر سرریزی (اگر وجود داشته باشد) نشانهٔ بصری می‌گیرد.
+     تست شد: mask-image روی عنصر با overflow-x:auto در Chrome/headless اعمال
+     می‌شود (getComputedStyle تأیید). */
+  .acc-decision-tabs,
+  .hub-tabs,
+  .ward-pills,
+  .section-pills,
+  .ss-ward-bar {
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%) !important;
+    mask-image: linear-gradient(to right, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%) !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   ۳) گریدهای چندستونه با عرض ثابت که در موبایل فشرده می‌شوند
+   -------------------------------------------------------------------------- */
+@media (max-width: 560px) {
+  /* شبکه‌های سه/چهارستونه‌ای رایج در سامانه — در موبایل حداقل ۲ ستون با
+     minmax کوچک‌تر، تا کارت‌ها له نشوند */
+  .grid-4, .stats, .statgrid, .dash-tiles, .metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   ۴) جداول پهن بدون قاب اسکرول — تضمین اسکرول به‌جای بریدگی
+   (قاعده‌ی احتیاطی هم‌راستا با «شبکه‌ی اطمینان» design-system:2230)
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  #root .panel:not(.psheet) table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   ۵) دکمه‌ی دانا در تب‌بار — متن و آیکون در پایین‌ترین ارتفاع‌ها (کوتاه‌تر از
+      آیفون SE) هم کامل بمانند
+   -------------------------------------------------------------------------- */
+@media (max-width: 1024px) and (max-height: 700px) {
+  .app-tabbar {
+    height: calc(56px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .app-tabbar .app-tab.app-tab-dana .app-tab-ic {
+    width: 36px !important;
+    height: 36px !important;
+    margin-top: -13px !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   ۶) صفحه‌ی «شاخص‌ها» (indicator-slides) — رفع سرریز متن KPI در موبایل
+   ---------------------------------------------------------------------
+   ریشه‌یابی (۱۴۰۵/۰۷/۲۰): `.kpi-sub` در موبایل display:flex + white-space:nowrap
+   است؛ فرزندانش با nowrap/مین‌عرض محتوا در کارت باریک جا نمی‌شوند و از لبه‌ی
+   چپ بیرون می‌زنند (overflow:hidden فقط والد است، فرزند بدون min-width:0 مهار
+   نمی‌شود → «کارت‌ها ناقص»). اصلاح: wrap به‌جای nowrap + min-width:0 برای
+   فرزندان + شکستن متن به خط بعد در عرض کم.
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .islide-kpi-card .kpi-sub {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    flex-wrap: wrap !important;
+    align-items: flex-start !important;
+    row-gap: 4px !important;
+    line-height: 1.65 !important;
+  }
+
+  .islide-kpi-card .kpi-sub > * {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .islide-kpi-card .kpi-trend-pill {
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   ۷) نوار بخش‌های اسلایدهای شاخص (islide-sections-bar) — اسکرول‌شونده با فِید
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .islide-sections-bar {
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%) !important;
+    mask-image: linear-gradient(to right, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%) !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   ۸) کارت‌های KPI صفحه شاخص‌ها — موبایل: تک‌ستونه برای خوانایی کامل
+   ---------------------------------------------------------------------
+   چرا: در 390px، گرید دوستونهی کارت‌های KPI (که برای دسکتاپ طراحی شده)
+   عنوان و متن آماری را به ellipsis می‌انداخت و کاربر آن را «ناقص» می‌دید.
+   در موبایل هر KPI تمام‌عرض می‌شود تا عنوان/مقدار/زیرمتن کامل خوانده شوند
+   (الزام خوانایی بر فشردگی مقدم است — قواعد پروژه).
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .islide-kpi-summary-row {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .islide-kpi-card {
+    padding: 13px 14px !important;
+    align-items: flex-start !important;
+  }
+
+  .islide-kpi-card .kpi-title {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    font-size: 12.5px !important;
+    line-height: 1.6 !important;
+  }
+
+  .islide-kpi-card .kpi-icon {
+    width: 42px !important;
+    height: 42px !important;
+    font-size: 20px !important;
+    margin-top: 2px !important;
+  }
+
+  .islide-kpi-card .kpi-val {
+    flex-wrap: wrap !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   ۹) کنترل‌های ناوبری اسلاید شاخص (islide-nav-controls) — موبایل: چند خطی
+   ---------------------------------------------------------------------
+   `.islide-nav-controls` با flex-wrap:nowrap ساخته شده و در 390px دکمه‌های
+   «تمام‌صفحه» و «ورود/ویرایش» را از لبه بیرون می‌برد (اندازه‌گیری: overL تا
+   171px). در موبایل اجازه شکستن خط می‌دهیم و دکمه‌ها را خردتر می‌کنیم.
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .islide-nav-controls {
+    flex-wrap: wrap !important;
+    row-gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .islide-nav-controls .btn {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    font-size: 12px !important;
+    padding: 7px 10px !important;
+    justify-content: center !important;
+  }
+
+  .islide-progress-pill {
+    width: 100% !important;
+  }
+}

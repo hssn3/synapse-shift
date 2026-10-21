@@ -1,0 +1,2382 @@
+/* =====================================================================
+   لایه‌ی طراحی v5 — «سطح تمیز»
+   ---------------------------------------------------------------------
+   این فایل بعد از app.css بارگذاری می‌شود و عمداً یک لایه‌ی جداست:
+   app.css حدود ۹۱ هزار خط قاعده‌ی انباشته دارد و جراحی درون آن پرریسک است.
+   اینجا فقط «توکن‌ها» و چند مؤلفه‌ی پرتکرار بازتعریف می‌شوند، پس هر صفحه‌ای
+   که از همان متغیرهای معنایی موجود (--gb/--bd/--th/--tm/--td/--gd/...)
+   استفاده می‌کند، خودکار ظاهر جدید می‌گیرد.
+
+   تصمیم‌های طراحی و دلیلشان:
+   ۱) تم روشن قبلی، تمِ تیره‌ی رنگ‌شده بود: همان گرادیان‌های شعاعی زمرد/طلا روی
+      زمینه‌ی روشن، که خاکی و کدر دیده می‌شد. حالا تم روشن سطح خودش را دارد:
+      زمینه‌ی خنثای سرد، کارت سفید تخت، بوردر ۱ پیکسلی واقعی، سایه‌ی نرم.
+   ۲) طلا در تم روشن از «رنگ کنش» به «رنگ تأکید» تنزل کرد. رنگ کنش، زمرد است.
+      طلای تیره روی سفید قهوه‌ای گِلی دیده می‌شود؛ زمرد هم خواناتر است هم
+      با فضای درمان سازگارتر.
+   ۳) شاین/براقی شیشه‌ای در تم روشن خاموش است. آن افکت برای سطح تیره ساخته شده
+      و روی سفید فقط لک زرد می‌گذارد.
+   ===================================================================== */
+
+/* ---------- ۱. توکن‌های مشترک هر دو تم ---------- */
+:root{
+  /* شعاع‌ها: کمی جمع‌تر از قبل. ۱۸px روی کارت‌های کوچک «حبابی» دیده می‌شد. */
+  --r:14px; --rs:9px; --rl:20px; --rp:999px;
+
+  /* نردبان فاصله — تا اندازه‌گذاری دلبخواهی نشود */
+  --sp1:4px; --sp2:8px; --sp3:12px; --sp4:16px; --sp5:24px; --sp6:32px;
+
+  /* سایه‌ها */
+  --sh1:0 1px 2px rgba(9,15,24,.06),0 1px 3px rgba(9,15,24,.05);
+  --sh2:0 2px 4px rgba(9,15,24,.05),0 4px 12px rgba(9,15,24,.07);
+  --sh3:0 8px 28px rgba(9,15,24,.12),0 2px 6px rgba(9,15,24,.06);
+
+  /* حلقه‌ی فوکوس یکسان در کل سامانه (دسترس‌پذیری) */
+  --ring:0 0 0 3px rgba(26,97,123,.28);
+}
+
+/* ---------- ۲. تایپوگرافی و ارقام ---------- */
+/* وزیرمتن انتخاب درستی است و می‌ماند: تحقیق بازار فارسی هم همین را می‌گوید
+   (استاندارد عملی وب فارسی، ارتفاع ایکس بلند، وزن متغیر ۱۰۰..۹۰۰، و ارقام
+   لاتینِ هماهنگ با Inter). مشکل، خودِ فونت نبود؛ نحوه‌ی استفاده بود. */
+
+/* ارقام: بزرگ‌ترین شکایت کاربر. ارقام فارسی در جاهای کوچک و فشرده
+   (نشان‌های گرد، ستون جدول، درصدها) بد جا می‌افتند چون عرضشان یکسان نیست و
+   «۴/۶/۵» در سایز کوچک شبیه هم می‌شوند. راه‌حل:
+   الف) ارقام جدولی (tabular) در همه‌ی بافت‌های داده‌ای، تا ستون‌ها زیر هم بنشینند؛
+   ب) کلاس .num برای هر عددی که باید «فنی» خوانده شود؛
+   ج) سوییچ سراسری ارقام لاتین/فارسی که در app.js پیاده شده و پیش‌فرضش
+      لاتین است — همان کاری که داشبوردهای فارسیِ روز می‌کنند. */
+.num,
+th,td,
+.st,.bsc-c,.stdc,.bdg,.cnt,
+input[type="number"],
+time,.mono{
+  font-variant-numeric:tabular-nums lining-nums;
+  font-feature-settings:'tnum' 1,'lnum' 1;
+  font-kerning:none;
+}
+/* اعداد لاتین داخل متن فارسی باید جهت‌شان ایزوله شود وگرنه علامت و پرانتز
+   کنارشان جابه‌جا می‌پرد. */
+.num{unicode-bidi:isolate;direction:ltr;display:inline-block}
+
+/* وزن‌ها: تیتر ۷۰۰ کافی است. ۸۰۰/۹۰۰ در خط فارسی «چاق» و کم‌خوان می‌شود. */
+h1,h2,h3,h4,.lsec-t,.pt,.card-t{font-weight:700;letter-spacing:0}
+body{text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
+
+/* ---------- ۳. تم روشن — بازنویسی کامل ---------- */
+html[data-theme="light"]{
+  /* سطوح */
+  --surface:#ffffff;
+  --surface-2:#f7f9f9;
+  --surface-3:#eef1f2;
+  --page:#f1f4f5;
+
+  /* متن — نردبان خنثای سرد با ته‌مایه‌ی سبز، نه قهوه‌ای */
+  --th:#0d141e;   /* تیتر */
+  --tm:#33474180; /* جای‌نگهدار؛ پایین‌تر مقدار واقعی ست می‌شود */
+  --tm:#334247;   /* متن */
+  --td:#64796f;   /* کم‌رنگ */
+
+  /* رنگ کنش: زمرد */
+  --pri:#185a72; --pri-h:#13475a; --pri-d:#112544;
+  --pri-soft:#e6f2f4; --pri-soft-b:#bfdee3;
+
+  /* طلا فقط تأکید — نه رنگ دکمه */
+  --gd:#b07d10; --gdl:#8a6209; --gdd:#6d4c05;
+  --gold-soft:#fdf4e0; --gold-soft-b:#eddcaf;
+
+  /* شیشه‌ها به سطح تخت تبدیل می‌شوند */
+  --gb:#ffffff;
+  --gbs:#f7f9f9;
+
+  /* بوردرها: خاکستریِ واقعی، نه طلای نیمه‌شفاف */
+  --bd:#e0e6e7;
+  --bds:#c8d3d5;
+
+  /* وضعیت‌ها با کنتراست AA روی سفید */
+  --ok:#185971; --wr:#a86a06; --dn:#c0392b;
+  --ok-soft:#e6f3f5; --wr-soft:#fdf3e0; --dn-soft:#fdecea;
+
+  --sheen-rgb:255,255,255;
+  color-scheme:light;
+}
+
+/* زمینه: صاف و خنثی. گرادیان‌های شعاعیِ زمرد/طلای قبلی حذف شدند — همان چیزی
+   بودند که کل صفحه را خاکی می‌کرد. یک تینت بسیار ملایم در بالا می‌ماند تا
+   صفحه کاملاً بی‌روح نشود. */
+html[data-theme="light"] body{
+  color:var(--tm);
+  background:
+    radial-gradient(1200px 520px at 78% -18%,rgba(24,90,114,.055) 0%,transparent 70%),
+    linear-gradient(180deg,#f6f9f9 0%,var(--page) 38%,#eef2f3 100%);
+  background-attachment:fixed;
+}
+/* نقطه‌چین طلایی روی زمینه در تم روشن فقط کثیف دیده می‌شود */
+html[data-theme="light"] body::before{opacity:0}
+html[data-theme="light"] .bgfx-aurora{opacity:.10;mix-blend-mode:normal}
+html[data-theme="light"] .bgfx-grid{
+  background-image:linear-gradient(rgba(13,20,30,.035) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(13,20,30,.035) 1px,transparent 1px)}
+
+/* ---------- ۴. کارت‌ها در تم روشن ---------- */
+html[data-theme="light"] .g{
+  background:var(--surface);
+  backdrop-filter:none;-webkit-backdrop-filter:none;
+  border:1px solid var(--bd);
+  border-radius:var(--r);
+  box-shadow:var(--sh1);
+}
+html[data-theme="light"] .g:hover{box-shadow:var(--sh2);border-color:var(--bds)}
+html[data-theme="light"] .gs{background:var(--surface-2);border-color:var(--bds)}
+/* شاین/پرتو/براقی: در سطح روشن فقط لکه‌ی زرد می‌سازد */
+html[data-theme="light"] .g::before,
+html[data-theme="light"] .g::after,
+html[data-theme="light"] .sheen,
+html[data-theme="light"] .shine::before,
+html[data-theme="light"] .shine::after{display:none!important}
+html[data-theme="light"] .side::before,
+html[data-theme="light"] .side::after{display:none}
+
+/* ---------- ۵. دکمه‌ها ---------- */
+html[data-theme="light"] .btn{border-radius:10px;font-weight:700;box-shadow:none;transition:.15s}
+html[data-theme="light"] .btn-g,
+html[data-theme="light"] .btn-gold{
+  background:var(--pri);color:#fff;border:1px solid var(--pri);
+  box-shadow:0 1px 2px rgba(19,71,90,.25);
+}
+html[data-theme="light"] .btn-g:hover,
+html[data-theme="light"] .btn-gold:hover{background:var(--pri-h);border-color:var(--pri-h)}
+html[data-theme="light"] .btn-o{
+  background:var(--surface);color:var(--th);border:1px solid var(--bds)}
+html[data-theme="light"] .btn-o:hover{background:var(--surface-3);border-color:var(--pri);color:var(--pri)}
+html[data-theme="light"] .btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* ---------- ۶. ورودی‌ها ---------- */
+html[data-theme="light"] .fg input,
+html[data-theme="light"] .fg select,
+html[data-theme="light"] .fg textarea,
+html[data-theme="light"] input[type="text"],
+html[data-theme="light"] input[type="password"],
+html[data-theme="light"] input[type="number"],
+html[data-theme="light"] input[type="date"],
+html[data-theme="light"] input[type="search"],
+html[data-theme="light"] select,
+html[data-theme="light"] textarea,
+html[data-theme="light"] .dsearch{
+  background:var(--surface);
+  border:1px solid var(--bds);
+  color:var(--th);
+  border-radius:10px;
+}
+html[data-theme="light"] .fg input::placeholder,
+html[data-theme="light"] textarea::placeholder,
+html[data-theme="light"] .dsearch::placeholder{color:#93a5a8}
+html[data-theme="light"] .fg select option,
+html[data-theme="light"] .ysel select option,
+html[data-theme="light"] select option{background:#fff;color:var(--th)}
+html[data-theme="light"] .fg label{color:var(--th);font-weight:600}
+
+/* حلقه‌ی فوکوس یکسان — در هر دو تم */
+.fg input:focus,.fg select:focus,.fg textarea:focus,
+input:focus-visible,select:focus-visible,textarea:focus-visible,
+button:focus-visible,a:focus-visible,[tabindex]:focus-visible{
+  outline:none;border-color:var(--pri,#188a9e);box-shadow:var(--ring)}
+
+/* ---------- ۷. نوار کناری و ناوبری ---------- */
+html[data-theme="light"] .side{background:transparent}
+html[data-theme="light"] .nitem,
+html[data-theme="light"] .navgroup-hd{color:var(--tm);border-radius:9px}
+html[data-theme="light"] .nitem:hover,
+html[data-theme="light"] .navgroup-hd:hover{background:var(--surface-3);color:var(--th)}
+html[data-theme="light"] .nitem.on,
+html[data-theme="light"] .navgroup-hd.on{
+  background:var(--pri-soft);color:var(--pri-d);font-weight:700}
+html[data-theme="light"] .navgroup-hd .ic,
+html[data-theme="light"] .nitem .ic{color:var(--pri)}
+html[data-theme="light"] .side-act{
+  background:var(--surface);border:1px solid var(--bd);color:var(--tm)}
+html[data-theme="light"] .side-act:hover{border-color:var(--pri);color:var(--pri);background:var(--pri-soft)}
+html[data-theme="light"] .side-act.out:hover{border-color:var(--dn);color:var(--dn);background:var(--dn-soft)}
+html[data-theme="light"] .navfoot{border-top:1px solid var(--bd)}
+
+/* شمارنده‌های کنار آیتم‌های منو — قبلاً حباب طلایی گِلی بودند */
+html[data-theme="light"] .cnt,
+html[data-theme="light"] .bdg,
+html[data-theme="light"] .stdc{
+  background:var(--surface-3);color:var(--td);border:1px solid var(--bd);
+  border-radius:var(--rp);font-weight:600}
+html[data-theme="light"] .navgroup-hd.on .cnt{background:#fff;color:var(--pri-d);border-color:var(--pri-soft-b)}
+
+/* ---------- ۸. سربرگ/فوتر عمومی ---------- */
+html[data-theme="light"] #ghdr .ghdr-in{
+  background:rgba(255,255,255,.92);border-bottom:1px solid var(--bd);box-shadow:var(--sh1)}
+html[data-theme="light"] #gftr{background:var(--surface-2);border-top:1px solid var(--bd)}
+
+/* ---------- ۹. جدول‌ها ---------- */
+html[data-theme="light"] table{background:var(--surface)}
+html[data-theme="light"] th{
+  background:var(--surface-3);color:var(--th);font-weight:700;
+  border-bottom:1px solid var(--bds)}
+html[data-theme="light"] td{border-bottom:1px solid var(--bd);color:var(--tm)}
+html[data-theme="light"] tbody tr:hover td{background:var(--surface-2)}
+
+/* ---------- ۱۰. نشان‌های وضعیت ---------- */
+html[data-theme="light"] .bdg.ok{background:var(--ok-soft);color:var(--ok);border:1px solid #bfdee3}
+html[data-theme="light"] .bdg.wr{background:var(--wr-soft);color:var(--wr);border:1px solid #ecd8a8}
+html[data-theme="light"] .bdg.dn,html[data-theme="light"] .bdg.no{background:var(--dn-soft);color:var(--dn);border:1px solid #f0c3bd}
+html[data-theme="light"] .st{background:var(--surface);border:1px solid var(--bd);box-shadow:var(--sh1)}
+html[data-theme="light"] .mcard{background:var(--surface-2);border:1px solid var(--bd)}
+html[data-theme="light"] .stdblk{border:1px solid var(--bd);background:var(--surface)}
+html[data-theme="light"] .stdhd:hover{background:var(--surface-2)}
+html[data-theme="light"] .stdc{background:var(--pri-soft);color:var(--pri-d);border:1px solid var(--pri-soft-b)}
+html[data-theme="light"] .svcbar-item{background:var(--surface);border:1px solid var(--bd)}
+html[data-theme="light"] .svccard-ic,html[data-theme="light"] .svcbar-ic{background:var(--pri-soft);color:var(--pri)}
+
+/* ---------- ۱۱. دُک شناور و کشوها ---------- */
+html[data-theme="light"] .dock-btn{
+  background:var(--surface);border:1px solid var(--bds);color:var(--th);box-shadow:var(--sh2)}
+html[data-theme="light"] .dock-btn:hover{border-color:var(--pri);color:var(--pri)}
+html[data-theme="light"] .dockmenu,
+html[data-theme="light"] .settdrawer{
+  background:var(--surface);border:1px solid var(--bd);box-shadow:var(--sh3)}
+html[data-theme="light"] .dockmenu-item{color:var(--tm)}
+html[data-theme="light"] .dockmenu-item:hover{background:var(--pri-soft);color:var(--pri-d)}
+html[data-theme="light"] .themebtn{background:var(--surface);border:1px solid var(--bds);color:var(--th)}
+
+/* ---------- ۱۲. پنل دستیار ---------- */
+html[data-theme="light"] .gwid{
+  background:var(--surface);border:1px solid var(--bd);box-shadow:var(--sh3)}
+html[data-theme="light"] .assist-opt{
+  background:var(--surface-2);border:1px solid var(--bd);color:var(--th)}
+html[data-theme="light"] .assist-opt:hover{background:var(--pri-soft);border-color:var(--pri-soft-b)}
+html[data-theme="light"] .gwid-row{background:var(--surface-2);border:1px solid var(--bd)}
+html[data-theme="light"] .assist-then-n{background:var(--surface-3);color:var(--td)}
+html[data-theme="light"] .duty-cad{background:var(--gold-soft);color:var(--gdl);border:1px solid var(--gold-soft-b)}
+
+/* ---------- ۱۳. کارت‌های صفحه‌ی فرود ---------- */
+html[data-theme="light"] .svccard{
+  background:var(--surface);border:1px solid var(--bd);box-shadow:var(--sh1)}
+html[data-theme="light"] .svccard:hover{
+  border-color:var(--pri-soft-b);box-shadow:var(--sh2);transform:translateY(-2px)}
+/* تیتر گرادیانی روی زمینه‌ی روشن ناخواناست */
+html[data-theme="light"] .lhero h1,
+html[data-theme="light"] .lhero h1 *{
+  background:none!important;-webkit-text-fill-color:var(--th)!important;color:var(--th)!important}
+html[data-theme="light"] .lhero h1 .hl{color:var(--pri)!important;-webkit-text-fill-color:var(--pri)!important}
+
+/* ---------- ۱۴. آیکون‌های SVG ---------- */
+.ic-s{width:1.15em;height:1.15em;flex:0 0 auto;display:inline-block;vertical-align:-.17em;
+  fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.ic-s.fillx{fill:currentColor;stroke:none}
+.nitem .ic-s,.navgroup-hd .ic-s{width:17px;height:17px}
+.ic-s.lg{width:1.6em;height:1.6em}
+
+/* ---------- ۱۵. آیکون ماه‌های شمسی ---------- */
+.mon-ic{display:inline-flex;align-items:center;justify-content:center;
+  width:2.1em;height:2.1em;border-radius:50%;flex:0 0 auto;
+  background:var(--pri-soft,rgba(52,187,211,.14));color:var(--pri,#34bbd3);
+  border:1px solid var(--pri-soft-b,rgba(52,187,211,.3))}
+.mon-ic svg{width:62%;height:62%;fill:none;stroke:currentColor;stroke-width:1.6;
+  stroke-linecap:round;stroke-linejoin:round}
+.mon-ic.sm{width:1.55em;height:1.55em}
+.mon-chip{display:inline-flex;align-items:center;gap:7px;padding:4px 10px 4px 4px;
+  border-radius:var(--rp);background:var(--surface-2,rgba(255,255,255,.06));
+  border:1px solid var(--bd);font-size:12.5px;font-weight:600;color:var(--th)}
+/* هر ماه، رنگ فصل خودش را دارد: بهار سبز، تابستان کهربایی، پاییز نارنجی‌قرمز، زمستان آبی */
+.mon-ic[data-season="spring"]{background:#e7f4f6;color:#1a617b;border-color:#bddfe5}
+.mon-ic[data-season="summer"]{background:#fdf3e0;color:#b45309;border-color:#eddcaf}
+.mon-ic[data-season="autumn"]{background:#fdeee6;color:#c2410c;border-color:#f3d0bd}
+.mon-ic[data-season="winter"]{background:#e8f1fa;color:#1d4ed8;border-color:#c3daf3}
+html[data-theme="dark"] .mon-ic[data-season="spring"],:root:not([data-theme]) .mon-ic[data-season="spring"]{background:rgba(34,173,197,.15);color:#4ac8de;border-color:rgba(74,200,222,.3)}
+html[data-theme="dark"] .mon-ic[data-season="summer"],:root:not([data-theme]) .mon-ic[data-season="summer"]{background:rgba(217,160,40,.16);color:#f0c060;border-color:rgba(240,192,96,.3)}
+html[data-theme="dark"] .mon-ic[data-season="autumn"],:root:not([data-theme]) .mon-ic[data-season="autumn"]{background:rgba(234,88,12,.16);color:#fb923c;border-color:rgba(251,146,60,.3)}
+html[data-theme="dark"] .mon-ic[data-season="winter"],:root:not([data-theme]) .mon-ic[data-season="winter"]{background:rgba(59,130,246,.16);color:#7dabf8;border-color:rgba(125,171,248,.3)}
+
+/* ---------- ۱۶. راهنمای فیلدها («؟» طلایی) — دیده‌شدن قطعی ---------- */
+/* شکایت کاربر: معلوم نیست کدام باکس راهنما دارد. پایه‌ی .hlp در app.css تعریف شده؛
+   اینجا فقط کنتراست و اندازه‌اش تقویت می‌شود تا در یک نگاه دیده شود. */
+.hlp{width:19px;height:19px;font-size:12px;font-weight:800;
+  box-shadow:0 0 0 2px rgba(201,168,76,.10);transition:transform .15s,box-shadow .15s,background .15s}
+.hlp:hover,.hlp.pinned{transform:scale(1.12);box-shadow:0 0 0 4px rgba(201,168,76,.20)}
+html[data-theme="light"] .hlp{
+  background:var(--gold-soft);color:var(--gdl);border:1px solid var(--gd)}
+html[data-theme="light"] .hlp:hover,html[data-theme="light"] .hlp.pinned{
+  background:var(--gd);color:#fff}
+/* نبضِ خیلی ملایم فقط برای راهنماهایی که هنوز باز نشده‌اند، تا چشم پیدایشان کند.
+   با prefers-reduced-motion یا data-anim=off خاموش می‌شود. */
+@keyframes hlpPulse{0%,100%{box-shadow:0 0 0 2px rgba(201,168,76,.10)}
+  50%{box-shadow:0 0 0 5px rgba(201,168,76,.22)}}
+.hlp.fgh:not(.done):not(.pinned){animation:hlpPulse 2.8s ease-in-out infinite}
+html[data-anim="off"] .hlp.fgh{animation:none}
+@media (prefers-reduced-motion:reduce){.hlp.fgh{animation:none}}
+/* فیلدی که راهنما دارد در یک نگاه معلوم باشد */
+.fg:has(.hlp) > label{display:flex;align-items:center;gap:2px}
+
+/* دکمه‌ی «پر کردن نمونه» — عمداً از «؟» جداست و داخل تولتیپ است.
+   کلیک روی «؟» هرگز فیلد را پر نمی‌کند؛ فقط این دکمه پر می‌کند. (قرارداد صریح کاربر) */
+.fgbtn{background:linear-gradient(135deg,#128ba0,#185a72 60%,#13475a)!important;color:#fff!important;
+  letter-spacing:.2px}
+.fgbtn:hover{filter:brightness(1.08);box-shadow:0 3px 12px rgba(24,90,114,.4)!important}
+
+/* ---------- ۱۷. چاپ ---------- */
+@media print{
+  html,body{background:#fff!important;color:#000!important}
+  body{zoom:1!important}
+  /* هرچه شناور/تزئینی است باید از کاغذ برود. فهرست از روی خروجی واقعی
+     (اسکرین‌شات با emulateMedia:'print') به‌دست آمده، نه حدس. */
+  .side,.dock,.dock-btn,.dockmenu,.settdrawer,.gwid,.gwid-panel,#ghdr,#gftr,
+  .noprint,.skip,.mbtn,.soverlay,.toast,.tipfloat,
+  .admin-gear,#adminGearBtn,.agpop,
+  #copilot-trigger,#copilot-panel,#cp-spotlight-mask,#cp-tour-card,
+  .bgfx,.bgfx-bg,.bgfx-grid,.bgfx-aurora,.bgfx-beam,.bgfx-orb,#bgfx-fx{display:none!important}
+  .main{height:auto!important;overflow:visible!important;padding:0!important}
+  #app{display:block!important;height:auto!important;min-height:0!important}
+  .g{box-shadow:none!important;border:1px solid #ccc!important;background:#fff!important;
+     break-inside:avoid;page-break-inside:avoid}
+  .g::before,.g::after{display:none!important}
+  table{break-inside:auto}
+  tr,img,svg{break-inside:avoid;page-break-inside:avoid}
+  thead{display:table-header-group}
+  h1,h2,h3{break-after:avoid;page-break-after:avoid}
+  a[href]::after{content:''}
+  /* کاغذ سفیدِ برگه‌های چاپی (printListSheet و هم‌خانواده‌ها): جوهر تیره‌ی اجباری.
+     ریشه‌ی باگِ «برگه‌ی سیاه»: سلول‌ها و تیترها رنگِ تمِ تیره را نگه می‌داشتند و
+     با چاپِ رنگی، جدولِ سبزِ تیره با متنِ مشکیِ نامرئی چاپ می‌شد (با خروجی واقعی
+     دیده شد، نه حدس). بج‌های معنایی (.bdg/.badge و rep-*) دست‌نخورده می‌مانند چون
+     قانون‌های خودشان خاص‌ترند یا روی span داخلی‌اند، نه روی td. */
+  .psheet h1,.psheet h2,.psheet h3{color:#000!important}
+  .psheet .sub,.psheet .empty,.psheet .psheet-intro{color:#333!important}
+  .psheet-intro{font-size:12px;margin-bottom:12px}
+  .psheet table{background:#fff!important}
+  .psheet th{background:#f1f5f9!important;color:#0f172a!important;border-color:#999!important}
+  .psheet td{background:#fff!important;color:#000!important;border-color:#bbb!important}
+  .psheet tbody tr:nth-child(even):not(.drow) td{background:#f8fafc!important}
+  /* حاشیه‌ی @page عمداً صفر است.
+     کارفرما گزارش داد روی برگه‌ها «سیناپس» و ساعت
+     چاپ می‌شود. آن متن هیچ‌جای کد ما نیست: عنوانِ صفحه (<title>) و تاریخ/ساعت و
+     نشانی و شماره‌ی صفحه را خودِ مرورگر داخلِ margin box کاغذ می‌کشد. با CSS
+     نمی‌شود آن‌ها را خاموش کرد، ولی با حاشیه‌ی صفر جایی برای کشیدنشان نمی‌ماند —
+     تنها راهِ قابل‌اتکا، و همان چیزی که تیکِ «سربرگ و پاورقی» مرورگر را بی‌اثر
+     می‌کند. عوارضش این است که حاشیه‌ی واقعیِ کاغذ را باید خودمان بگذاریم؛ که
+     بهتر هم هست، چون padding داخلِ thead/tfoot روی «هر» صفحه تکرار می‌شود
+     در حالی که @page فقط یک بار اعمال می‌شد. */
+  /* اندازه‌ی کاغذ صریح است، نه پیش‌فرضِ مرورگر: بدون size، کروم روی نصب‌های
+     منطقه‌ی آمریکا کاغذ Letter (۲۱۶×۲۷۹) می‌گیرد و برگه‌ی طراحی‌شده برای A4
+     یا بریده می‌شود یا حاشیه‌ی نامتقارن پیدا می‌کند. با رندر واقعی دیده شد.
+     گزارش‌های پهن این را با @page{size:A4 landscape} بازنویسی می‌کنند. */
+  @page{size:A4 portrait;margin:0}
+  /* حاشیه‌ی چپ/راست: روی همه‌ی صفحه‌ها اعمال می‌شود، چون padding افقی در جریانِ
+     چندصفحه‌ای تکرار می‌شود. حاشیه‌ی بالا/پایینِ برگه‌های رسمی از thead/tfoot
+     می‌آید (بخش ۳۴)، پس این‌جا فقط برای صفحه‌های عادی گذاشته می‌شود تا دوبرابر
+     نشود. */
+  body{padding-left:12mm!important;padding-right:12mm!important}
+  /* برگه‌ی شیفت و برگه‌ی فلوچارت کلِ کاغذ را خودشان مدیریت می‌کنند (اندازه‌گیری
+     و مقیاس‌گیریِ JS)، پس هیچ حاشیه‌ای از body نمی‌گیرند — به‌صراحت کنار
+     گذاشته شده‌اند تا به ترتیبِ بارگذاریِ فایل‌های CSS وابسته نباشد. */
+  body.ss-printing,body.fc-printing{padding:0!important}
+  body:not(:has(.psheet)):not(.ss-printing):not(.fc-printing){
+    padding-top:12mm!important;padding-bottom:12mm!important}
+}
+
+/* ---------- ۱۸. دکمه‌ی دستیار هوشمند ---------- */
+/* بازخورد کاربر: «زیاد انیمیشنی نیست». نسخه‌ی قبل عمداً محتاط بود؛ حالا حرکت
+   واقعاً دیده می‌شود: دو حلقه‌ی نبض پشت‌سرهم، جرقه‌ای که می‌چرخد و نفس می‌کشد،
+   یک درخششِ عبوری روی خود دکمه، و بالا-پایینِ خیلی ملایم. همه با
+   data-anim="off" یا prefers-reduced-motion کاملاً می‌ایستند. */
+#guideDockBtn{display:none !important;position:relative;overflow:visible;animation:asstFloat 4.2s ease-in-out infinite}
+@keyframes asstFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+
+.asst-mark{position:relative;display:inline-flex;align-items:center;justify-content:center;
+  width:1.55em;height:1.55em;transition:transform .18s cubic-bezier(.2,.7,.3,1)}
+.asst-svg{width:100%;height:100%;overflow:visible;position:relative;z-index:2;
+  filter:drop-shadow(0 1px 3px rgba(0,0,0,.28))}
+
+/* یک حلقه‌ی نبضِ آرام. قبلاً دو حلقه‌ی متوالی بود و همراه با چرخشِ ستاره و دو نقطه‌ی
+   چشمک‌زن، پنج چیز هم‌زمان تکان می‌خورد — همان شلوغی‌ای که کاربر از آن ایراد گرفت. */
+.asst-ring{
+  content:'';position:absolute;inset:-28%;border-radius:50%;z-index:1;
+  border:1.6px solid var(--pri,#2fbad3);opacity:0;
+  animation:asstRing 3.2s cubic-bezier(.22,.61,.36,1) infinite}
+@keyframes asstRing{
+  0%{transform:scale(.6);opacity:0}
+  20%{opacity:.55}
+  70%,100%{transform:scale(1.45);opacity:0}}
+
+/* جرقه‌ی داخل حباب فقط نفس می‌کشد — نمی‌چرخد. چرخشِ یک جرقه‌ی ریز داخل حباب
+   بیشتر شبیه لرزش دیده می‌شد تا حرکت. */
+.asst-spark{transform-box:fill-box;transform-origin:center;
+  animation:asstBreathe 2.4s ease-in-out infinite}
+@keyframes asstBreathe{0%,100%{opacity:.72;transform:scale(.9)}50%{opacity:1;transform:scale(1.08)}}
+
+/* درخششِ عبوری روی خود دکمه — همان حسِ «دارد فکر می‌کند» */
+#guideDockBtn::after{
+  content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:3;
+  background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.42) 50%,transparent 65%);
+  background-size:280% 100%;background-position:220% 0;
+  animation:asstSheen 3.6s ease-in-out infinite}
+@keyframes asstSheen{0%{background-position:220% 0}45%,100%{background-position:-140% 0}}
+
+/* هاور/فوکوس: پاسخ فوری */
+#guideDockBtn:hover{animation-play-state:paused}
+#guideDockBtn:hover .asst-mark{transform:scale(1.14) rotate(-6deg)}
+#guideDockBtn:hover .asst-ring{animation-duration:1.4s}
+
+/* بجِ «چند کار مانده» — با تپش، چون یعنی کاری منتظر شماست */
+#guideDockBtn .dock-badge:not(:empty){
+  position:absolute;top:-3px;inset-inline-end:-3px;min-width:19px;height:19px;padding:0 5px;
+  display:flex;align-items:center;justify-content:center;border-radius:999px;
+  background:#d9534f;color:#fff;font-size:11px;font-weight:800;line-height:1;
+  border:2px solid var(--surface,#060d18);z-index:4;
+  font-variant-numeric:tabular-nums lining-nums;
+  animation:asstBadge 2.4s ease-in-out infinite}
+@keyframes asstBadge{0%,100%{transform:scale(1)}
+  12%{transform:scale(1.22)}24%{transform:scale(1)}}
+
+html[data-anim="off"] #guideDockBtn,
+html[data-anim="off"] #guideDockBtn::after,
+html[data-anim="off"] .asst-ring,html[data-anim="off"] .asst-spark,
+html[data-anim="off"] .dock-badge{animation:none;opacity:1}
+@media (prefers-reduced-motion:reduce){
+  #guideDockBtn,#guideDockBtn::after,.asst-ring,
+  .asst-spark,.dock-badge{animation:none!important}
+  .asst-ring{opacity:.35}}
+
+/* در موبایل دکمه بزرگ‌تر و انگشت‌پسند می‌شود (هدف لمسی ۴۸px) */
+@media (max-width:768px){
+  .dock-btn{width:52px;height:52px}
+  .asst-mark{width:1.85em;height:1.85em}
+}
+
+/* آیکون‌های داخل پنل دستیار */
+.gwid-ic .ic-s{width:1.25em;height:1.25em}
+.assist-opt-ic{display:inline-flex;align-items:center;justify-content:center;
+  width:34px;height:34px;border-radius:10px;flex:0 0 auto;
+  background:var(--pri-soft,rgba(52,187,211,.14));color:var(--pri,#34bbd3)}
+.assist-opt-ic .ic-s{width:18px;height:18px}
+
+/* ---------- ۱۹. پاک‌سازی بازمانده‌های تم تیره در تم روشن ---------- */
+/* app.css پر است از پس‌زمینه‌های نیمه‌شفافِ مشکی (rgba(0,0,0,.2)) و سفیدِ
+   خیلی کم‌رنگ (rgba(255,255,255,.04)). هر دو برای سطح تیره طراحی شده‌اند:
+   اولی روی زمینه‌ی روشن «لکه‌ی خاکستری» می‌شود و دومی کلاً ناپدید.
+   فهرست زیر از روی خودِ app.css استخراج شده، نه حدسی. */
+
+/* ۱۹-الف) کنترل‌ها و کاشی‌های تعاملی → سطح سفید با بوردر واقعی */
+html[data-theme="light"] .duser,
+html[data-theme="light"] .dtile,
+html[data-theme="light"] .hpitem,
+html[data-theme="light"] .usertile,
+html[data-theme="light"] .hosp-chip,
+html[data-theme="light"] .ssearch input,
+html[data-theme="light"] .mbtn,
+html[data-theme="light"] .scut-i,
+html[data-theme="light"] .ysel,
+html[data-theme="light"] .sel,
+html[data-theme="light"] .hbt,
+html[data-theme="light"] .evbox,
+html[data-theme="light"] .mc,
+html[data-theme="light"] .orgtab,
+html[data-theme="light"] .sd-fs-btn{
+  background:var(--surface);border:1px solid var(--bds);color:var(--th)}
+html[data-theme="light"] .dtile:hover,
+html[data-theme="light"] .hpitem:hover,
+html[data-theme="light"] .usertile:hover,
+html[data-theme="light"] .hosp-chip:hover,
+html[data-theme="light"] .mbtn:hover,
+html[data-theme="light"] .scut-i:hover,
+html[data-theme="light"] .orgtab:hover,
+html[data-theme="light"] .sd-fs-btn:hover{
+  background:var(--pri-soft);border-color:var(--pri-soft-b);color:var(--pri-d)}
+html[data-theme="light"] .dtile.open,
+html[data-theme="light"] .orgtab.on,
+html[data-theme="light"] .sd-fs-btn.on{
+  background:var(--pri);border-color:var(--pri);color:#fff}
+html[data-theme="light"] .sd-fs-btn.on .cnt{color:#fff}
+
+/* ۱۹-ب) پنل‌ها و نوارهای فرعی → سطح دوم */
+html[data-theme="light"] .lfeat,
+html[data-theme="light"] .lfitem,
+html[data-theme="light"] .docrib,
+html[data-theme="light"] .docsec,
+html[data-theme="light"] .docfilters,
+html[data-theme="light"] .dochead>div,
+html[data-theme="light"] .bsc-ph,
+html[data-theme="light"] .orgform,
+html[data-theme="light"] .rg-note,
+html[data-theme="light"] .rg-ax,
+html[data-theme="light"] .rg-sti,
+html[data-theme="light"] .rg-step,
+html[data-theme="light"] .rg-abci,
+html[data-theme="light"] .gwid-bar,
+html[data-theme="light"] .gwid-step,
+html[data-theme="light"] .fsec-hd,
+html[data-theme="light"] .ovis,
+html[data-theme="light"] .bar,
+html[data-theme="light"] .mini-bar{
+  background:var(--surface-2);border-color:var(--bd)}
+html[data-theme="light"] .nitem:hover,
+html[data-theme="light"] .navgroup-hd:hover,
+html[data-theme="light"] .sechd:hover,
+html[data-theme="light"] .axi:hover,
+html[data-theme="light"] .fsec-hd:hover,
+html[data-theme="light"] .ccard:hover,
+html[data-theme="light"] .bsc-c:hover,
+html[data-theme="light"] tbody tr:hover{background:var(--surface-3)}
+html[data-theme="light"] tbody tr:nth-child(even):not(.drow){background:var(--surface-2)}
+
+/* ۱۹-ج) نشان‌ها و مارک‌هایی که گرادیان طلای تیره داشتند.
+   طلای تیره روی سفید «قهوه‌ای گِلی» است. اینها نشانِ برند/شمارنده‌اند، پس
+   به گرادیان زمرد منتقل شدند و طلا فقط برای تأکیدهای واقعی (ستاره، راهنما)
+   نگه داشته شد. */
+html[data-theme="light"] .bmark,
+html[data-theme="light"] .lmark,
+html[data-theme="light"] .av,
+html[data-theme="light"] .rg-n{
+  background:linear-gradient(135deg,#1793a9,var(--pri) 60%,var(--pri-d));
+  color:#fff;border:none;box-shadow:0 1px 3px rgba(19,71,90,.3)}
+html[data-theme="light"] .nbadge.on{
+  background:var(--dn);color:#fff}
+html[data-theme="light"] .rg-eb{
+  background:var(--pri-soft);color:var(--pri-d);border:1px solid var(--pri-soft-b)}
+html[data-theme="light"] .sd-tgl{background:var(--bds)}
+html[data-theme="light"] .sd-tgl[aria-checked="true"]{background:var(--pri)}
+/* حرف محور (الف/ب/ج) — سرمه‌ای تیره‌ی قدیمی روی سفید سنگین بود */
+html[data-theme="light"] .secl{
+  background:var(--pri-soft);color:var(--pri-d);border:1px solid var(--pri-soft-b);font-weight:800}
+html[data-theme="light"] .abadge{
+  background:var(--pri-soft);color:var(--pri-d);border:1px solid var(--pri-soft-b)}
+html[data-theme="light"] .skip{background:var(--pri);color:#fff}
+html[data-theme="light"] .cnt{background:var(--surface-3);color:var(--td);border:1px solid var(--bd)}
+html[data-theme="light"] .stdc{background:var(--pri-soft);color:var(--pri-d);border:1px solid var(--pri-soft-b)}
+
+/* ---------- ۲۰. پس‌زمینه‌ی متحرک در تم روشن ---------- */
+/* لایه‌های bgfx برای سطح تیره ساخته شده‌اند. روی زمینه‌ی روشن، همان‌ها
+   یک «لکه‌ی سبز/خاکی» درست می‌کردند که کاربر به آن ایراد گرفت.
+   در تم روشن تا حد یک بافت بسیار ملایم کم می‌شوند، نه اینکه کاملاً حذف — تا
+   صفحه مرده نشود. */
+html[data-theme="light"] .bgfx-bg{
+  background:radial-gradient(1200px 700px at 84% -12%,rgba(24,90,114,.055),transparent 64%),
+             radial-gradient(1000px 640px at 6% 8%,rgba(24,90,114,.03),transparent 62%);
+  opacity:.9}
+html[data-theme="light"] .bgfx-aurora{display:none}
+html[data-theme="light"] .bgfx-beam{display:none}
+html[data-theme="light"] .bgfx-grid{opacity:.22}
+
+/* حاشیه‌ی طلایی «کارت ویژه» روی سفید، قاب قهوه‌ای می‌شد */
+html[data-theme="light"] .gold{
+  border:1px solid var(--pri-soft-b)!important;
+  box-shadow:0 4px 16px rgba(24,90,114,.08),0 1px 3px rgba(9,15,24,.06)!important}
+html[data-theme="light"] .dock-btn.gold{
+  background:linear-gradient(135deg,#1793a9,var(--pri));color:#fff;border-color:transparent;
+  box-shadow:0 4px 14px rgba(24,90,114,.35)!important}
+
+/* آیکون کارت‌های ماژول/خدمت (حالا SVG) */
+.svccard-ic .ic-s,.svcbar-ic .ic-s,.lfitem .ic-s{width:20px;height:20px}
+.lfitem-ic,.svccard-ic,.svcbar-ic{display:flex;align-items:center;justify-content:center}
+
+/* آیکون کارت‌های ماژول در صفحه‌ی فرود — بزرگ‌تر و با رنگ برند، نه خاکستریِ محو */
+.pfic{display:inline-flex;align-items:center;justify-content:center;
+  width:36px;height:36px;border-radius:10px;
+  background:var(--pri-soft,rgba(52,187,211,.14));color:var(--pri,#34bbd3)}
+.pfic .ic-s{width:20px;height:20px}
+
+/* ---------- ۲۱. موبایل ---------- */
+/* ممیزی با مرورگر واقعی (۳۹۰×۸۴۴) روی ۱۶ صفحه: سرریز افقی و اسکرول جانبی
+   هیچ‌جا نبود، ولی هدف‌های لمسی کوچک بودند — دکمه‌های .btn-sm و .tgl و
+   select ها بین ۲۶ تا ۳۵ پیکسل. حداقل توصیه‌شده ۴۴px (iOS) / ۴۸dp (اندروید). */
+@media (max-width:768px){
+  .btn-sm,.tgl,.btn{min-height:42px;padding-block:9px}
+  select,.ysel,input[type="date"]{min-height:42px}
+  .sd-fs-btn,.sd-num-btn{min-height:40px}
+  .sd-reset{min-height:40px;padding:8px}
+  .sd-tgl{min-height:32px}
+  .hlp{width:24px;height:24px;font-size:13px}
+  .fgbtn{min-height:42px}
+  .nitem,.navgroup-hd{min-height:44px;display:flex;align-items:center}
+  .dockmenu-item{min-height:44px}
+  /* فاصله‌ی انگشتی بین کنترل‌های ردیفی، تا اشتباهی زده نشوند */
+  .phd,.docfilters,.tbar{gap:10px}
+  /* جدول‌های عریض داخل قاب خودشان اسکرول شوند، نه اینکه صفحه را بکشند */
+  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  /* تیترها در عرض کم نباید بشکنند و ناخوانا شوند */
+  .phd h3{font-size:15px;line-height:1.6}
+  .lhero h1{font-size:21px}
+}
+/* در صفحه‌های خیلی باریک، جدول‌های چندستونی بهتر است کارت شوند تا افقی کشیده */
+@media (max-width:430px){
+  .stats{grid-template-columns:1fr}
+  .svcgrid{grid-template-columns:1fr}
+}
+
+/* ---------- ۲۲. دو بخش تازه‌ی پنل سوپرادمین (ارائه و نحوه‌ی عملکرد) ---------- */
+.sd-sec{margin-bottom:26px}
+.sd-sec>h4{display:flex;align-items:center;gap:9px;font-size:16px;font-weight:700;
+  color:var(--th);margin:0 0 12px;padding-bottom:9px;border-bottom:1px solid var(--bd)}
+.sd-sec>h4 .ic-s{width:19px;height:19px;color:var(--pri,#34bbd3)}
+.sd-lead{font-size:13.5px;line-height:2;color:var(--tm);margin:0 0 14px}
+
+/* مشکل ↔ پاسخ */
+.sd-pains{display:grid;gap:10px}
+.sd-pain{display:grid;grid-template-columns:1fr 1fr;gap:0;
+  border:1px solid var(--bd);border-radius:var(--rs);overflow:hidden}
+.sd-pain-p,.sd-pain-s{padding:12px 14px;font-size:12.8px;line-height:1.95}
+.sd-pain-p{background:var(--dn-soft,rgba(217,122,106,.10));color:var(--tm)}
+.sd-pain-s{background:var(--ok-soft,rgba(52,187,211,.10));color:var(--tm);
+  border-inline-start:1px solid var(--bd)}
+.sd-pain b{display:block;font-size:10.5px;font-weight:800;letter-spacing:.3px;
+  margin-bottom:5px;opacity:.85}
+.sd-pain-p b{color:var(--dn)}
+.sd-pain-s b{color:var(--ok)}
+
+/* کارت خدمات */
+.sd-svcs{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:12px}
+.sd-svc{border:1px solid var(--bd);border-radius:var(--r);padding:15px 16px;
+  background:var(--surface-2,rgba(255,255,255,.035))}
+.sd-svc-hd{display:flex;align-items:center;gap:10px;margin-bottom:11px}
+.sd-svc-hd b{font-size:14.5px;color:var(--th)}
+.sd-svc-ic{display:inline-flex;align-items:center;justify-content:center;
+  width:32px;height:32px;border-radius:9px;flex:0 0 auto;
+  background:var(--pri-soft,rgba(52,187,211,.14));color:var(--pri,#34bbd3)}
+.sd-svc-ic .ic-s{width:18px;height:18px}
+.sd-svc-r{margin-bottom:8px}
+.sd-svc-r>span{display:block;font-size:10.5px;font-weight:800;color:var(--gd);
+  letter-spacing:.3px;margin-bottom:2px}
+.sd-svc-r>p{margin:0;font-size:12.5px;line-height:1.95;color:var(--tm)}
+
+/* پرسش و پاسخ */
+.sd-qa{display:grid;gap:7px}
+.sd-q{border:1px solid var(--bd);border-radius:var(--rs);
+  background:var(--surface-2,rgba(255,255,255,.035))}
+.sd-q>summary{cursor:pointer;padding:11px 14px;font-size:13.2px;font-weight:700;
+  color:var(--th);list-style:none;display:flex;align-items:center;gap:8px}
+.sd-q>summary::-webkit-details-marker{display:none}
+.sd-q>summary::before{content:'+';font-size:15px;font-weight:800;color:var(--pri,#34bbd3);
+  width:16px;text-align:center;flex:0 0 auto}
+.sd-q[open]>summary::before{content:'−'}
+.sd-q>summary:hover{background:var(--surface-3,rgba(255,255,255,.05))}
+.sd-q>p{margin:0;padding:0 14px 13px 38px;font-size:12.8px;line-height:2;color:var(--tm)}
+
+/* لایه‌ها و گام‌ها */
+.sd-layers,.sd-flow{display:grid;gap:9px}
+.sd-layer,.sd-step{display:flex;gap:12px;align-items:flex-start;
+  border:1px solid var(--bd);border-radius:var(--rs);padding:12px 14px;
+  background:var(--surface-2,rgba(255,255,255,.035))}
+.sd-layer-n,.sd-step-n{flex:0 0 auto;width:26px;height:26px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:800;
+  background:var(--pri-soft,rgba(52,187,211,.14));color:var(--pri-d,#34bbd3);
+  font-variant-numeric:tabular-nums lining-nums}
+.sd-layer b,.sd-step b{display:block;font-size:13.5px;color:var(--th);margin-bottom:3px}
+.sd-layer p,.sd-step p{margin:0;font-size:12.5px;line-height:1.95;color:var(--tm)}
+.sd-files{display:block;margin-top:7px;font-size:11px;direction:ltr;text-align:left;
+  color:var(--td);background:var(--surface-3,rgba(0,0,0,.18));padding:5px 8px;
+  border-radius:6px;word-break:break-all;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+
+/* دسترسی و عملیات */
+.sd-access,.sd-ops{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+.sd-acc,.sd-op{border:1px solid var(--bd);border-radius:var(--rs);padding:12px 14px;
+  background:var(--surface-2,rgba(255,255,255,.035))}
+.sd-acc b,.sd-op b{display:block;font-size:13.2px;color:var(--th);margin-bottom:4px}
+.sd-acc p,.sd-op p{margin:0;font-size:12.5px;line-height:1.95;color:var(--tm)}
+
+/* یادداشت هشدار */
+.sd-note{display:flex;gap:11px;align-items:flex-start;padding:13px 15px;border-radius:var(--rs);
+  background:var(--wr-soft,rgba(224,184,78,.12));border:1px solid var(--gold-soft-b,rgba(224,184,78,.35));
+  font-size:12.8px;line-height:1.95;color:var(--tm)}
+.sd-note .ic-s{width:19px;height:19px;flex:0 0 auto;color:var(--wr);margin-top:2px}
+.sd-note b{color:var(--th)}
+
+@media (max-width:640px){
+  .sd-pain{grid-template-columns:1fr}
+  .sd-pain-s{border-inline-start:none;border-top:1px solid var(--bd)}
+  .sd-svcs,.sd-access,.sd-ops{grid-template-columns:1fr}
+}
+
+/* آیکون سمت‌ها (موزاییک ورود و کارت‌های چارت سازمانی) — حالا SVG */
+.role-ic{display:inline-flex;align-items:center;justify-content:center;
+  width:34px;height:34px;border-radius:10px;flex:0 0 auto;
+  background:var(--pri-soft,rgba(52,187,211,.14));color:var(--pri,#34bbd3)}
+.role-ic .ic-s{width:18px;height:18px}
+.oc-card-ic .ic-s,.oc-card-l .ic-s{width:16px;height:16px}
+.abadge .ic-s{width:19px;height:19px}
+
+/* ---------- ۲۳. اصلاح‌های یافته‌شده در ممیزی موبایل ---------- */
+/* ستون چسبانِ جدول کارت امتیازی، رنگ سرمه‌ایِ ثابت (#0b1a2e) داشت — یعنی در
+   تم روشن یک ستون سیاه با متن نامرئی می‌شد. حالا از توکن سطح استفاده می‌کند. */
+html[data-theme="light"] .bsc-t td:first-child{background:var(--surface);color:var(--th)}
+html[data-theme="light"] .bsc-t th:first-child{background:var(--surface-3);color:var(--th)}
+html[data-theme="light"] .bsc-t tbody tr:hover td:first-child{background:var(--surface-2)}
+html[data-theme="light"] .bsc-t td:first-child .tsub{color:var(--td)}
+
+/* نوار پیشرفت: بستر خاکستریِ روشن و پرکننده‌ی زمردی — به‌جای گودالِ مشکی
+   و پرکننده‌ی طلای گِلی. */
+html[data-theme="light"] .bar{background:var(--surface-3);border:1px solid var(--bd)}
+html[data-theme="light"] .bar>i,html[data-theme="light"] .bf-ok{
+  background:linear-gradient(90deg,#1793a9,var(--pri))}
+/* .bf-gd نوار «امتیاز وزنی» است — طلای تیره روی سفید گِلی می‌شد. کهربایی روشن‌تر
+   می‌گیرد تا از نوار سبزِ «درصد تکمیل» هم قابل تفکیک بماند. */
+html[data-theme="light"] .bf-gd{background:linear-gradient(90deg,#d99a1f,#b8830f)}
+html[data-theme="light"] .mini-bar{background:var(--surface-3)}
+
+/* ---------- ۲۴. خوانایی متن‌های ریز روی موبایل ---------- */
+/* ممیزی واقعی روی ۳۹۰×۸۴۴: سرریز افقی و خطای JS در هیچ‌کدام از ۲۸ صفحه نبود،
+   ولی نشان‌ها و برچسب‌های فرعی روی ۱۰ پیکسل بودند. روی صفحه‌ی گوشی، ۱۰px
+   برای متن فارسی (که نقطه و سرکش دارد) عملاً خوانده نمی‌شود. */
+@media (max-width:768px){
+  .bdg{font-size:11.5px;padding:3px 9px}
+  .tsub{font-size:11px}
+  .cal-dow{font-size:11.5px}
+  .stdc,.cnt,.duty-cad{font-size:11.5px}
+  .sub{font-size:12.5px;line-height:1.85}
+  .cal-dn{font-size:13px}
+  .cal-more,.dtile-cv,.evfm,.rolechip{font-size:11.5px}
+  /* این‌ها در app.css با انتخابگر خاص‌تر ۱۰px شده‌اند، پس باید هم‌سطح بازنویسی شوند */
+  .bsc-t td:first-child .tsub{font-size:11px}
+  /* متن‌های ریزِ inline داخل صفحه‌ی کمیته‌ها/سنجه‌ها (style مستقیم دارند) */
+  .main [style*="font-size:10px"]{font-size:11.5px!important}
+  /* عنوان‌های ستون جدول هم روی موبایل ریز بودند */
+  th{font-size:12px}
+  td{font-size:12.5px}
+}
+
+/* ---------- ۲۵. جدول‌های پهن روی موبایل ---------- */
+/* مشاهده‌ی واقعی روی گوشی: جدول اسناد از عرض صفحه پهن‌تر است و داخل قاب خودش
+   اسکرول می‌شود — که درست است — ولی ستون آخر نیمه‌بریده دیده می‌شود و هیچ
+   نشانه‌ای نیست که بشود جدول را کشید. کاربر فکر می‌کند صفحه خراب است.
+   سه اصلاح: پدینگ جمع‌تر تا بیشتر جا شود، محوشدگی لبه به‌عنوان نشانه‌ی
+   «ادامه دارد»، و یک راهنمای یک‌خطی بالای جدول. */
+@media (max-width:768px){
+  .tbl-wrap{
+    position:relative;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:thin;
+    /* محوشدگی فقط وقتی واقعاً محتوای بیشتری هست (background-attachment:local) */
+    background:
+      linear-gradient(to left,var(--surface,#fff) 30%,transparent) left center/22px 100% no-repeat local,
+      linear-gradient(to right,var(--surface,#fff) 30%,transparent) right center/22px 100% no-repeat local,
+      radial-gradient(farthest-side at 0 50%,rgba(9,15,24,.14),transparent) left center/12px 100% no-repeat scroll,
+      radial-gradient(farthest-side at 100% 50%,rgba(9,15,24,.14),transparent) right center/12px 100% no-repeat scroll;
+  }
+  .tbl-wrap::after{
+    content:'برای دیدن ستون‌های بیشتر، جدول را بکشید ←';
+    display:block;position:sticky;right:0;
+    padding:6px 2px 2px;font-size:11px;color:var(--td);opacity:.85}
+  th,td{padding:8px 9px}
+  /* عنوان‌های بلند نباید ستون را به پنج خط بکشند */
+  td{min-width:0}
+  table{font-size:12.5px}
+}
+
+/* ---------- ۲۶. سربرگ سند — لوگو و نوار تاریخ‌ها ---------- */
+/* اندازه‌ی لوگو در سربرگ عمداً ثابت است تا همه‌ی اسناد یک قد داشته باشند و
+   چاپشان روی هم بیفتد. راهنمای آپلود (۵۱۲×۵۱۲) از همین عدد آمده. */
+.docletterhead img{height:46px;max-width:120px;object-fit:contain}
+@media print{
+  .docletterhead{border-bottom:2px solid #333!important}
+  .docletterhead img{height:42px;max-width:110px;background:transparent!important;padding:0}
+}
+
+/* نوار تاریخ‌های سند، درست زیر سربرگ و در همه‌ی فرم‌ها یکسان */
+.doc-dates{
+  display:flex;flex-wrap:wrap;gap:0;
+  border:1px solid var(--bd);border-radius:var(--rs);
+  margin:0 0 14px;overflow:hidden;background:var(--surface-2,rgba(255,255,255,.035))}
+.doc-dates > div{
+  flex:1 1 150px;min-width:0;padding:8px 12px;
+  border-inline-start:1px solid var(--bd)}
+.doc-dates > div:first-child{border-inline-start:none}
+.doc-dates span{display:block;font-size:10.5px;color:var(--td);margin-bottom:3px}
+.doc-dates b{display:block;font-size:12.5px;color:var(--th);font-weight:700;
+  font-variant-numeric:tabular-nums lining-nums}
+.doc-dates b.due{color:var(--wr)}
+.doc-dates b.over{color:var(--dn)}
+@media (max-width:768px){
+  .doc-dates > div{flex:1 1 50%;border-top:1px solid var(--bd)}
+  .doc-dates > div:nth-child(-n+2){border-top:none}
+  .doc-dates > div:nth-child(odd){border-inline-start:none}
+  .doc-dates span{font-size:11px}
+}
+@media print{
+  .doc-dates{border:1px solid #999!important;background:#fff!important;break-inside:avoid}
+  .doc-dates > div{border-inline-start:1px solid #999!important}
+  .doc-dates b,.doc-dates span{color:#000!important}
+}
+
+/* ---------- ۲۷. دفتر کد مدارک ---------- */
+.dcode-legend{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;justify-content:space-between;
+  padding:13px 15px;margin-bottom:16px;border-radius:var(--rs);
+  border:1px solid var(--bd);background:var(--surface-2,rgba(255,255,255,.035))}
+.dcode-legend b{display:block;font-size:13px;color:var(--th);margin-bottom:5px}
+.dcode-x{display:block;font-size:12px;color:var(--tm);line-height:1.95}
+.dcode-x code{direction:ltr;unicode-bidi:isolate;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:var(--surface-3,rgba(0,0,0,.18));padding:1px 6px;border-radius:5px;font-size:11.5px}
+.dcode-stats{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-start}
+.dcode-grp{margin-bottom:22px}
+.dcode-grp .docsl{display:flex;align-items:center;gap:9px}
+.dcode-n{margin-inline-start:auto;font-size:11.5px;color:var(--td);font-weight:600}
+
+/* ورودی کد: همیشه چپ‌به‌راست و تک‌فاصله، چون کد لاتین است */
+.dcode-in{width:100%;padding:7px 10px;border-radius:8px;font-size:12.5px;font-weight:700;
+  direction:ltr;text-align:left;letter-spacing:.4px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:var(--surface,rgba(0,0,0,.25));color:var(--th);
+  border:1px solid var(--bds);transition:.15s}
+.dcode-in:focus{outline:none;border-color:var(--pri,#34bbd3);box-shadow:var(--ring)}
+.dcode-in.dcode-dup{border-color:var(--dn);background:var(--dn-soft,rgba(217,122,106,.10))}
+.dcode-in.dcode-nonstd{border-color:var(--wr);background:var(--wr-soft,rgba(224,184,78,.10))}
+.dcode-msg{display:block;margin-top:3px;font-size:10.5px;font-weight:700}
+.dcode-msg.dn{color:var(--dn)}
+.dcode-msg.wr{color:var(--wr)}
+
+/* بخش‌های پیش‌نمایش سند */
+.dcode-sec{margin-bottom:12px;padding:11px 14px;border-radius:var(--rs);
+  border:1px solid var(--bd);background:var(--surface-2,rgba(255,255,255,.03))}
+.dcode-sec>span{display:block;font-size:11px;font-weight:800;color:var(--gd);margin-bottom:4px}
+.dcode-sec>p{margin:0;font-size:12.8px;line-height:2;color:var(--tm);white-space:pre-wrap}
+
+@media (max-width:768px){
+  .dcode-legend{flex-direction:column;gap:10px}
+  .dcode-grp .tbl-wrap table{min-width:640px}
+}
+
+/* ---------- ۲۸. ویرایشگر متن غنی (فرم‌ساز شبیه ورد) ---------- */
+.re-wrap{border:1px solid var(--bds);border-radius:var(--rs);overflow:hidden;
+  background:var(--surface,rgba(0,0,0,.2))}
+.re-bar{display:flex;flex-wrap:wrap;gap:4px;padding:7px 8px;
+  background:var(--surface-3,rgba(255,255,255,.05));
+  border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:5}
+.re-grp{display:flex;gap:3px;padding-inline-end:7px;
+  border-inline-end:1px solid var(--bd)}
+.re-grp:last-child{border-inline-end:none;padding-inline-end:0}
+.re-b{min-width:32px;height:30px;padding:0 8px;border-radius:7px;cursor:pointer;
+  font-family:inherit;font-size:12px;font-weight:600;line-height:1;
+  background:var(--surface,rgba(0,0,0,.2));color:var(--tm);
+  border:1px solid var(--bd);transition:.13s}
+.re-b:hover{background:var(--pri-soft,rgba(52,187,211,.14));
+  border-color:var(--pri-soft-b,rgba(52,187,211,.32));color:var(--pri,#34bbd3)}
+.re-b:active{transform:translateY(1px)}
+/* دکمه‌ی «قطعه‌ی لاتین» — پرکاربردترین ابزار در متن فارسیِ مخلوط */
+.re-b-hi{background:var(--gold-soft,rgba(201,168,76,.16));
+  border-color:var(--gold-soft-b,rgba(201,168,76,.4));color:var(--gd)}
+.re-b-hi:hover{background:var(--gd);color:#fff;border-color:var(--gd)}
+
+.re-area{min-height:220px;max-height:60vh;overflow-y:auto;padding:16px 18px;
+  font-size:14px;line-height:2;color:var(--th);outline:none}
+.re-area:focus{box-shadow:inset 0 0 0 2px var(--pri-soft-b,rgba(52,187,211,.3))}
+.re-area>*:first-child{margin-top:0}
+.re-area p{margin:0 0 10px}
+.re-area h3{font-size:15.5px;font-weight:700;margin:16px 0 8px;color:var(--th)}
+.re-area ul,.re-area ol{margin:0 0 10px;padding-inline-start:24px}
+.re-area li{margin-bottom:4px}
+.re-area hr{border:none;border-top:1px solid var(--bd);margin:14px 0}
+/* قطعه‌ی درون‌خطی با جهت مخالف — دیده شود که کاربر بداند کجاست */
+.re-area span[dir]{background:rgba(201,168,76,.10);border-radius:3px;padding:0 2px}
+.re-area span[dir="ltr"]{unicode-bidi:isolate}
+
+/* جدول — هم داخل ویرایشگر، هم در نمایش و چاپ سند */
+.re-table{width:100%;border-collapse:collapse;margin:12px 0;
+  font-size:13px;line-height:1.85}
+.re-table th,.re-table td{
+  border:1px solid var(--bds);padding:7px 10px;vertical-align:top;
+  min-width:56px;word-break:break-word}
+.re-table th{background:var(--surface-3,rgba(255,255,255,.06));
+  font-weight:700;color:var(--th);text-align:center}
+.re-table td{color:var(--tm)}
+.re-area .re-table td:focus,.re-area .re-table th:focus{
+  outline:2px solid var(--pri,#34bbd3);outline-offset:-2px}
+
+/* خروجی خوانده‌شده (نمایش سند) — همان ظاهر، بدون ابزار */
+.re-out{font-size:13.5px;line-height:2;color:var(--tm)}
+.re-out p{margin:0 0 10px}
+.re-out h3{font-size:15px;font-weight:700;color:var(--th);margin:16px 0 8px}
+.re-out ul,.re-out ol{margin:0 0 10px;padding-inline-start:24px}
+.re-out span[dir="ltr"]{unicode-bidi:isolate}
+
+@media (max-width:768px){
+  .re-bar{gap:3px;padding:6px}
+  .re-grp{padding-inline-end:5px}
+  .re-b{min-width:38px;height:38px;font-size:12.5px}
+  .re-area{min-height:180px;padding:13px 14px;font-size:13.5px}
+  .re-table{font-size:12px}
+  .re-table th,.re-table td{padding:6px 7px}
+}
+
+/* چاپ: نوار ابزار می‌رود، کادر ویرایش به متن ساده تبدیل می‌شود، جدول
+   خطوط سیاه می‌گیرد و بین صفحه‌ها نصف نمی‌شود. */
+@media print{
+  .re-bar{display:none!important}
+  .re-wrap{border:none!important;background:#fff!important}
+  .re-area{min-height:0!important;max-height:none!important;overflow:visible!important;
+    padding:0!important;color:#000!important;box-shadow:none!important}
+  .re-area span[dir],.re-out span[dir]{background:transparent!important}
+  .re-table{break-inside:auto}
+  .re-table th,.re-table td{border:1px solid #333!important;color:#000!important;
+    padding:5px 8px!important}
+  .re-table th{background:#eee!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .re-table tr{break-inside:avoid;page-break-inside:avoid}
+  .re-table thead{display:table-header-group}
+  .re-out,.re-out p,.re-out li{color:#000!important}
+}
+
+/* سالِ نمایش‌داده‌شده در پنل BSC — حالا فقط بازتابِ انتخابگرِ بالای صفحه است،
+   نه یک فیلترِ دوم. دو انتخابگر برای یک مفهوم، همان چیزی بود که کاربر را
+   گمراه کرد (سالِ بالا را عوض می‌کرد و جدول عوض نمی‌شد). */
+.bsc-yr{display:inline-flex;align-items:center;padding:5px 14px;border-radius:var(--rp);
+  font-size:14px;font-weight:800;background:var(--pri-soft,rgba(52,187,211,.14));
+  color:var(--pri-d,#34bbd3);border:1px solid var(--pri-soft-b,rgba(52,187,211,.3));
+  font-variant-numeric:tabular-nums lining-nums}
+.bsc-yr-h{display:block;font-size:10.5px;color:var(--td);margin-top:4px;text-align:center}
+
+/* ---------- ۲۹. سطل بازیافت ---------- */
+.rb-filters{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-bottom:14px}
+.rb-filters input[type="text"],.rb-filters input:not([type]),.rb-filters select{
+  padding:8px 12px;border-radius:9px;min-width:190px;
+  background:var(--surface,rgba(0,0,0,.25));border:1px solid var(--bds);color:var(--th)}
+.rb-filters input:not([type]){flex:1 1 260px}
+.rb-chk{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--tm);cursor:pointer}
+@media (max-width:768px){ .rb-filters{flex-direction:column;align-items:stretch}
+  .rb-filters input,.rb-filters select{min-width:0;width:100%} }
+
+/* ---------- ۳۰. تصدی سمت‌ها ---------- */
+.ten-grp{margin-bottom:20px}
+.ten-grp .docsl{display:flex;align-items:center;gap:9px}
+.ten-line{position:relative;padding-inline-start:18px;margin-top:8px}
+.ten-line::before{content:'';position:absolute;inset-inline-start:5px;top:8px;bottom:8px;
+  width:2px;background:var(--bd)}
+.ten-item{position:relative;display:flex;gap:11px;align-items:flex-start;
+  padding:10px 13px;margin-bottom:7px;border-radius:var(--rs);
+  border:1px solid var(--bd);background:var(--surface-2,rgba(255,255,255,.03))}
+.ten-item.ten-now{border-color:var(--pri-soft-b,rgba(52,187,211,.35));
+  background:var(--pri-soft,rgba(52,187,211,.09))}
+.ten-dot{position:absolute;inset-inline-start:-18px;top:16px;width:10px;height:10px;
+  border-radius:50%;background:var(--bds);border:2px solid var(--surface,#fff)}
+.ten-item.ten-now .ten-dot{background:var(--pri,#34bbd3)}
+.ten-item b{font-size:13.5px;color:var(--th);margin-inline-end:7px}
+.ten-range{display:block;margin-top:3px;font-size:12px;color:var(--tm);
+  font-variant-numeric:tabular-nums lining-nums}
+
+/* دکمه‌ی «قطعه‌ی لاتین» وقتی نشانگر داخل قطعه است روشن می‌ماند — کاربر باید
+   بداند در چه حالتی تایپ می‌کند، وگرنه ادامه‌ی متن فارسی هم LTR می‌شود. */
+.re-b.on{background:var(--gd,#c9a84c)!important;color:#fff!important;
+  border-color:var(--gd,#c9a84c)!important;box-shadow:0 0 0 3px rgba(201,168,76,.22)}
+
+/* ---------- ۳۱. چیدمان سمت‌ها در صفحه‌ی ورود ----------
+   دو بار عوض شده و هر بار به‌خاطر ایرادی که کارفرما گرفت. اول یک شبکه‌ی
+   چهارستونه‌ی تخت بود و ریاست بیمارستان وسطِ بقیه گم می‌شد؛ بعد یک چارتِ عمودی
+   با تورفتگیِ پله‌ای شد که سلسله‌مراتب را نشان می‌داد ولی نوزده ردیفِ زیرِ هم
+   بود. حالا هر دو خواسته با هم: دسته‌بندیِ رده‌ای (که ریاست را از پرستار جدا
+   نگه می‌دارد) ولی کارت‌های هر دسته کنارِ هم.
+   قبلاً یک چارتِ عمودی بود: نوزده ردیف زیرِ هم با تورفتگیِ پله‌ای. برای دیدنِ
+   ساختارِ سازمانی خوب بود، ولی این صفحه کارِ دیگری دارد — کاربر آمده سمتِ خودش
+   را پیدا کند و برود تو، و در آن فهرستِ بلند باید تا ته اسکرول می‌کرد.
+   حالا هر رده یک نوار است و کارت‌های همان رده کنارِ هم در یک شبکه می‌نشینند. */
+.roleband + .roleband{margin-top:18px}
+.roleband-t{display:flex;align-items:center;gap:10px;margin-bottom:10px;
+  font-size:12.5px;font-weight:700;color:var(--gdl)}
+.roleband-t::after{content:'';flex:1;height:1px;
+  background:linear-gradient(90deg,var(--bd),transparent)}
+.rolegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
+  gap:10px;align-items:start}
+.rolegrid .rolecard{border-radius:var(--rm,12px);position:relative}
+.rolegrid .rolecard:hover{transform:none;border-color:var(--gd)}
+/* کارتِ باز کلِ عرضِ شبکه را می‌گیرد تا نام‌های داخلش واقعاً کنارِ هم ردیف شوند،
+   نه اینکه در یک ستونِ باریکِ ۲۱۰ پیکسلی زیرِ هم بیفتند. */
+.rolegrid .rolecard.open{grid-column:1/-1;border-color:var(--gd);box-shadow:var(--glow-gd)}
+/* ردیف افقی: آیکون، عنوان، راهنما — نه ستونیِ کارتِ بلند */
+.rolegrid .rolecard-hd{flex-direction:row;align-items:center;gap:12px;padding:12px 14px}
+.rolegrid .role-tx{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0;text-align:start}
+.rolegrid .role-tx b{font-size:13.5px}
+.rolegrid .role-tx span{font-size:11px}
+.rolegrid .role-ic{flex:0 0 auto;width:34px;height:34px;font-size:15px}
+.rolegrid .role-chev{flex:0 0 auto;color:var(--td);font-size:14px}
+@media (max-width:520px){
+  .rolegrid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+  .rolegrid .rolecard-hd{padding:11px 12px;gap:10px}
+  .rolegrid .role-ic{width:30px;height:30px;font-size:14px}
+  .rolegrid .role-tx b{font-size:12.5px}
+  .rolegrid .usermosaic{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));padding:0 12px 12px}
+}
+}
+
+/* ---------- ۳۲. ویرایش چارت در پنل سوپرادمین (کشیدنی) ---------- */
+.rh-list{display:flex;flex-direction:column;gap:7px;margin:14px 0}
+.rh-card{display:flex;align-items:center;gap:10px;padding:10px 12px;
+  margin-inline-start:calc(var(--lvl,0) * 22px);
+  border:1px solid var(--bd);border-radius:var(--rs,10px);
+  background:var(--surface-2,rgba(255,255,255,.03));
+  touch-action:pan-x;transition:border-color .15s,box-shadow .15s}
+.rh-card.dragging{border-color:var(--gd);box-shadow:0 12px 30px -10px rgba(0,0,0,.55);
+  opacity:.95;position:relative;z-index:5;transition:none}
+.rh-card.drop-before{box-shadow:inset 0 3px 0 var(--gd)}
+.rh-card.drop-after{box-shadow:inset 0 -3px 0 var(--gd)}
+.rh-grip{cursor:grab;color:var(--td);font-size:16px;line-height:1;padding:2px 4px;
+  touch-action:none;user-select:none}
+.rh-card.dragging .rh-grip{cursor:grabbing}
+.rh-rank{min-width:26px;text-align:center;font-size:11.5px;color:var(--td);
+  font-variant-numeric:tabular-nums lining-nums}
+.rh-title{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.rh-title b{font-size:13.5px;color:var(--th)}
+.rh-sub{font-size:11px;color:var(--td)}
+.rh-btns{display:flex;gap:4px;flex:0 0 auto}
+.rh-b{width:28px;height:28px;border-radius:8px;border:1px solid var(--bd);
+  background:transparent;color:var(--tm);cursor:pointer;font-size:12px;line-height:1;
+  font-family:inherit;transition:.15s}
+.rh-b:hover{border-color:var(--gd);color:var(--gdl)}
+.rh-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  padding-top:12px;border-top:1px solid var(--bd)}
+.rh-hint{font-size:12px;color:var(--td)}
+@media (max-width:600px){
+  .rh-card{flex-wrap:wrap;margin-inline-start:calc(var(--lvl,0) * 12px)}
+  .rh-title{flex:1 1 100%;order:2}
+  .rh-btns{order:3;margin-inline-start:auto}
+  .rh-b{width:34px;height:34px}
+}
+
+/* ---------- ۳۳. موبایل، دور دوم: چگالی و خوانایی ----------
+   دور اول (بخش ۲۱) فقط سرریز افقی و هدف‌های لمسی را درست کرد. ممیزی دوباره
+   با مرورگر واقعی روی ۳۹۰×۸۴۴ نشان داد مشکلِ باقی‌مانده «چیدمان» است:
+   ردیف‌هایی که در دسکتاپ سه‌ستونه‌اند در موبایل هم سه‌ستونه می‌مانند و
+   ستون متن به ۹۰ پیکسل می‌رسد، یعنی هر عنوان به هشت خطِ یک‌کلمه‌ای می‌شکند.
+   قاعده‌ی این بخش: زیر ۶۰۰px هر ردیفِ «نشان + متن + سنجه‌ی پیشرفت» به دو
+   سطر می‌شکند و متن، سطر کاملِ خودش را می‌گیرد. */
+@media (max-width:600px){
+
+  /* --- ردیف استاندارد در درخت سنجه‌ها --- */
+  .stdhd{flex-wrap:wrap;align-items:center;padding:11px 13px;gap:8px}
+  .stdhd .stdt{flex:1 1 100%;order:3;font-size:13.5px;line-height:1.85;margin-top:2px}
+  .stdhd .stdc{order:1;margin-top:0}
+  .stdhd .stdmeta{order:2;margin-inline-start:auto;margin-top:0}
+  .stdbody{padding:2px 10px 12px}
+
+  /* --- کارت سنجه --- */
+  .mcard{padding:12px 13px}
+  .mtop{gap:7px;margin-bottom:6px}
+  .mst{font-size:13.5px;line-height:1.9}
+
+  /* --- سربرگ پنل: تیتر سطر خودش، کنترل‌ها سطر بعد --- */
+  .phd{flex-wrap:wrap;align-items:center}
+  .phd>div[style*="flex:1"]{flex:1 1 100%;order:2}
+  .phd>.abadge{order:1}
+  .phd>div[style*="min-width"]{order:3;flex:1 1 100%;min-width:0!important}
+
+  /* --- نوار بالای صفحه: عنوان و منو در سطر اول، سال و کاربر در سطر دوم --- */
+  .top{padding:12px 13px;gap:8px;flex-wrap:wrap}
+  .top h2{font-size:16px;order:1;flex:1 1 55%;line-height:1.6}
+  .top .uchip{order:2}
+  .top .mbtn{order:3}
+  .top .ysel{order:4}
+
+  /* دکمه‌ی کنار سربرگ پنل (مثل «مشاهده نمودار») سطر خودش را می‌گیرد، وگرنه
+     ستون متن کنارش به ۹۰ پیکسل می‌رسد و تیتر عمودی می‌شکند. */
+  .phd>.btn{order:4;flex:1 1 100%;justify-content:center}
+
+  /* --- کاشی‌های آمار: دو ستونه، نه یک ستونِ بلند --- */
+  .stats{grid-template-columns:1fr 1fr!important;gap:9px}
+  .st{padding:12px 13px}
+  .st .l{font-size:11px;margin-bottom:4px;line-height:1.55}
+  .st .v{font-size:21px}
+
+  /* --- جدول‌ها: به‌جای فشرده‌شدن ستون‌ها، داخل قاب خودشان افقی اسکرول شوند.
+         بدون min-width، مرورگر ستون‌ها را تا ۶۰ پیکسل می‌فشرد و عنوان‌ها
+         عمودی می‌شکستند؛ اسکرول افقیِ آگاهانه خواناتر از آن است. --- */
+  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;
+    /* لبه‌ی محو در سمت چپ: نشانه‌ی اینکه ادامه‌ی جدول با کشیدن دیده می‌شود */
+    background:linear-gradient(to left,transparent 85%,rgba(0,0,0,.05))}
+  /* width:max-content یعنی «به اندازه‌ای که محتوا لازم دارد» و min-width:100%
+     یعنی «ولی هرگز باریک‌تر از قاب». نتیجه: جدولِ دوستونی کش نمی‌آید و
+     جدولِ ششستونی هم ستون‌هایش له نمی‌شود. */
+  .tbl-wrap table{width:max-content;min-width:100%}
+  .tbl-wrap th,.tbl-wrap td{white-space:nowrap}
+  /* ستون عنوان تنها ستونی است که باید بشکند، وگرنه جدول بی‌نهایت پهن می‌شود */
+  .tbl-wrap td:nth-child(2){white-space:normal;min-width:150px}
+
+  /* --- کارت‌هایی که در دسکتاپ کنار هم می‌نشینند: در موبایل تمام‌عرض.
+         بدون این، flex-wrap با min-width عرض هر کارت را به اندازه‌ی متنش
+         می‌کند و فهرست پلکانی و بی‌نظم به نظر می‌رسد. --- */
+  .ccard{width:100%;min-width:0}
+  .docgrid,.pfgrid,.svcgrid{grid-template-columns:1fr}
+
+  /* --- فیلترها: برچسب و ورودی زیر هم، بدون فضای هدررفته --- */
+  /* دو فیلترِ کشویی کنار هم، جست‌وجو و دکمه تمام‌عرض. قبلاً هر چهارتا زیر هم
+     بودند و نیمی از صفحه پیش از رسیدن به خودِ فهرست هدر می‌رفت. */
+  .docfilters,.dcode-filters{gap:9px}
+  .docfilters>*,.dcode-filters>*{flex:1 1 calc(50% - 5px);min-width:0}
+  .docfilters>.fg:has(input),.docfilters>.btn,
+  .dcode-filters>.fg:has(input),.dcode-filters>.btn{flex:1 1 100%}
+  .docfilters .fg{min-width:0}
+  /* در نیم‌عرض، متن گزینه‌ی select بریده می‌شد («همه وضعیت‌ه») */
+  .docfilters select,.dcode-filters select{font-size:12.5px;padding-inline:7px}
+}
+
+/* گوشی‌های خیلی باریک (≤۳۶۰px): کاشی آمار تک‌ستونه می‌شود چون دو ستون
+   عددِ ۲۱ پیکسلی را هم می‌شکند. */
+@media (max-width:360px){
+  .stats{grid-template-columns:1fr!important}
+}
+
+/* ---------- ۳۴. برگه‌ی چاپ با سربرگ تکرارشونده ----------
+   گزارش کاربر: «سربرگ فقط روی صفحه‌ی اول چاپ می‌افتد».
+   دلیلش این بود که سربرگ یک بلوک معمولی در جریان صفحه بود. تنها ساختاری که
+   مرورگرها روی هر برگه‌ی کاغذ تکرار می‌کنند thead/tfoot یک جدول است؛
+   position:fixed در کروم فقط صفحه‌ی اول را می‌گیرد و margin box های @page هم
+   هنوز پشتیبانی کاملی ندارند.
+
+   بنابراین محتوای قابل‌چاپ داخل یک جدول تک‌ستونه رفته است. روی نمایشگر همه‌ی
+   بخش‌های جدول display:block می‌شوند تا چیدمان دقیقاً همان قبل بماند (هیچ
+   ستون/حاشیه/رنگ جدولی دیده نمی‌شود) و فقط هنگام چاپ به جدول واقعی تبدیل شود. */
+.psheet,.psheet>thead,.psheet>tbody,.psheet>tfoot,
+.psheet>thead>tr,.psheet>tbody>tr,.psheet>tfoot>tr,
+.psheet>thead>tr>td,.psheet>tbody>tr>td,.psheet>tfoot>tr>td{
+  display:block;width:auto;padding:0;margin:0;border:none;background:none}
+/* پانویس فقط روی کاغذ معنا دارد؛ روی نمایشگر جای بیخود می‌گیرد */
+.psheet>tfoot{display:none}
+.psheet-foot{
+  display:flex;justify-content:space-between;gap:12px;
+  padding-top:6px;margin-top:10px;border-top:1px solid #999;
+  font-size:9.5px;color:#444}
+
+/* ---------- خواندن متن از عکس/PDF ---------- */
+.ocrbar{margin-bottom:14px;padding:11px 13px;border-radius:11px;
+  border:1px dashed var(--bd);background:rgba(212,175,90,.05)}
+.ocrhd{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ocric{color:var(--gdl);flex-shrink:0;display:inline-flex}
+.ocrres{margin-top:10px}
+.ocrmeta{font-size:11px;color:var(--gdl);margin-bottom:6px}
+/* بدون این، textarea پس‌زمینه‌ی سفیدِ پیش‌فرضِ مرورگر می‌گیرد و روی تم تیره
+   شکسته به‌نظر می‌رسد — همان کلاسِ باگی که در بازبینی‌های قبلی هم تکرار شد. */
+.ocrres textarea{width:100%;font-size:12.5px;line-height:1.9;
+  color:var(--th);background:var(--subpanel);border:1px solid var(--bd);
+  border-radius:9px;padding:9px 11px;resize:vertical}
+.ocrres textarea:focus{outline:none;border-color:var(--gd)}
+.ocract{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0 6px}
+
+/* ---------- کارت‌های مسیرِ سنجه (بخش ← محور ← استاندارد ← سنجه) ----------
+   کارفرما خواست مسیر بالای هر سنجه/چک‌لیست دیده شود و کارت‌ها با فلش به هم وصل
+   باشند. در موبایل به‌جای اسکرول افقی، عمودی می‌شکند و فلش‌ها می‌چرخند — مسیرِ
+   نصفه‌دیده‌شده بدتر از مسیرِ دوخطی است. */
+.pathbar{display:flex;align-items:stretch;gap:6px;flex-wrap:wrap;margin:0 0 14px}
+/* همان نوار، این‌بار برای مسیرِ *ناوبری* بالای هر صفحه (خانه ‹ بخش ‹ دسته ‹ صفحه).
+   کارفرما گفت روی یک صفحه مثل «خط‌مشی» معلوم نیست زیر کدام حوزه است؛ این نوار
+   همان را جواب می‌دهد و کارتِ بالادست کلیک‌پذیر است.
+   بیرونِ #content است تا با هر بار رندرِ صفحه پاک نشود، پس فاصله‌اش را خودش دارد. */
+#navcrumb:not(:empty){margin:0 0 4px}
+#navcrumb .pathbar{margin-bottom:10px}
+/* کارتِ «دسته» کلیک‌پذیر نیست (دسته یک صفحه نیست)، پس نباید ظاهرِ دکمه بگیرد —
+   ولی باید خوانده شود، چون تمامِ حرفِ این نوار همان است. */
+#navcrumb .pathcard{padding:6px 10px}
+#navcrumb .pathttl{font-size:12px;font-weight:600;white-space:nowrap}
+.pathcard{display:flex;flex-direction:column;gap:1px;min-width:0;max-width:290px;
+  padding:7px 11px;border-radius:10px;border:1px solid var(--bd);
+  background:rgba(255,255,255,.035)}
+.pathcard[role=link]{cursor:pointer;transition:border-color .15s,background .15s}
+.pathcard[role=link]:hover,.pathcard[role=link]:focus-visible{
+  border-color:var(--gd);background:rgba(212,175,90,.09);outline:none}
+.pathcard.on{border-color:var(--gd);background:rgba(212,175,90,.13)}
+.pathlvl{font-size:9.5px;color:var(--td);letter-spacing:.02em}
+.pathcode{font-size:11px;font-weight:800;color:var(--gdl);direction:ltr;unicode-bidi:plaintext}
+.pathttl{font-size:11.5px;color:var(--th);line-height:1.5;overflow:hidden}
+.patharr{align-self:center;color:var(--td);font-size:15px;line-height:1;flex-shrink:0}
+@media(max-width:700px){
+  .pathbar{flex-direction:column;align-items:stretch}
+  .pathcard{max-width:none}
+  .patharr{align-self:flex-start;margin-inline-start:14px;transform:rotate(-90deg)}
+}
+
+/* ---------- ویرایشگر گام‌های فلوچارت ---------- */
+/* ویرایشگر هم مثل خودِ نمودار جمع‌وجور شد: با ۹ گام، نسخه‌ی قبلی چند صفحه
+   اسکرول می‌خواست و کاربر کلِ فرآیند را یک‌جا نمی‌دید. ارتفاع هر ردیف کم شد و
+   فهرست گام‌ها سقفِ ارتفاع گرفت تا دکمه‌های پایین فرم همیشه در دسترس بمانند. */
+.psteps-box{max-height:56vh;overflow-y:auto;padding-inline-end:4px}
+.pstep{display:flex;gap:8px;align-items:flex-start;padding:7px 8px;margin-bottom:5px;
+  border-radius:9px;background:rgba(255,255,255,.035);border:1px solid var(--bd)}
+.pstep-n{flex-shrink:0;width:21px;height:21px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:11px;font-weight:800;color:var(--gdl);
+  background:rgba(212,175,90,.14);border:1px solid rgba(212,175,90,.3)}
+.pstep-b{flex:1;min-width:0}
+.pstep-r{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.pstep-r>select{max-width:132px}
+.pstep-r>input{flex:1;min-width:120px}
+.pstep select,.pstep input{padding:5px 8px;font-size:12px}
+/* مسیرهای خروجی هر گام (یال‌های فلوچارت) */
+.plinks{margin-top:5px;padding-top:5px;border-top:1px dashed var(--bd)}
+.plink{display:flex;gap:5px;align-items:center;margin-bottom:4px;flex-wrap:wrap}
+.plink-i{color:var(--gdl);font-size:12px;flex-shrink:0}
+.plink>select{flex:1;min-width:130px}
+.pstep-a{display:flex;gap:3px;flex-shrink:0}
+.pstep-a .tgl{padding:4px 7px;font-size:11px}
+.pstep-a .tgl[disabled]{opacity:.35;cursor:default}
+@media(max-width:760px){
+  .pstep-r>select,.pstep-r>input{max-width:none;width:100%;flex:1 1 100%}
+}
+
+/* ---------- فلوچارت فرآیند (SVG) ----------
+   رنگ‌ها با متغیرهای تم می‌آیند تا در تیره/روشن درست باشند، ولی در چاپ همه به
+   سیاه‌وسفیدِ پرکنتراست می‌روند: برگه قرار است روی دیوار برود و از فاصله خوانده
+   شود («نصب فرآیند … در معرض دید گیرندگان خدمت» — ب-۱۰-۱-۳). */
+.fcwrap{overflow-x:auto;padding:6px 0;text-align:center}
+/* svg اندازه‌ی طبیعی خودش را دارد (توضیح در flowchart.js). این‌جا فقط سقف
+   می‌گذاریم تا نمودارِ بلند کوچک شود و در یک صفحه بنشیند — هرگز بزرگ‌تر از
+   اندازه‌ی طبیعی نمی‌شود، چون همان بزرگ‌شدن بود که «آیکون‌های خیلی بزرگ» را
+   می‌ساخت. نسبت ابعاد را خودِ viewBox حفظ می‌کند. */
+.fcsvg{display:inline-block;margin:0 auto;width:auto;height:auto;max-width:100%;max-height:72vh}
+.fc-sh{stroke:var(--gd);stroke-width:1.6;fill:rgba(212,175,90,.07)}
+.fc-start,.fc-end{fill:rgba(28,126,143,.16);stroke:var(--ok)}
+.fc-decision{fill:rgba(214,158,46,.14);stroke:var(--wr)}
+.fc-document{fill:rgba(120,140,190,.14);stroke:var(--bds)}
+.fc-t{font-size:10.5px;fill:var(--th);text-anchor:middle;font-weight:600;direction:rtl}
+.fc-o{font-size:9px;fill:var(--gdl);text-anchor:middle;direction:rtl}
+.fc-e{font-size:9.5px;fill:var(--gdl);font-weight:700;direction:rtl}
+.fc-ln{stroke:var(--bds);stroke-width:1.5;fill:none}
+.fc-ar{fill:var(--bds)}
+/* راهنمای نمادها */
+.fclegend{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;padding-top:10px;
+  border-top:1px dashed var(--bd);font-size:11px;color:var(--td)}
+.fclegend span{display:inline-flex;align-items:center;gap:6px}
+.fclegend i{width:22px;height:13px;display:inline-block;border:1.5px solid var(--gd);
+  background:rgba(212,175,90,.07)}
+.fclegend i.s{border-radius:7px;border-color:var(--ok);background:rgba(28,126,143,.16)}
+.fclegend i.d{transform:rotate(45deg) scale(.78);border-color:var(--wr);background:rgba(214,158,46,.14)}
+.fclegend i.f{transform:skewX(-16deg);border-color:var(--bds);background:rgba(120,140,190,.14)}
+/* جوهر تیره‌ی اجباری روی کاغذ سفید (پیش‌نمایش چاپ).
+   متغیرهای تمِ تیره (--th/--gdl روشن) روی کاغذ سفید ناپدید می‌شوند و متن
+   فلوچارت سفید روی زمینه‌ی روشن می‌ماند (باگ گزارش‌شده). این قانون فقط داخل
+   برگه‌های سفید اثر می‌کند؛ پیش‌نمایش تیره‌ی ویرایشگر دست‌نخورده می‌ماند. */
+.a4-paper .fc-t{fill:#0f172a!important}
+.a4-paper .fc-o,.a4-paper .fc-e{fill:#334155!important}
+.a4-paper .fc-sh{stroke:#0f172a!important}
+.a4-paper .fc-ln{stroke:#475569!important}
+.a4-paper .fc-ar{fill:#475569!important}
+@media print{
+  .fc-sh{fill:#fff!important;stroke:#000!important;stroke-width:1.6!important}
+  .fc-start,.fc-end{fill:#eee!important;stroke:#000!important}
+  .fc-decision{fill:#f4f4f4!important;stroke:#000!important}
+  .fc-document{fill:#f8f8f8!important;stroke:#000!important}
+  .fc-t{fill:#000!important}
+  .fc-o,.fc-e{fill:#333!important}
+  .fc-ln{stroke:#000!important}
+  .fc-ar{fill:#000!important}
+  .fcwrap{overflow:visible!important}
+  .fcsvg{max-width:100%!important}
+  .fclegend{color:#000!important;border-top-color:#999!important}
+  .fclegend i{border-color:#000!important;background:#fff!important}
+
+  /* ---- برگه‌ی فلوچارت باید *دقیقاً* یک صفحه‌ی A4 باشد ----
+     این برگه روی دیوار نصب می‌شود (ب-۱۰-۱-۳)؛ صفحه‌ی دوم یعنی نیمِ فلوچارت روی
+     دیوار. سقفِ قبلی (۱۹۶mm) فقط ارتفاعِ خودِ SVG را می‌دید و حساب سربرگ،
+     پانویس، دو ردیف شناسنامه، راهنمای نمادها و کادرهای امضا را نمی‌کرد؛ اندازه‌گیری
+     نشان داد برگه ۱٫۲۹ صفحه می‌شود. حالا دو کار هم‌زمان انجام می‌شود:
+       ۱) همه‌ی عناصر جانبی در چاپ فشرده می‌شوند تا بودجه آزاد شود
+       ۲) سقف SVG روی همان بودجه‌ی واقعیِ باقی‌مانده تنظیم می‌شود
+     نسبت ابعاد را viewBox نگه می‌دارد، پس نمودار فقط کوچک می‌شود و به‌هم نمی‌ریزد. */
+  .fcsheet{page-break-inside:avoid;break-inside:avoid}
+  .fcsheet .doc-dates{margin:0 0 6px!important}
+  .fcsheet .doc-dates > div{padding:4px 9px!important}
+  .fcsheet .doc-dates span{font-size:8.5px!important;margin-bottom:1px!important}
+  .fcsheet .doc-dates b{font-size:10px!important}
+  .fcsheet .fcwrap{padding:0!important;margin-top:8px!important}
+  .fcsheet .fclegend{margin-top:6px!important;padding-top:5px!important;font-size:9px!important;gap:10px!important}
+  .fcsheet .chksign{margin-top:9px!important;gap:12px!important}
+  .fcsheet .chksign > div{padding:6px 10px!important}
+  .fcsheet .chksign span{font-size:9px!important;margin-bottom:2px!important}
+  .fcsheet .chksign i{height:22px!important}
+  /* سقفِ ارتفاعِ SVG عمداً برداشته شد. مرورگر نسبتِ viewBox را حفظ می‌کند، پس
+     max-height عرض را هم می‌شکست و نمودار به نوارِ باریکِ ناخوانا تبدیل می‌شد
+     (اندازه‌گیری: ۴۲mm عرض). جا دادن در یک صفحه حالا کارِ مقیاس‌گیریِ JS است
+     (procPrintChart در public/js/app.js) که کلِ برگه را یکنواخت کوچک می‌کند. */
+  .fcsheet .fcsvg{max-width:100%!important}
+
+  /* موقع چاپِ برگه‌ی فلوچارت، پوسته‌ی اپ از کاغذ می‌رود — وگرنه ارتفاعِ
+     min-height دارِ #root خودش صفحه‌های خالیِ اضافه می‌ساخت. */
+  body.fc-printing #root,body.fc-printing #ghdr,body.fc-printing #gftr{display:none!important}
+  body.fc-printing{margin:0!important;padding:0!important}
+  .fc-print-fit{position:relative;overflow:hidden;margin:0;padding:0;
+    break-inside:avoid;page-break-inside:avoid;break-after:avoid;page-break-after:avoid}
+  .fc-print-inner{position:absolute;top:0;right:0}
+  /* برگه در حالت عادی یک <table> است تا سربرگ/پانویس روی هر صفحه تکرار شود.
+     ولی این‌جا کلِ برگه با مقیاس در *یک* صفحه جا شده و تکرار معنا ندارد؛ در عوض
+     صفحه‌بندیِ ویژه‌ی جدول‌ها با page-break-inside:avoid می‌جنگید و کلِ برگه را به
+     صفحه‌ی بعد پرت می‌کرد — نتیجه‌اش صفحه‌ی اولِ خالی و دو صفحه شدنِ خروجی بود.
+     پس فقط در همین حالت، ساختارِ جدولی به بلوکِ ساده تبدیل می‌شود. */
+  body.fc-printing .fc-print-inner .psheet,
+  body.fc-printing .fc-print-inner .psheet > thead,
+  body.fc-printing .fc-print-inner .psheet > tbody,
+  body.fc-printing .fc-print-inner .psheet > tfoot,
+  body.fc-printing .fc-print-inner .psheet > * > tr,
+  body.fc-printing .fc-print-inner .psheet > * > tr > td{display:block!important;width:auto!important}
+  /* حاشیه‌ی کاغذ این‌جا از خودِ ظرف می‌آید، نه از سلول‌های برگه — وگرنه ۱۲mm
+     داخلِ محتوایی می‌افتاد که بعداً مقیاس می‌خورد و یک فاصله‌ی بی‌دلیلِ بزرگ
+     بالای نمودار می‌ساخت. */
+  body.fc-printing .fc-print-inner .psheet > thead > tr > td{padding-top:0!important}
+  body.fc-printing .fc-print-inner .psheet > tfoot > tr > td{padding-bottom:0!important}
+  body.fc-printing #fcPrintRoot{padding:12mm}
+}
+
+/* ظرفِ چاپ روی نمایشگر دیده نمی‌شود — ولی عمداً display:none نیست.
+   با display:none مرورگر اصلاً چیدمان نمی‌کند و scrollWidth/Height صفر می‌شود،
+   یعنی مقیاس‌گیری کور انجام می‌شد و برگه با scale=1 می‌رفت روی کاغذ. همان اشتباه
+   یک‌بار در برگه‌ی شیفت رخ داد و با همین راه‌حل درست شد: بیرونِ کادرِ دید بنشیند
+   ولی چیدمان‌شده و قابل‌اندازه‌گیری بماند. */
+#fcPrintRoot{position:fixed;top:-20000px;right:-20000px;visibility:hidden;z-index:-1}
+@media print{
+  body.fc-printing #fcPrintRoot{position:static;visibility:visible;z-index:auto}
+  body:not(.fc-printing) #fcPrintRoot{display:none}
+}
+
+/* ---------- یافته‌های عدم انطباق چک‌لیست ----------
+   پاسخِ «خیر»/«کم» تا پیش از این فقط یک عدد در امتیاز بود. حالا هم در جدول پاسخ‌ها
+   نشان‌دار می‌شود و هم بالای برگه فهرست می‌شود، چون کتاب اصلاحِ همین موارد را
+   الزامی می‌داند (الف-۲-۲-۵) و ارزیاب اول سراغ همین‌ها می‌رود. */
+.ncsec{border-inline-start:3px solid var(--wr)}
+.nclist{list-style:none;margin:6px 0 0;padding:0}
+.nclist li{padding:9px 12px;margin-bottom:6px;border-radius:9px;
+  background:rgba(214,158,46,.07);border:1px solid rgba(214,158,46,.24);font-size:12.5px;line-height:1.9}
+.nclist b{display:block;color:var(--th);font-weight:700;margin-bottom:4px}
+.nclist i{display:block;font-style:normal;font-size:11.5px;color:var(--td);margin-top:4px}
+tbody tr.ncrow{background:rgba(214,158,46,.06)}
+tbody tr.ncrow:hover{background:rgba(214,158,46,.1)}
+@media print{
+  .ncsec{border-inline-start:3px solid #666}
+  .nclist li{background:#f7f7f7!important;border:1px solid #999!important}
+  .nclist b,.nclist i{color:#000!important}
+  tbody tr.ncrow{background:#f3f3f3!important}
+}
+
+/* کادر امضای برگه‌های چاپی (پاسخ‌نامه‌ی چک‌لیست و مانند آن). روی نمایشگر هم دیده
+   می‌شود تا کاربر بداند برگه‌ی چاپی جای امضا دارد، ولی خطِ امضا فقط با چاپ پررنگ
+   می‌شود. break-inside:avoid تا کادر امضا بین دو صفحه‌ی کاغذ نصف نشود. */
+.chksign{display:flex;gap:16px;margin-top:22px;break-inside:avoid;page-break-inside:avoid}
+.chksign>div{flex:1;padding:11px 13px;border:1px solid var(--bd);border-radius:9px}
+.chksign span{display:block;font-size:10.5px;color:var(--td);margin-bottom:4px}
+.chksign i{display:block;height:38px;border-bottom:1px dashed var(--bd)}
+@media print{
+  .chksign>div{border:1px solid #999}
+  .chksign i{border-bottom:1px solid #666}
+  .chksign span{color:#000}
+}
+
+/* ستون امضای جدولِ اعضا در صورت‌جلسه: عمداً خالی می‌ماند تا روی کاغذ جای دست‌خط
+   باشد. کتاب «امضای اعضای حاضر» را می‌خواهد؛ ثبت الکترونیکی در سامانه هست ولی
+   نسخه‌ی چاپیِ روی میزِ ارزیاب هم باید جای امضا داشته باشد. */
+/* «امضای غایبین هنوز اخذ نشده» عمداً چاپ هم می‌شود: تا وقتی این خط روی برگه هست،
+   بند ۶ سنجه کامل نشده و همان کسی که برگه را برمی‌دارد باید امضا را بگیرد. */
+.cmpending{margin-top:8px;font-size:11.5px;color:var(--td);line-height:1.9}
+.cmpending b{color:var(--gdl)}
+@media print{ .cmpending,.cmpending b{color:#000!important} }
+/* برگه‌ی گزارشِ پهن (هشت ستون به بالا): کاغذ افقی می‌شود (از JS)، و جدول هم
+   فشرده‌تر می‌شود تا ستون‌ها روی هم نیفتند. table-layout:fixed لازم است وگرنه
+   عرضِ جدول را طولانی‌ترین سلول تعیین می‌کند و باز از کاغذ بیرون می‌زند. */
+@media print{
+  .pl-wide .psheet table{table-layout:fixed;width:100%;font-size:9px}
+  .pl-wide .psheet th,.pl-wide .psheet td{padding:3px 4px;word-break:break-word}
+  .pl-wide .tbl-wrap{overflow:visible!important}
+}
+.cmsigcell{min-width:96px}
+.cmsigcell::after{content:'';display:block;height:24px;border-bottom:1px dashed var(--bd)}
+@media print{ .cmsigcell::after{border-bottom:1px solid #666} }
+
+@media print{
+  /* table-layout:fixed لازم است: بدون آن، عرض جدول را طولانی‌ترین خطِ
+     نشکستنیِ محتوا تعیین می‌کند و کلِ برگه از کاغذ بیرون می‌زند (در رندر
+     واقعی PDF دیده شد: سطرهای متن از هر دو لبه بریده می‌شدند). */
+  .psheet{display:table!important;width:100%!important;table-layout:fixed;border-collapse:collapse}
+  .psheet>thead{display:table-header-group!important}
+  .psheet>tfoot{display:table-footer-group!important}
+  .psheet>tbody{display:table-row-group!important}
+  .psheet>thead>tr,.psheet>tbody>tr,.psheet>tfoot>tr{display:table-row!important}
+  .psheet>thead>tr>td,.psheet>tbody>tr>td,.psheet>tfoot>tr>td{
+    display:table-cell!important;padding:0!important}
+  /* بدون این، سربرگِ تکرارشده به متنِ صفحه‌ی بعد می‌چسبد */
+  .psheet>thead>tr>td .docletterhead{margin-bottom:10px}
+  /* حاشیه‌ی بالا و پایینِ کاغذ. چون @page دیگر حاشیه ندارد (برای حذفِ سربرگ و
+     ساعتِ مرورگر)، فاصله‌ی لبه‌ی کاغذ این‌جا ساخته می‌شود — و چون thead/tfoot روی
+     هر صفحه تکرار می‌شوند، صفحه‌ی دوم و سوم هم دقیقاً همان حاشیه را دارند. */
+  .psheet>thead>tr>td{padding-top:12mm!important}
+  .psheet>tfoot>tr>td{padding-top:4px!important;padding-bottom:12mm!important}
+
+  /* عرضِ برگه باید از کاغذ بیاید، نه از پنجره‌ی مرورگر.
+     ------------------------------------------------------------------
+     این با رندر واقعیِ PDF پیدا شد و علتِ دو ایرادی بود که کارفرما دید:
+     «صفحه‌ی اول سفید» و «کاغذ تا نیمه پر می‌شود». اندازه‌گیری نشان داد برگه
+     ۳۳۳mm پهن می‌شد در حالی که عرضِ چاپیِ A4 افقی ۲۷۳mm است — چون
+     `.psheet{width:100%}` یعنی صددرصدِ *ظرفِ روی صفحه*، و ظرف از عرضِ پنجره
+     می‌آید نه از کاغذ. نتیجه: سرریزِ افقی؛ و کروم برای سرریزِ افقی صفحه‌ی
+     اضافه می‌سازد که در چیدمانِ راست‌به‌چپ اولین‌شان خالی می‌افتد.
+     پس عرض این‌جا به میلی‌متر و بر حسبِ خودِ کاغذ قفل می‌شود: A4 منهای ۱۲mm
+     حاشیه از هر طرف (همان حاشیه‌ای که body می‌سازد). با table-layout:fixed،
+     ستون‌ها هم بر همین مبنا پخش می‌شوند نه بر مبنای پنجره. */
+  .docprint{width:186mm!important;max-width:186mm!important;
+    margin:0!important;padding:0!important;border:0!important;background:none!important}
+  .docprint.pl-wide{width:273mm!important;max-width:273mm!important}
+  .docprint .pbody{width:100%!important;max-width:100%!important;
+    padding:0!important;margin:0!important;overflow:visible!important}
+  /* ظرف‌های بالادستی نباید کاغذ را پهن‌تر کنند */
+  html,body,#root,.main,.docprint .pbody>*{max-width:100%!important;overflow-x:visible!important}
+}
+
+/* ---------- ۳۵. خنثی‌کردن قواعد موبایل هنگام چاپ ----------
+   نکته‌ای که با رندر واقعی PDF کشف شد: کروم موقع ساختن PDF، عرض viewport را
+   برابر عرض کاغذ می‌گیرد (A4 منهای حاشیه ≈ ۷۰۰px). یعنی همه‌ی مدیا کوئری‌های
+   موبایل (۷۶۸px و ۶۰۰px) روی کاغذ هم فعال می‌شوند — و جدول‌ها با قاب اسکرول
+   افقی و راهنمای «جدول را بکشید» چاپ می‌شدند، که روی کاغذ بی‌معناست و ستون‌ها
+   را هم می‌بُرید. */
+@media print{
+  .tbl-wrap{overflow:visible!important;background:none!important}
+  .tbl-wrap::after{display:none!important}
+  .tbl-wrap table{width:100%!important;min-width:0!important}
+  .tbl-wrap th,.tbl-wrap td{white-space:normal!important}
+  /* بنر «این یک نمونه فرم است» راهنمای صفحه است، نه بخشی از سند */
+  .exbanner{display:none!important}
+  /* ردیف‌های جدول نباید وسط‌شان صفحه عوض شود */
+  .tbl-wrap tr{break-inside:avoid;page-break-inside:avoid}
+}
+
+/* ---------- ۳۶. سنجه‌ی «غیرقابل ارزیابی» ----------
+   این وضعیت نه خوب است نه بد — سنجه‌ای است که این مرکز اصلاً آن خدمت را
+   ندارد. پس رنگ سبز/زرد/قرمزِ سه وضعیت دیگر به آن نمی‌خورد و عمداً خنثی
+   (خاکستریِ متمایل به سبزِ پالت) است تا با آن‌ها اشتباه گرفته نشود. */
+.sel.s-na{border-color:var(--bds);color:var(--td);font-style:italic}
+.na-note{
+  display:flex;gap:9px;align-items:flex-start;
+  margin:8px 0 2px;padding:9px 12px;border-radius:var(--rs,10px);
+  border:1px dashed var(--bds);background:var(--surface-2,rgba(255,255,255,.03))}
+.na-note .ic-s{width:16px;height:16px;color:var(--td);flex:0 0 auto;margin-top:2px}
+.na-note b{display:block;font-size:12px;color:var(--tm);font-weight:700;margin-bottom:2px}
+.na-note span{display:block;font-size:11.5px;color:var(--td);line-height:1.9}
+
+/* ---------- ۳۷. سه قضاوت روی یک سنجه ----------
+   خودارزیابی بالا در نوار کنترل سنجه می‌ماند؛ این ردیف دو قضاوت دیگر را
+   نگه می‌دارد. عمداً از خودارزیابی جدا و کم‌رنگ‌تر است: کاربر روزمره با
+   ستون اول کار دارد و این دو فقط وقتی پر می‌شوند که ارزیابی‌ای رخ داده
+   باشد. */
+.revrow{
+  display:flex;flex-wrap:wrap;align-items:center;gap:10px;
+  margin-top:9px;padding-top:9px;border-top:1px dashed var(--bd)}
+.rev-f{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--td)}
+.rev-f>span{white-space:nowrap}
+.rev-ro{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--td)}
+.rev-ro b{color:var(--tm);font-weight:700}
+.sel.sm{font-size:11.5px;padding:5px 8px;min-height:32px}
+/* اختلاف با ارزیاب: «خوش‌بینی ما» هشدار است، «سخت‌گیری ما» فقط اطلاع */
+.rev-gap{
+  margin-inline-start:auto;font-size:11px;font-weight:700;
+  padding:3px 10px;border-radius:7px;white-space:nowrap}
+.rev-gap.over{color:var(--dn);background:var(--dn-soft,rgba(217,122,106,.12))}
+.rev-gap.under{color:var(--tm);background:var(--surface-2,rgba(255,255,255,.05))}
+@media (max-width:600px){
+  .revrow{gap:8px}
+  .rev-f,.rev-ro{flex:1 1 100%;justify-content:space-between}
+  .rev-gap{flex:1 1 100%;margin-inline-start:0;text-align:center}
+}
+
+/* ---------- ۳۸. ضریب وزنی سطح سنجه ---------- */
+.lw-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:14px 0}
+.lw-f{display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--tm)}
+.lw-f>span{display:flex;align-items:baseline;gap:7px;font-weight:600;color:var(--th)}
+.lw-f em{font-style:normal;font-size:11px;color:var(--td);font-weight:400}
+.lw-f input{
+  padding:9px 12px;border-radius:9px;min-height:42px;
+  background:var(--surface,rgba(0,0,0,.25));border:1px solid var(--bds);color:var(--th);
+  font-family:inherit;font-size:14px;font-variant-numeric:tabular-nums lining-nums;
+  direction:ltr;text-align:center}
+.lw-f input:focus{outline:2px solid var(--pri,#34bbd3);outline-offset:1px}
+
+/* ---------- ۳۹. روش ارزیابی هر سنجه ---------- */
+.evmrow{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-bottom:9px}
+.evm-l{font-size:10.5px;color:var(--td);margin-inline-end:2px}
+.evm{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;padding:3px 10px;border-radius:20px;
+  border:1px solid var(--bd);color:var(--td);background:transparent;white-space:nowrap}
+.evm.on{border-color:var(--pri,#34bbd3);color:var(--pri,#34bbd3);
+  background:var(--pri-soft,rgba(52,187,211,.10))}
+.evm.tgl-chip{cursor:pointer}
+.evm.tgl-chip input{width:13px;height:13px;accent-color:var(--pri,#34bbd3);cursor:pointer;margin:0}
+/* صادق بودن درباره‌ی اینکه مقدار حدس است یا تأیید — کاربر باید تفاوت را ببیند */
+.evm-src{font-size:10px;color:var(--td);font-style:italic;margin-inline-start:auto}
+.evm-src.ok{color:var(--pri,#34bbd3);font-style:normal}
+@media (max-width:600px){
+  .evm-src{flex:1 1 100%;margin-inline-start:0;margin-top:2px}
+}
+
+/* ---------- ۴۰. مسیر ارائه در تب «ارائه برای فروش» ----------
+   ترتیب اینجا اطلاعات است، نه تزئین: هر قدم چیزی را باز می‌کند که قدم بعد
+   رویش سوار می‌شود. پس شماره‌گذاری واقعی است و کارت‌ها زیر هم می‌نشینند. */
+.sd-route{list-style:none;margin:0;padding:0;display:grid;gap:2px;counter-reset:none}
+.sd-route li{
+  padding:14px 16px;background:var(--surface,rgba(255,255,255,.02));
+  border:1px solid var(--bd)}
+.sd-route li:first-child{border-radius:var(--r,14px) var(--r,14px) 0 0}
+.sd-route li:last-child{border-radius:0 0 var(--r,14px) var(--r,14px)}
+.sd-r-hd{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;margin-bottom:5px}
+.sd-r-hd b{font-size:14px;color:var(--th);font-weight:700}
+/* «کجا» — همان صفحه‌ای که باید موقع ارائه باز باشد */
+.sd-r-w{
+  font-size:11px;color:var(--gdl);background:var(--gold-soft,rgba(212,175,90,.12));
+  border:1px solid var(--bd);padding:2px 9px;border-radius:20px;white-space:nowrap}
+.sd-route p{margin:0;font-size:13px;line-height:1.95;color:var(--tm)}
+/* جمله‌ای که واقعاً گفته می‌شود — از توضیحِ کار جدا می‌ماند */
+.sd-r-say{
+  margin-top:7px!important;padding:8px 12px;border-radius:var(--rs,10px);
+  border-inline-start:2px solid var(--pri,#34bbd3);
+  background:var(--pri-soft,rgba(52,187,211,.08));
+  font-size:12.5px!important;color:var(--th)!important;font-style:italic}
+@media (max-width:600px){
+  .sd-route li{padding:12px 13px}
+  .sd-r-w{flex:1 1 100%}
+}
+
+/* ---------- ۴۱. گوی‌های نورانی و پدیدارشدن هنگام اسکرول ----------
+   برگرفته از سایت hssn.info خودِ کاربر: دو گویِ محوِ رنگی پشت هیرو، و
+   بخش‌های صفحه که با رسیدن اسکرول ظاهر می‌شوند نه یک‌جا. فقط روی صفحه‌ی
+   ورودیِ عمومی (پیش از لاگین) اعمال شده، نه داخل خودِ اپ. */
+.lhero{position:relative;overflow:hidden}
+.lglow{position:absolute;border-radius:50%;filter:blur(90px);opacity:.22;pointer-events:none;z-index:0}
+.lglow-a{width:340px;height:340px;background:var(--pri,#185a72);inset-inline-start:-60px;top:-90px}
+.lglow-b{width:280px;height:280px;background:var(--gd,#b07d10);inset-inline-end:-50px;bottom:-80px}
+.lhero>*{position:relative;z-index:1}
+@media (max-width:768px){ .lglow{display:none} }
+
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+.reveal.is-visible{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){ .reveal{opacity:1;transform:none;transition:none} }
+
+/* هدر عمومی، عمیق‌تر و محسوس‌تر بعد از چندپیکسل اسکرول — امضای «سایت شیشه‌ای» */
+#ghdr .ghdr-in{transition:box-shadow .3s ease,background-color .3s ease}
+#ghdr.is-scrolled .ghdr-in{
+  background:rgba(6,13,24,.94);
+  box-shadow:0 22px 48px -22px rgba(0,0,0,.8)}
+html[data-theme="light"] #ghdr.is-scrolled .ghdr-in{background:rgba(255,255,255,.94)}
+
+/* ---------- ۴۲. نتایج نظرسنجی رضایت — اصلاح چیدمان روی موبایل ----------
+   گزارش کاربر: «روی نسخه موبایل خوب نتیجه نداد».
+
+   دو ایراد واقعی در اسکرین‌شات موبایل دیده شد:
+
+   ۱) فیلتر بازه‌ی تاریخی همیشه باز بود. دو ردیف انتخابگر سه‌تایی (روز/ماه/سال)
+      به‌علاوه‌ی دو دکمه، روی صفحه‌ی ۳۹۰ پیکسلی حدود ۳۳۰ پیکسل ارتفاع می‌گرفت —
+      یعنی کاربر پیش از دیدن حتی یک عدد، باید کل صفحه را رد می‌کرد. حالا روی
+      موبایل جمع‌شده باز می‌شود و با دکمه‌ی سربرگ باز/بسته می‌شود.
+
+   ۲) شبکه‌ی کاشی‌های آمار روی موبایل دوستونه است و این صفحه سه کاشی دارد، پس
+      کاشی سوم تنها در یک ستون می‌افتاد و کنارش یک حفره‌ی خالی می‌ماند. حالا اگر
+      تعداد کاشی‌ها فرد باشد، آخری کل عرض را می‌گیرد. */
+
+.satr-ftgl{display:none}
+.satr-filter .satr-ftgl-open{display:none}
+.satr-filter.collapsed .satr-ftgl-open{display:inline}
+.satr-filter.collapsed .satr-ftgl-close{display:none}
+.satr-filter.collapsed .satr-fbody{display:none!important}
+
+@media (max-width:768px){
+  .satr-ftgl{display:inline-flex}
+  /* سربرگ پنل: عنوان سمت راست، کلید باز/بسته سمت چپ */
+  .satr-filter .phd{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .satr-filter .satr-ftgl{order:3;flex:0 0 auto}
+
+  /* کاشیِ آخر وقتی تعداد فرد است، تمام عرض را بگیرد تا حفره‌ی کنارش نماند */
+  .stats>.st:last-child:nth-child(odd){grid-column:1 / -1}
+}
+
+/* ---------- ۴۳. سوپرادمین: پنل جدا برای هر مرکز درمانی ----------
+   خواسته‌ی کاربر: «پنل مدیریت هر مرکز درمان جدا باشه، روش زدم فقط همون مرکز باز بشه».
+
+   پیش از این همه‌ی مراکز در یک جدول بودند و هفت دکمه‌ی عملیاتی هر مرکز در یک ردیف
+   کنار هم می‌نشست؛ فرم‌های زیرین هم همه در یک #superSub مشترک زیر کل جدول باز
+   می‌شدند، پس با چند مرکز معلوم نبود فرمِ باز مال کدام مرکز است. حالا فهرست
+   کارت‌هاست و کلیک روی هر کارت، پنل همان مرکز را باز می‌کند. */
+
+.hgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+
+.hcard{display:flex;flex-direction:column;gap:10px;text-align:right;width:100%;
+  padding:16px 18px;border-radius:14px;cursor:pointer;font:inherit;color:var(--th);
+  background:var(--pnl,rgba(0,0,0,.18));border:1px solid var(--bd);
+  transition:border-color .18s ease,transform .18s ease,box-shadow .18s ease}
+.hcard:hover{border-color:var(--gdl);transform:translateY(-2px);box-shadow:0 14px 30px -18px rgba(0,0,0,.55)}
+.hcard:focus-visible{outline:2px solid var(--gdl);outline-offset:2px}
+
+.hcard-top{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.hcard-name{font-weight:800;font-size:14.5px;flex:1 1 auto;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hcard-logo{height:30px;width:30px;object-fit:contain;background:#fff;
+  border-radius:6px;padding:2px;flex:none}
+.hcard-logo-ph{display:grid;place-items:center;background:rgba(255,255,255,.08);color:var(--gdl)}
+.hcard-meta{display:flex;gap:16px;font-size:12px;color:var(--sub)}
+.hcard-meta b{color:var(--th)}
+.hcard-cta{font-size:12.5px;font-weight:700;color:var(--gdl)}
+
+/* پنل یک مرکز */
+.hdet-hd{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.hdet-title{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-weight:800;font-size:16px}
+.hdet-meta{display:flex;gap:18px;font-size:12.5px;color:var(--sub);margin-bottom:14px}
+.hdet-meta b{color:var(--th)}
+.hdet-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+@media (max-width:768px){
+  .hgrid{grid-template-columns:1fr}
+  /* دکمه‌های عملیات روی گوشی تمام‌عرض می‌شوند تا هدف لمس درست باشد و
+     ردیف‌های نصفه‌نیمه نسازند */
+  .hdet-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .hdet-actions .btn{width:100%;justify-content:center}
+}
+@media (max-width:420px){
+  .hdet-actions{grid-template-columns:1fr}
+}
+
+/* ---------- ۴۴. اصلاح ظاهر: منوی موبایل، و کادرهای انتخاب لهیده ----------
+   گزارش کاربر با اسکرین‌شات: «وضعیت نشان‌دادن منوها داغون است، مشخص نیست» و
+   «ماه و سال چیست و آن باکس‌ها چه در می‌شود، رنگ‌ها با پیش‌زمینه نمی‌خواند». */
+
+/* ۱) کشوی منو روی موبایل زمینه‌ی مات می‌گیرد.
+      روی دسکتاپ سایدبار یک ستون کنار محتواست و شفاف‌بودنش عمدی و درست است، ولی
+      زیر ۱۰۰۰px همان المان position:fixed می‌شود و *روی* صفحه می‌آید — و قاعده‌ی
+      html[data-theme="light"] .side{background:transparent} باعث می‌شد متنِ صفحه
+      از پشتش رد شود و منو کاملاً ناخوانا بماند. */
+@media (max-width:1000px){
+  .side{
+    background:var(--em9,#060d18);
+    box-shadow:-18px 0 44px -18px rgba(0,0,0,.55);
+    overflow-y:auto}
+  html[data-theme="light"] .side{
+    background:#f7fafa;
+    box-shadow:-18px 0 44px -20px rgba(9,19,36,.28)}
+  /* درخشش طلاییِ پس‌زمینه در حالت کشویی فقط متن را کدر می‌کرد */
+  .side::before{display:none}
+}
+
+/* ۲) کادرهای انتخاب (روز/ماه/سال، ساعت، اتاق) دیگر له نمی‌شوند.
+      این ردیف‌ها با grid-template-columns ثابت داخل style اینلاین ساخته شده‌اند و
+      روی صفحه‌ی ۳۹۰ پیکسلی همان چهار ستون را نگه می‌داشتند؛ سهم هر select حدود
+      ۵۲ پیکسل می‌شد و فلشِ بومیِ خودِ select تمام آن را می‌خورد، پس کادر خالی
+      دیده می‌شد — در حالی که مقدارش («۱۴۰۵») سرجایش بود و فقط بریده می‌شد. */
+.sel{min-width:0}
+.jdatepicker-wrap{
+  display:grid!important;grid-template-columns:56px 1fr 78px!important;gap:6px;
+  width:100%;min-width:235px;align-items:center;box-sizing:border-box
+}
+.jdatepicker-wrap select.sel{
+  padding:6px 6px!important;font-size:13px!important;text-align:center;
+  border-radius:10px;width:100%;box-sizing:border-box
+}
+.jdatepicker-wrap .jdate-m{min-width:92px}
+.jdatepicker-wrap .jdate-y{min-width:72px}
+.jdatepicker-wrap .jdate-d{min-width:50px}
+.fg.fg-date,.fg:has(.jdatepicker-wrap){min-width:235px}
+@media (max-width:768px){
+  /* هر شبکه‌ای که ستون‌هایش اینلاین تعریف شده، روی گوشی تک‌ستونه می‌شود */
+  .main [style*="grid-template-columns"]{grid-template-columns:1fr!important}
+  /* ردیف روز/ماه/سال: به‌جای flex با نسبت‌های اینلاین، یک گریدِ سه‌ستونه‌ی قطعی. */
+  .jdatepicker-wrap{
+    grid-template-columns:50px 1.4fr 72px!important;gap:4px!important;min-width:0!important
+  }
+  .main .fg>[style*="display:flex"]:not(.jdatepicker-wrap){
+    display:grid!important;grid-template-columns:.85fr 1.4fr 1.05fr;gap:8px}
+  .main .fg>[style*="display:flex"]>.sel{width:100%;min-width:0}
+  .main .fg select.sel{padding-inline:6px;font-size:13px}
+}
+
+/* ==================== ۴۵. صفحه‌های هاب — دو تب اصلی ====================
+   کارفرما رابط قبلی را «شلوغ» رد کرد. این‌جا فقط دو صفحه می‌ماند و هر کار یک کارت
+   است. کارت‌ها عمداً روی همان شیشه‌ی موجود (.g) سوار شده‌اند نه یک زبان بصری تازه،
+   تا با بقیه‌ی سامانه یکی باشند — فقط شفاف‌تر و با جزئیات دقیق‌تر. */
+
+.hub{display:flex;flex-direction:column;gap:34px;max-width:1180px}
+.hub-sec{display:flex;flex-direction:column;gap:14px}
+.hub-h{
+  font-size:.95rem;font-weight:700;letter-spacing:.01em;color:var(--tm);
+  margin:0;display:flex;align-items:center;gap:10px}
+.hub-h::after{content:'';flex:1;height:1px;
+  background:linear-gradient(90deg,var(--bd),transparent)}
+
+/* ---- کارت سمت کاربر ---- */
+.hub-role{padding:20px 24px;display:flex;flex-direction:column;gap:5px}
+.hub-role-t{font-size:1.35rem;font-weight:800;letter-spacing:-.02em;color:var(--th)}
+.hub-role-s{font-size:.9rem;color:var(--td)}
+
+/* ---- رنگِ آبی+طلاییِ موکاپ روی کارت‌های آماریِ داشبورد (فقط تمِ تیره) ----
+   خواسته‌ی کارفرما: «رنگشون هنوز عوض نشده». تغییرِ --pri به آبی کافی نبود چون
+   .st .v رنگش را مستقیم از --th می‌گرفت، نه از --pri. اینجا دقیقاً همان دو
+   کلاس را هدف می‌گیرد که در موکاپ هر عدد رنگ/درخششِ خودش را دارد. */
+:root:not([data-theme="light"]) .st .v,
+html[data-theme="dark"] .st .v{color:var(--pri);text-shadow:0 0 14px rgba(56,189,248,.35)}
+:root:not([data-theme="light"]) .st.gold .v,
+html[data-theme="dark"] .st.gold .v{color:var(--gdl);text-shadow:0 0 14px rgba(201,168,76,.4)}
+:root:not([data-theme="light"]) .abadge,
+html[data-theme="dark"] .abadge{box-shadow:0 0 14px rgba(201,168,76,.28)}
+
+/* ---- گیجِ دایره‌ای «پیشرفت کل» ----
+   خواسته‌ی کارفرما بر اساس موکاپِ گوگل اسنیچ: عددِ کلِ اعتباربخشی به‌جای نوار،
+   یک حلقه‌ی دایره‌ای با درخششِ طلایی باشد. عمداً فقط تمِ تیره — تمِ روشن فعلاً
+   دست نمی‌خورد (خواسته‌ی صریح کارفرما). */
+.hub-ring-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  position:relative;width:180px;height:180px;margin:4px auto 8px}
+.hub-ring{width:100%;height:100%;transform:rotate(-90deg);
+  filter:drop-shadow(0 0 10px rgba(212,168,76,.45))}
+.hub-ring-track{fill:none;stroke:var(--subpanel);stroke-width:8}
+.hub-ring-val{fill:none;stroke:var(--gd,#c9a84c);stroke-width:8;stroke-linecap:round;
+  transition:stroke-dashoffset .3s}
+.hub-ring-mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:2px}
+.hub-ring-pctnum{font-size:2rem;font-weight:800;color:var(--gd,#c9a84c);
+  text-shadow:0 0 18px rgba(212,168,76,.5);font-variant-numeric:tabular-nums}
+.hub-ring-mid span{font-size:.78rem;color:var(--td)}
+
+/* ---- سه بخش اصلی اعتباربخشی ----
+   دقیقاً سه‌تاست و همیشه سه‌تا می‌ماند، پس چیدمان سه‌ستونه اطلاعات درستی می‌دهد. */
+.secard-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.secard{
+  --mx:50%;--my:0%;
+  position:relative;
+  display:flex;flex-direction:column;gap:11px;align-items:stretch;
+  padding:22px 22px 20px;border-radius:18px;cursor:pointer;text-align:right;
+  font-family:inherit;color:var(--th);
+  background:var(--gb);
+  backdrop-filter:blur(26px) saturate(150%);-webkit-backdrop-filter:blur(26px) saturate(150%);
+  border:1px solid var(--bd);
+  box-shadow:0 10px 34px -14px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.07);
+  transition:transform .28s cubic-bezier(.2,.7,.3,1),box-shadow .28s,border-color .28s}
+.secard:hover{transform:translateY(-3px);border-color:var(--bds);
+  box-shadow:0 20px 46px -16px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.12)}
+.secard:focus-visible{outline:2px solid var(--gd);outline-offset:3px}
+/* حلقه‌ی نبضِ «این را پر کن» — یک لایه‌ی جدا روی خودِ کارت، نه تغییرِ box-shadow
+   اصلی کارت (که چندتکه‌ای و شاملِ inset است و GSAP نمی‌تواند بین دو شکلِ متفاوت
+   از آن درون‌یابی کند). فقط opacity همین لایه نبض می‌زند — یک مشخصه‌ی ساده که
+   همیشه کار می‌کند. */
+.fillring{position:absolute;inset:-3px;border-radius:inherit;pointer-events:none;opacity:0;
+  box-shadow:0 0 0 5px rgba(212,175,90,.30),0 10px 28px rgba(212,175,90,.24);z-index:0}
+.secard-top{display:flex;align-items:center;gap:10px}
+.secard-ic{width:34px;height:34px;display:grid;place-items:center;border-radius:10px;
+  background:rgba(201,168,76,.12);color:var(--gd,#c9a84c);border:1px solid rgba(201,168,76,.25);
+  box-shadow:0 0 14px rgba(201,168,76,.22)}
+.secard-ic svg{width:19px;height:19px}
+.secard-code{
+  font-size:.78rem;font-weight:700;letter-spacing:.08em;color:var(--gdl);
+  border:1px solid var(--bd);border-radius:999px;padding:2px 10px}
+.secard-t{font-size:1.06rem;font-weight:700;line-height:1.5;letter-spacing:-.01em;
+  text-wrap:balance;min-height:2.6em}
+.secard-bar{height:5px;border-radius:999px;background:var(--subpanel);overflow:hidden;display:block}
+.secard-bar>span{display:block;height:100%;border-radius:999px;
+  background:linear-gradient(90deg,var(--pri,#2fbad3),var(--gd,#c9a84c))}
+.secard-n{font-size:.82rem;color:var(--td);font-variant-numeric:tabular-nums}
+
+/* ---- کارت‌های کار ---- */
+.hcard-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:14px}
+/* عنوانِ دسته روی کارت‌های صفحه‌ی اعتباربخشی. عمداً از .hub-h کوچک‌تر و کم‌رنگ‌تر
+   است: .hub-h عنوانِ *بخشِ* صفحه است («کارهای اصلی») و این یک رده پایین‌تر —
+   اگر هم‌وزن می‌شدند، کاربر دو سطحِ متفاوت را یکی می‌دید. */
+.hub-cat{display:flex;flex-direction:column;gap:10px}
+.hub-cat + .hub-cat{margin-top:20px}
+.hub-cat-t{display:flex;align-items:center;gap:10px;
+  font-size:12.5px;font-weight:700;color:var(--gdl)}
+.hub-cat-t::after{content:'';flex:1;height:1px;
+  background:linear-gradient(90deg,var(--bd),transparent)}
+.hcard{
+  display:flex;align-items:center;gap:14px;width:100%;
+  padding:16px 18px;border-radius:15px;cursor:pointer;text-align:right;
+  font-family:inherit;color:var(--th);
+  background:var(--gb);
+  backdrop-filter:blur(22px) saturate(140%);-webkit-backdrop-filter:blur(22px) saturate(140%);
+  border:1px solid var(--bd);
+  box-shadow:0 8px 26px -14px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.06);
+  transition:transform .22s cubic-bezier(.2,.7,.3,1),box-shadow .22s,border-color .22s}
+.hcard:hover{transform:translateY(-2px);border-color:var(--bds);
+  box-shadow:0 16px 38px -16px rgba(0,0,0,.46),inset 0 1px 0 rgba(255,255,255,.11)}
+.hcard:focus-visible{outline:2px solid var(--gd);outline-offset:3px}
+.hcard.locked{opacity:.55}
+.hcard-ic{flex:none;width:38px;height:38px;display:grid;place-items:center;border-radius:11px;
+  background:var(--pri-soft,rgba(47,186,211,.12));color:var(--pri,#2fbad3)}
+.hcard-ic svg{width:20px;height:20px}
+.hcard-b{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.hcard-t{font-size:.98rem;font-weight:700;letter-spacing:-.005em}
+.hcard-d{font-size:.8rem;color:var(--td);line-height:1.65;
+  overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.hcard-go{flex:none;color:var(--td);font-size:1.15rem;transition:transform .22s,color .22s}
+.hcard:hover .hcard-go{color:var(--gdl);transform:translateX(-3px)}
+.hcard-lock{font-size:.8em}
+
+/* ---- وظایف سمت ---- */
+.duty-g{margin-bottom:16px}
+.duty-gh{font-size:.8rem;font-weight:700;letter-spacing:.05em;color:var(--gdl);
+  margin-bottom:9px}
+.duty{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;margin-bottom:8px;
+  border-radius:13px;background:var(--gb);border:1px solid var(--bd);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.duty.done{opacity:.62}
+.duty-x{flex:none;width:22px;height:22px;display:grid;place-items:center;border-radius:50%;
+  font-size:.8rem;font-weight:700;
+  background:var(--subpanel);color:var(--td)}
+.duty.done .duty-x{background:var(--pri-soft,rgba(47,186,211,.15));color:var(--pri,#2fbad3)}
+.duty-b{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.duty-t{font-size:.95rem;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.duty-cad{font-size:.7rem;font-weight:600;color:var(--gdl);
+  border:1px solid var(--bd);border-radius:999px;padding:1px 8px}
+.duty-d{font-size:.83rem;color:var(--td);line-height:1.7}
+.duty-gap{font-size:.8rem;color:var(--wr)}
+.duty-go{flex:none;align-self:center;font-family:inherit;font-size:.83rem;font-weight:700;
+  padding:6px 14px;border-radius:999px;cursor:pointer;
+  background:transparent;border:1px solid var(--bd);color:var(--gdl);
+  transition:border-color .2s,color .2s,background .2s}
+.duty-go:hover{border-color:var(--gd);color:var(--gdx,#fff8e2);background:rgba(201,168,76,.12)}
+
+/* ---- درخت محورها فقط روی صفحه‌ی سنجه‌ها ---- */
+#side .ssearch,#side .tree{display:none}
+#side.show-tree .ssearch{display:block}
+#side.show-tree .tree{display:block}
+
+@media (max-width:900px){
+  .secard-row{grid-template-columns:1fr}
+  .secard-t{min-height:0}
+}
+@media (prefers-reduced-motion:reduce){
+  .secard,.hcard,.hcard-go,.secard-bar>span{transition:none}
+  .secard:hover,.hcard:hover{transform:none}
+}
+
+/* ---- عمق و جلای کارت‌های هاب ----
+   کارفرما «شفاف و لاکچری» خواست. روی تم روشن، شیشه‌ی پایه (--gb) تقریباً سفیدِ تخت
+   دیده می‌شد و سایه‌ی تیره‌ی تم شب هم رویش سنگین بود. این بلوک به هر دو تم یک
+   گرادیانِ ملایم، یک خطِ نوریِ بالا و سایه‌ی متناسب با همان تم می‌دهد. */
+.secard,.hcard{
+  background-image:linear-gradient(158deg,rgba(255,255,255,.10) 0%,transparent 42%);
+  background-origin:border-box}
+.secard::after,.hcard::after{
+  content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.14),transparent 34%);
+  opacity:.7}
+.secard,.hcard{position:relative}
+
+html[data-theme="light"] .secard,
+html[data-theme="light"] .hcard{
+  background:linear-gradient(158deg,rgba(255,255,255,.92),rgba(240,246,247,.72));
+  border-color:rgba(17,37,68,.14);
+  box-shadow:0 10px 30px -18px rgba(9,19,36,.30),
+             inset 0 1px 0 rgba(255,255,255,.9)}
+html[data-theme="light"] .secard::after,
+html[data-theme="light"] .hcard::after{
+  background:linear-gradient(180deg,rgba(255,255,255,.75),transparent 40%);opacity:.55}
+html[data-theme="light"] .secard:hover,
+html[data-theme="light"] .hcard:hover{
+  border-color:rgba(176,125,16,.42);
+  box-shadow:0 20px 42px -20px rgba(9,19,36,.34),
+             inset 0 1px 0 rgba(255,255,255,.95)}
+
+/* آیکون‌ها روی تم روشن باید زمردِ تیره باشند تا روی شیشه‌ی روشن خوانده شوند */
+html[data-theme="light"] .secard-ic,
+html[data-theme="light"] .hcard-ic{background:var(--pri-soft);color:var(--pri)}
+html[data-theme="light"] .secard-bar{background:rgba(17,37,68,.10)}
+
+/* شرح وظایف قانونی — فهرست شماره‌دار. شماره این‌جا اطلاعات واقعی است (بند شماره‌ی
+   چند از شرح وظایف)، نه تزئین. */
+.legal{margin:0;padding:0 22px 0 0;display:flex;flex-direction:column;gap:9px;
+  counter-reset:none}
+.legal li{font-size:.92rem;line-height:1.85;color:var(--tm)}
+.legal li::marker{color:var(--gdl);font-weight:700}
+.legal-src{margin-top:12px;font-size:.78rem;color:var(--td);
+  padding-top:10px;border-top:1px dashed var(--bd)}
+
+/* ---- نوار پیشرفت دوره‌ای (روزانه/هفتگی/ماهانه/فصلی/سالانه) ---- */
+.pprog{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px}
+.pp{position:relative;display:flex;flex-direction:column;gap:7px;padding:15px 16px;border-radius:14px;
+  background:var(--gb);border:1px solid var(--bd);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+html[data-theme="light"] .pp{
+  background:linear-gradient(158deg,rgba(255,255,255,.92),rgba(240,246,247,.7));
+  border-color:rgba(17,37,68,.14)}
+.pp-l{font-size:.8rem;color:var(--td);font-weight:600}
+.pp-v{font-size:1.5rem;font-weight:800;letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums;line-height:1}
+.pp-bar{height:5px;border-radius:999px;background:var(--subpanel);overflow:hidden}
+.pp-bar>span{display:block;height:100%;border-radius:999px}
+.pp-n{font-size:.75rem;color:var(--td);font-variant-numeric:tabular-nums}
+/* رنگ معنایی — جدا از رنگ برند، چون وضعیت را می‌گوید نه هویت را */
+.pp.ok  .pp-v{color:var(--ok)}   .pp.ok  .pp-bar>span{background:var(--ok)}
+.pp.mid .pp-v{color:var(--wr)}   .pp.mid .pp-bar>span{background:var(--wr)}
+.pp.low .pp-v{color:var(--dn)}   .pp.low .pp-bar>span{background:var(--dn)}
+
+/* =====================================================================
+   ۲۱. لایه‌ی «لاکچری» — عمق و جنس، نه رنگِ تازه
+   ---------------------------------------------------------------------
+   شکایت کاربر بعد از تخت‌شدنِ عمدیِ تم روشن (بخش ۱ همین فایل): «بی‌روح شده».
+   جواب درست، برگرداندنِ طلای گِلی روی سفید نیست (همان چیزی که قبلاً رد شده)؛
+   جواب، دادنِ *عمق* است: سایه‌ی لایه‌ای واقعی، گرادیانِ ظریف روی نشان‌ها به‌جای
+   تخت‌محض، و یک لبه‌ی طلاییِ نازک فقط دور خودِ آیکون‌ها (نه زمینه‌ی کارت) —
+   جایی که طلا رنگِ تأکید می‌ماند، نه رنگِ سطح.
+   ===================================================================== */
+html[data-theme="light"] .abadge{
+  background:linear-gradient(155deg,var(--pri-soft) 0%,#dcedf0 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 1px 3px rgba(9,15,24,.08);
+}
+.abadge{position:relative}
+html[data-theme="light"] .abadge::after{
+  content:'';position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;
+  box-shadow:0 0 0 1px rgba(176,125,16,.18)}
+
+/* دکمه‌ی اصلی: گرادیان به‌جای تخت، با درخششِ عبوری روی هاور — لمسِ لاکچری
+   بدون برگشتن به سایه‌های سنگینِ قبلی */
+html[data-theme="light"] .btn-g,
+html[data-theme="light"] .btn-gold{
+  background:linear-gradient(135deg,var(--pri) 0%,var(--pri-h) 100%);
+  position:relative;overflow:hidden;
+  box-shadow:0 2px 6px rgba(19,71,90,.28),inset 0 1px 0 rgba(255,255,255,.14);
+}
+html[data-theme="light"] .btn-g:hover,
+html[data-theme="light"] .btn-gold:hover{
+  background:linear-gradient(135deg,var(--pri-h) 0%,var(--pri-d) 100%);
+  box-shadow:0 4px 14px rgba(19,71,90,.36),inset 0 1px 0 rgba(255,255,255,.16);
+  transform:translateY(-1px);
+}
+html[data-theme="light"] .btn-g:active,
+html[data-theme="light"] .btn-gold:active{transform:translateY(0)}
+
+/* سربرگ پنل: یک خطِ طلاییِ ظریف زیر تیتر — امضای بصری تکرارشونده که هویت
+   می‌سازد، بدون رنگ‌کردنِ کل کارت */
+html[data-theme="light"] .phd{position:relative}
+html[data-theme="light"] .panel.g > .phd::after{
+  content:'';position:absolute;right:0;bottom:-1px;height:2px;width:46px;border-radius:2px;
+  background:linear-gradient(90deg,var(--gd),transparent)}
+
+/* بالا‌رفتنِ ظریفِ کارت‌ها زیرِ دست — بازخوردِ لمسی که نسخه‌ی تختِ محض نداشت */
+html[data-theme="light"] .panel.g,
+html[data-theme="light"] .st.g{transition:box-shadow .2s ease,transform .2s ease,border-color .2s ease}
+html[data-theme="light"] .st.g:hover{
+  box-shadow:var(--sh2);border-color:var(--bds);transform:translateY(-1px)}
+
+/* دکمه‌ی شناور دستیار/تنظیمات: حلقه‌ی طلاییِ نازک، به‌جای بوردر خاکستریِ ساده */
+html[data-theme="light"] .dock-btn.gold{
+  border-color:rgba(176,125,16,.4);
+  box-shadow:var(--sh2),0 0 0 1px rgba(176,125,16,.12)}
+.pp.na  .pp-v{color:var(--td)}   .pp.na  .pp-bar{opacity:.4}
+
+/* ===== ماژول شاخص ===== */
+.frow{display:flex;flex-wrap:wrap;gap:10px 14px;margin-bottom:14px}
+.frow .fg{flex:1 1 150px;min-width:130px;margin-bottom:0}
+.ind-kpis{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:18px}
+.ind-kpi{flex:1 1 150px;background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rs);padding:14px 16px}
+.ind-kv{font-size:26px;font-weight:800;color:var(--th);font-family:var(--sf)}
+.ind-kt{font-size:12.5px;color:var(--tm);margin-top:4px}
+.ind-ks{font-size:11px;color:var(--gdl);margin-top:2px}
+.ind-chs{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:820px){.ind-chs{grid-template-columns:1fr}}
+/* ---- گروه‌بندی و پیوندِ شاخص با محورِ اعتباربخشی ----
+   کارفرما فهرستِ تختِ ۷۱ ردیفی را دید و گفت مرتب و منطق‌دار شود. حالا هر دسته
+   سرگروه دارد و کنارش محورِ اعتباربخشیِ همان دسته، که کلیک‌پذیر است. */
+.ind-grp{margin-bottom:18px}
+.ind-grp-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.ind-grp-h b{font-size:13px;color:var(--th)}
+.ind-grp-n{font-size:11px;color:var(--td)}
+.ind-axis{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;
+  border:1px solid var(--bd);background:rgba(255,255,255,.035);font-size:11px;color:var(--td)}
+.ind-axis b{color:var(--gdl);font-weight:800;direction:ltr;unicode-bidi:plaintext}
+.ind-axis.go{cursor:pointer;transition:border-color .15s,background .15s}
+.ind-axis.go:hover,.ind-axis.go:focus-visible{border-color:var(--gd);background:rgba(212,175,90,.1);outline:none}
+.ind-axis.big{padding:5px 12px;font-size:12px}
+
+/* ---- نمودار مقایسه‌ای ----
+   SVG خام و نه یک کتابخانه‌ی نموداری: این پروژه هیچ‌کدام را ندارد و اسپارک‌لاینِ
+   شاخص هم دستی کشیده شده. wrap افقی اسکرول می‌گیرد تا روی موبایل نمودار له نشود. */
+.cmp-svg-wrap{overflow-x:auto}
+.cmp-svg{width:100%;min-width:560px;height:auto;display:block}
+.cmp-legend{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:8px}
+.cmp-scale{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.cmp-scale .sub{font-size:11px}
+/* دایره‌ای: نمودار و فهرستِ سهم‌ها کنار هم؛ روی موبایل زیر هم.
+   فهرست فقط تزئین نیست — قطعه‌ی نازک روی خودِ دایره جای برچسب ندارد و عددش
+   باید یک‌جا خوانده شود. */
+.cmp-pie{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+.cmp-pie .cmp-svg-wrap{flex:0 1 380px;display:flex;justify-content:center}
+.cmp-pielist{flex:1 1 260px;min-width:240px}
+.cmp-pierow{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:11.5px;
+  border-bottom:1px solid var(--bd)}
+.cmp-pierow i{width:11px;height:11px;border-radius:3px;flex:0 0 auto}
+.cmp-pierow span{flex:1;color:var(--th);min-width:0}
+.cmp-pierow b{color:var(--gdl);font-variant-numeric:tabular-nums}
+.cmp-pierow u{color:var(--td);text-decoration:none;font-size:10.5px;white-space:nowrap}
+.cmp-lg{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--th)}
+.cmp-lg i{width:11px;height:11px;border-radius:3px;flex:0 0 auto}
+.cmp-lg u{color:var(--td);text-decoration:none;font-size:10.5px}
+.cmp-pick{display:flex;flex-wrap:wrap;gap:7px;max-height:190px;overflow-y:auto;padding:2px}
+.cmp-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;
+  border:1px solid var(--bd);background:rgba(255,255,255,.03);font-size:11.5px;color:var(--th);cursor:pointer}
+.cmp-chip input{margin:0;accent-color:var(--gd)}
+.cmp-chip:hover{border-color:var(--gd)}
+.cmp-chip.on{border-color:var(--gd);background:rgba(212,175,90,.13)}
+
+.ind-ch{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rs);padding:14px 16px;margin-bottom:14px}
+.ind-cht{font-size:13px;font-weight:700;color:var(--th);margin-bottom:10px}
+.ind-bar{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12.5px}
+.ind-bl{flex:0 0 120px;color:var(--tm);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ind-bt{flex:1;height:8px;background:rgba(255,255,255,.06);border-radius:5px;overflow:hidden}
+.ind-bt i{display:block;height:100%;background:var(--gd);border-radius:5px}
+.ind-bv{flex:0 0 26px;text-align:left;color:var(--th);font-weight:700}
+.ind-fs{display:grid;grid-template-columns:1fr 1fr;gap:4px 20px}
+@media (max-width:640px){.ind-fs{grid-template-columns:1fr}}
+.ind-f{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px dashed var(--bd);font-size:12.5px}
+.ind-fl{color:var(--tm)}
+.ind-fv{color:var(--th);font-weight:600;text-align:left}
+.ind-tx{font-size:13px;color:var(--tm);line-height:1.9}
+.ind-spark{display:flex;gap:4px;align-items:flex-end;height:120px;padding-top:8px}
+.ind-sp{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:3px;font-size:10px}
+.ind-sp i{display:block;width:100%;border-radius:3px 3px 0 0;min-height:2px}
+.ind-sp b{color:var(--gdl);font-weight:600}
+.ind-sp u{color:var(--th);text-decoration:none;font-weight:700}
+.ind-cks{display:flex;flex-wrap:wrap;gap:8px 16px}
+.ind-ck{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--tm);cursor:pointer}
+.ind-ck input{width:auto}
+
+/* ===== عدم انطباق و اقدام اصلاحی روی سنجه ===== */
+.mca-item{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rs);padding:12px 14px;margin-bottom:10px}
+.mca-hd{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px;font-size:13px}
+.mca-meta{display:flex;flex-wrap:wrap;gap:14px;font-size:11px;color:var(--tm)}
+.mca-tx{font-size:11.5px;color:var(--tm);margin-top:4px;line-height:1.7}
+.mca-tx b{color:var(--th)}
+.mca-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.mca-form{display:flex;flex-direction:column;gap:8px}
+.mca-form .frow{margin-bottom:0}
+
+/* ---------- ۴۲. گزارش شاخص‌ها ----------
+   برگه‌ی چاپیِ شاخص: کارت‌های خلاصه، بلوکِ هر شاخص با نمودار و جدولِ ماه‌به‌ماه.
+   رنگ‌ها همان --ok/--wr/--dn ِ سیستم است تا «سبز یعنی بر هدف» در کلِ برنامه یک
+   معنا داشته باشد. */
+/* ــ نکته‌ی رنگ: ‏--ok-soft/--wr-soft/--dn-soft فقط در تم روشن تعریف شده‌اند و در
+   تم تاریک وجود ندارند (رشته‌ی خالی برمی‌گردانند). پس مثل .sd-pain بالاتر،
+   مقدارِ جانشین داده می‌شود؛ بدون آن کارت‌ها در تم تاریک بی‌رنگ می‌مانند. */
+.rep-cards{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 18px}
+.rep-card{flex:1 1 120px;min-width:110px;padding:12px 14px;border-radius:var(--rs);
+  border:1px solid var(--bd);background:var(--bg2,rgba(255,255,255,.04));text-align:center}
+.rep-card b{display:block;font-size:22px;line-height:1.2;color:var(--th)}
+.rep-card span{display:block;font-size:11.5px;color:var(--td);margin-top:3px}
+.rep-ok{border-color:var(--ok);background:var(--ok-soft,rgba(52,187,211,.12))}
+.rep-ok b{color:var(--ok)}
+.rep-wr{border-color:var(--wr);background:var(--wr-soft,rgba(224,184,78,.12))}
+.rep-wr b{color:var(--wr)}
+.rep-dn{border-color:var(--dn);background:var(--dn-soft,rgba(217,122,106,.12))}
+.rep-dn b{color:var(--dn)}
+
+.rep-blk{border:1px solid var(--bd);border-radius:var(--rs);padding:14px 16px;margin-bottom:16px;
+  background:var(--bg2);break-inside:avoid;page-break-inside:avoid}
+.rep-blk-h{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+.rep-blk-h h4{margin:0;font-size:14px;color:var(--th)}
+.rep-blk-h .sub{font-size:11.5px;color:var(--td);margin-top:2px}
+.rep-badge{margin-inline-start:auto;flex:0 0 auto;padding:4px 11px;border-radius:999px;
+  font-size:11.5px;font-weight:700;border:1px solid var(--bd);color:var(--tm);white-space:nowrap}
+.rep-badge.rep-ok{border-color:var(--ok);background:var(--ok-soft,rgba(52,187,211,.12));color:var(--ok)}
+.rep-badge.rep-wr{border-color:var(--wr);background:var(--wr-soft,rgba(224,184,78,.12));color:var(--wr)}
+.rep-badge.rep-dn{border-color:var(--dn);background:var(--dn-soft,rgba(217,122,106,.12));color:var(--dn)}
+.rep-nums{margin-bottom:10px}
+.rep-t-ok{color:var(--ok)}
+.rep-t-dn{color:var(--dn)}
+.rep-tbl{margin-top:10px}
+.rep-tbl table{font-size:11.5px}
+.rep-tbl th{white-space:nowrap}
+/* جدولِ چرخیده (بازه‌ی بلند) فقط دو ستون دارد؛ اگر تمامِ عرض را بگیرد، دو ستونِ
+   باریک با دریایی از فضای خالی بین‌شان می‌ماند. */
+.rep-tbl-v table{max-width:340px}
+.rep-nil{color:var(--td)}
+
+@media print{
+  /* رنگِ وضعیت بخشی از معنای برگه است، نه تزیین: بدون این، کروم پس‌زمینه‌ها را
+     حذف می‌کند و «بر هدف» از «فاصله تا هدف» قابلِ تشخیص نمی‌ماند. */
+  .rep-card,.rep-badge{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  /* رنگ‌ها روی کاغذ صریح نوشته می‌شوند، نه از متغیرِ تم: تمِ تاریک سبزِ روشن
+     (#34bbd3) دارد که روی کاغذِ سفید کم‌رنگ و بی‌جان می‌افتد، و برگه باید بی‌توجه
+     به تمِ کاربر یک‌جور چاپ شود. */
+  .rep-card.rep-ok,.rep-badge.rep-ok{background:#e6f3f5!important;border-color:#185971!important}
+  .rep-card.rep-ok b,.rep-badge.rep-ok{color:#185971!important}
+  .rep-card.rep-wr,.rep-badge.rep-wr{background:#fdf3e0!important;border-color:#a86a06!important}
+  .rep-card.rep-wr b,.rep-badge.rep-wr{color:#a86a06!important}
+  .rep-card.rep-dn,.rep-badge.rep-dn{background:#fdecea!important;border-color:#c0392b!important}
+  .rep-card.rep-dn b,.rep-badge.rep-dn{color:#c0392b!important}
+  .rep-card{background:#fff!important;border-color:#bbb}
+  .rep-card b{color:#000}
+  .rep-card span{color:#333!important}
+  /* همان تلهٔ سربرگ در app.css: ‏--th رنگِ روشنِ تمِ تیره است و عنوانِ شاخص روی
+     کاغذِ سفید تقریباً نامرئی چاپ می‌شد. --td هم برای کاغذ زیادی کم‌رنگ است. */
+  .rep-blk-h h4{color:#000!important}
+  .rep-blk-h .sub{color:#333!important}
+  .rep-nil{color:#888!important}
+  .rep-t-ok{color:#185971!important}
+  .rep-t-dn{color:#c0392b!important}
+  .rep-t-na{color:#333!important}
+  .rep-blk{background:none!important;border-color:#bbb}
+  .rep-cards{gap:8px}
+  .rep-card b{font-size:18px}
+  /* همان درسِ بخشِ ۳۵: عرضِ viewport روی کاغذ ≈۷۰۰px می‌شود، پس min-width ِ
+     نمودار باعث بیرون‌زدن از کاغذ می‌شد. */
+  .rep-paper .cmp-svg{min-width:0!important;width:100%!important}
+  .rep-paper .cmp-svg-wrap{overflow:visible!important}
+  .rep-paper .cmp-pie{display:block}
+  .rep-paper .cmp-pie .cmp-svg-wrap{flex:none;max-width:320px;margin:0 auto}
+  /* متنِ محورهای نمودار با fill="var(--td)" می‌آید که در تم تیره روشن است و روی
+     کاغذ سفید کم‌رنگ می‌افتد — همان خانواده‌ی باگ فلوچارت. فقط در چاپ تیره می‌شود؛
+     برچسب‌های رنگی داده (fill صریح) دست‌نخورده می‌مانند. */
+  .rep-paper text[fill="var(--td)"]{fill:#334155!important}
+}
+
+/* ---------- ۴۳. کنترل‌های پنل مقایسه ---------- */
+.cmp-lbl{font-size:11.5px;color:var(--td);margin-inline-end:4px;align-self:center}
+.cmp-pal{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;
+  margin-inline-start:auto;padding-inline-start:10px}
+.cmp-pal select{font-size:11.5px;padding:4px 8px;height:auto;width:auto;min-width:110px}
+.cmp-sw{display:inline-flex;gap:3px}
+/* input[type=color] بومی در همه‌ی مرورگرها قاب و پدینگِ خودش را دارد؛ بدون این
+   هشت‌تایشان یک نوارِ ۴۰۰ پیکسلی می‌شوند. */
+.cmp-sw input[type=color]{width:22px;height:22px;padding:0;border:1px solid var(--bd);
+  border-radius:5px;background:none;cursor:pointer;flex:0 0 auto}
+.cmp-sw input[type=color]::-webkit-color-swatch-wrapper{padding:2px}
+.cmp-sw input[type=color]::-webkit-color-swatch{border:none;border-radius:3px}
+.btn-xs{padding:3px 8px;font-size:11px}
+
+/* جدولِ دوره‌به‌دوره: ستون زیاد دارد، پس فشرده‌تر از جدول‌های معمولِ برنامه */
+.cmp-grid table{font-size:11.5px}
+.cmp-grid th,.cmp-grid td{padding:6px 8px;white-space:nowrap}
+.cmp-grid tbody th{text-align:center;font-weight:600;color:var(--th);
+  background:var(--bg2,rgba(255,255,255,.03))}
+.cmp-dot{display:inline-block;width:9px;height:9px;border-radius:3px;
+  margin-inline-end:6px;vertical-align:middle}
+.cmp-diff th,.cmp-diff td{border-top:2px solid var(--bd)}
+.cmp-diff th{font-size:11px;color:var(--tm)}
+
+@media print{
+  /* پالت و دکمه‌های حالت روی کاغذ بی‌معنی‌اند */
+  .cmp-pal,.cmp-scale{display:none!important}
+  .cmp-grid table{font-size:10px}
+  .cmp-grid th,.cmp-grid td{padding:4px 5px;white-space:normal}
+  .cmp-grid tbody th{background:#f4f4f4!important;color:#000!important;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .cmp-dot{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+
+/* ---------- ۴۴. نتایج نظرسنجی — جدول، پروفایل پاسخ ---------- */
+/* فونت یک پله بزرگ‌تر: این صفحه را مدیرِ ارشد می‌خواند، اغلب روی تبلت. */
+.satr-tbl{font-size:13.5px}
+.satr-tbl td{padding:11px 13px}
+.satr-row{cursor:pointer;transition:.15s}
+.satr-row:hover td{background:rgba(212,175,90,.07)}
+.satr-row:focus-visible{outline:2px solid var(--gd);outline-offset:-2px}
+.satr-cm{max-width:320px}
+/* نظرِ بلند نباید سطر را چند برابر کند؛ در جدول کوتاه می‌شود و کاملش در پروفایل. */
+.satr-cmt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;line-height:1.85;color:var(--tm)}
+.satr-go{white-space:nowrap;color:var(--gdl);font-size:12px;font-weight:700;text-align:left}
+
+.satr-ovl{overflow-y:auto;align-items:flex-start;padding:26px 18px}
+.satr-ocard{max-width:720px;width:100%;margin:auto}
+.satr-obody{max-height:none}
+.satr-psec{margin-bottom:14px}
+.satr-psec-h{display:flex;align-items:baseline;gap:10px;font-size:13.5px;font-weight:700;
+  color:var(--gdl);margin-bottom:7px;padding-bottom:6px;border-bottom:1px solid var(--bd)}
+.satr-psec-h span{margin-inline-start:auto;font-size:12px;font-weight:600;color:var(--td)}
+.satr-ptbl{font-size:13px}
+.satr-ptbl td{padding:8px 11px;border-bottom:1px dashed var(--bd)}
+.satr-ptbl td:first-child{color:var(--tm);line-height:1.9}
+.satr-v-ok{color:var(--ok)}
+.satr-v-mid{color:var(--wr)}
+.satr-v-bad{color:var(--dn)}
+.satr-cmbox{font-size:13.5px;color:var(--tm);line-height:2.05;white-space:pre-wrap;
+  background:var(--bg2,rgba(255,255,255,.03));border:1px solid var(--bd);
+  border-radius:var(--rs);padding:12px 14px}
+
+@media (max-width:768px){
+  /* روی گوشی ستون‌های کم‌اهمیت‌تر می‌روند تا نظر و امتیاز جا شوند */
+  .satr-tbl th:nth-child(2),.satr-tbl td:nth-child(2),
+  .satr-tbl th:nth-child(4),.satr-tbl td:nth-child(4){display:none}
+  .satr-cm{max-width:none}
+  .satr-ovl{padding:12px 8px}
+  .satr-ptbl td{padding:7px 8px;font-size:12.5px}
+}
+@media print{
+  .satr-ovl{display:none!important}
+  .satr-go{display:none!important}
+  .satr-cmt{-webkit-line-clamp:unset;overflow:visible}
+}
+
+/* ستونِ جمعِ دوره‌ای در جدولِ مقایسه: هم‌جنسِ ماه‌ها نیست، پس هم‌شکلشان هم نیست */
+.cmp-grid th.cmp-roll,.cmp-grid td.cmp-roll,.cmp-grid tr.cmp-roll td,.cmp-grid tr.cmp-roll th{
+  background:rgba(212,175,90,.09);font-weight:700;color:var(--gdl)}
+@media print{
+  .cmp-grid th.cmp-roll,.cmp-grid td.cmp-roll,.cmp-grid tr.cmp-roll td,.cmp-grid tr.cmp-roll th{
+    background:#f2ead6!important;color:#000!important;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+
+/* =====================================================================
+   SUBAGENT-05-UI-SIMPLIFY — ساده‌سازی رابط کاربری (صرفاً افزودنی؛ هیچ امکانی حذف نشده)
+   ---------------------------------------------------------------------
+   این بلوک عمداً در انتهای design-system.css می‌نشیند، چون این فایل بعد از
+   app.css بار می‌شود؛ پس override اینجا امن است و به app.js/app.css دست نمی‌زنیم.
+
+   (۱) جست‌وجوی تکراری سایدبار:
+       جست‌وجوی سراسری #gsq (نوار بالا) از قبل سنجه‌ها/درخت را هم می‌گردد.
+       پس جست‌وجوی محلی سایدبار (.ssearch > input#sq) به‌طور پیش‌فرض پنهان
+       می‌شود و فقط وقتی سایدبار درخت سنجه‌ها را نشان می‌دهد دیده می‌شود.
+       کلاسِ وضعیت از app.js تأیید شد: $('side').classList.toggle('show-tree', ...)
+
+   (۲) هم‌پوشانی عناصر شناور:
+       .floatdock (app.css:185) و .admin-gear (app.css:1324) هر دو
+       left:18px;bottom:18px بودند و روی هم می‌افتادند. دکمهٔ ادمین حالا
+       بالای دکل می‌نشیند (bottom بزرگ‌تر) و پنل ادمین هم متناسب با آن بالا
+       می‌آید. هم دکمهٔ ادمین و هم دکل هر دو باقی می‌مانند.
+
+   (۳) حالت خالی یکدست:
+       .empty / .dempty / .gs-empty با یک سلکتور مشترک، ظاهر یکسان می‌گیرند
+       (مرکزچین، رنگ ثانویه، پدینگ/اندازهٔ هم‌سان). هیچ کلاسی حذف نمی‌شود.
+   ===================================================================== */
+
+/* --- (۱) یک جست‌وجو در هر لحظه --- */
+.ssearch{display:none}
+#side.show-tree .ssearch{display:block}
+
+/* --- (۲) دکمهٔ ادمین بالای دکل شناور --- */
+.admin-gear{bottom:calc(18px + 2*46px + 10px + 12px)}
+.admin-gear-panel{bottom:calc(18px + 2*46px + 10px + 12px + 44px + 10px)}
+@media(max-width:700px){
+  .admin-gear{bottom:calc(10px + 2*40px + 8px + 10px)}
+  .admin-gear-panel{bottom:calc(10px + 2*40px + 8px + 10px + 40px + 8px)}
+}
+
+/* --- (۳) حالت خالی یکدست --- */
+.empty,.dempty,.gs-empty{
+  text-align:center;
+  color:var(--td);
+  padding:26px 16px;
+  font-size:13px;
+  line-height:1.9;
+}
+
+/* =====================================================================
+   SUBAGENT-10-UI-ROUND2 — دور دومِ سادهسازی رابط (فقط CSS افزودنی)
+   ---------------------------------------------------------------------
+   این بلوک عمداً در انتهای design-system.css مینشیند چون این فایل آخر
+   بار میشود (index.html:12)؛ پس افزودن/override اینجا امن است.
+   به app.js / app.css / index.html دست نزده شد.
+   هیچ قابلیت/تم/تنظیمی حذف نشد؛ فقط پیشفرضهای بصری روی صفحهی باریک
+   سبکتر میشوند.
+   ===================================================================== */
+
+/* --- (۲) جدول پهن داخل پنل/کارت روی موبایل: افقی اسکرول، نه بریدهشدن ---
+   واقعیت پروژه: اکثریت جدولها از قبل داخل قابِ اسکرولِ .tbl-wrap هستند
+   (app.css:996 و design-system.css:587/735/1069). این قاعده «شبکهی اطمینان»
+   برای جدولهایی است که (هنوز) داخل .tbl-wrap نیستند. سلکتور با :where( )
+   عمداً کماختصاص (specificity≈0,1,0) نوشته شده تا هیچ قاعدهی موجودی را
+   نشکند؛ جدولهای ویژه (برگهی سند .psheet، سفارشپذیری .bsc-t، مقایسهای
+   .cmp-grid، .re-table، .satr-*) دستنخورده میمانند. قاعدهی جبرانِ پایینتر
+   تضمین میکند هر جدولی که قابِ اسکرولِ خودش را دارد دقیقاً مثل قبل بماند. */
+@media (max-width:760px){
+  .panel :where(table:not(.psheet):not(.ss-grid):not(.ss-print-table):not(.bsc-t):not(.re-table):not(.satr-tbl):not(.satr-ptbl):not(.cmp-grid)),
+  .card  :where(table:not(.psheet):not(.ss-grid):not(.ss-print-table):not(.bsc-t):not(.re-table):not(.satr-tbl):not(.satr-ptbl):not(.cmp-grid)){
+    display:block;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    max-width:100%;
+  }
+  /* جبران: قابهای اسکرولِ موجود و جدولهای ویژه دقیقاً مثل قبل بمانند */
+  .tbl-wrap table,
+  .cmp-grid table,
+  .rep-tbl table,
+  .re-wrap table{
+    display:table;
+    overflow:visible;
+    max-width:none;
+  }
+}
+
+/* --- (۳) حالت آرامِ خودکار: روی موبایل و «کاهش حرکت» ---
+   ویدیوی پسزمینه (تنها <video> اپ: .bgx-video ساختهشده در bg-theme.js) پنهان
+   میشود و پوسترِ ثابت جای آن میماند؛ شدت افکتها (--shine-i/--glow-i) کم
+   میشود تا صفحه سبکتر و کمریسورس باشد. مقدارها عمداً «کم»اند نه صفر؛ هیچ
+   چیزی حذف نمیشود. کشوی «تنظیمات ظاهر» دستنخورده است — این قاعده فقط
+   پیشفرضِ حالت آرام را در این دو شرط تقویت میکند (overrideِ آگاهانه با
+   !important، چون app.js همین دو متغیر را بهصورت inline روی <html> مینویسد:
+   app.js:281-286 و 470-472). */
+@media (max-width:760px){
+  .bgx-video{display:none}
+  .bgx-stage[data-bgx-video="on"][data-bgx-ready="1"] .bgx-poster{opacity:var(--bgx-video-opacity)}
+  html{--shine-i:.12!important;--glow-i:.10!important}
+}
+@media (prefers-reduced-motion: reduce){
+  .bgx-video{display:none}
+  .bgx-stage[data-bgx-video="on"][data-bgx-ready="1"] .bgx-poster{opacity:var(--bgx-video-opacity)}
+  html{--shine-i:.06!important;--glow-i:.05!important}
+}
+/* === پایان SUBAGENT-10-UI-ROUND2 === */
+
+/* === SUBAGENT-12-CLASSIC-DARK ===
+   خواستهٔ صریح کارفرما: «فرمت کار همان تیرهٔ کلاسیک بماند و هرچه روشن است حذف شود».
+   ۱) پس‌زمینهٔ صحنه‌ای خودکار (ویدیو/تصویر ink-wash + هاله/مِه) دیگر ساخته نمی‌شود؛
+      اسکریپت bg-theme.js بدون data-auto/data-root لود می‌شود. برای محکم‌کاری، اگر
+      المان .bgx-stage به هر دلیلی ساخته شد، کامل پنهان می‌شود.
+   ۲) پس‌زمینهٔ تیرهٔ یکدست کلاسیک (بدون تصویر/ویدیو) تثبیت می‌شود.
+   ۳) کنتراست متن روی زمینهٔ تیره تقویت می‌شود (پاراگراف hero و توضیح کوچک کارت‌ها).
+   هیچ تنظیمِ «روشن» در این بلوک اضافه نشده — تمِ روشن به‌طور کامل حذف شده است. */
+
+/* ۱) صحنهٔ خودکارِ پس‌زمینه — حذف کامل (حتی اگر ساخته شود) */
+.bgx-stage,
+.bgx-stage .bgx-video,
+.bgx-stage .bgx-poster,
+.bgx-stage .bgx-scrim,
+.bgx-stage .bgx-halo,
+.bgx-stage .bgx-motes,
+.bgx-stage .bgx-grain,
+.bgx-stage .bgx-vignette{display:none!important;visibility:hidden!important}
+
+/* ۲) پس‌زمینهٔ تیرهٔ یکدست کلاسیک (بدون تصویر/ویدیو) */
+html[data-theme="dark"],
+:root:not([data-theme]){
+  background-color:#0b1120!important;
+  background-image:none!important;
+}
+html[data-theme="dark"] body,
+:root:not([data-theme]) body{
+  background-color:#0b1120!important;
+  background-image:none!important;
+  background-attachment:scroll!important;
+}
+html[data-theme="dark"] body::before,
+:root:not([data-theme]) body::before{opacity:.035!important}
+
+/* ۳) کنتراست متن روی زمینهٔ تیره — پاراگراف hero و توضیح کوچک کارت‌ها */
+html[data-theme="dark"] .lhero p,
+:root:not([data-theme]) .lhero p,
+html[data-theme="dark"] .lhero p span,
+:root:not([data-theme]) .lhero p span{color:#e7edf4!important}
+html[data-theme="dark"] .lpill,
+:root:not([data-theme]) .lpill{color:#dde6f0!important}
+html[data-theme="dark"] .lsec-s,
+:root:not([data-theme]) .lsec-s,
+html[data-theme="dark"] .lstep p,
+:root:not([data-theme]) .lstep p{color:#dde6f0!important}
+html[data-theme="dark"] .lcard small,
+:root:not([data-theme]) .lcard small,
+html[data-theme="dark"] .card small,
+:root:not([data-theme]) .card small,
+html[data-theme="dark"] .pfcard span,
+:root:not([data-theme]) .pfcard span{color:#dde6f0!important}
+
+/* === FIX-PRINT-0111: خنثی‌سازی پس‌زمینه‌ی تیره‌ی اجباری روی کاغذ ===
+   بلوک SUBAGENT-12-CLASSIC-DARK (بالا) با !important و specificity بالاتر،
+   قانونِ پایه‌ی چاپ (html,body سفید) را می‌شکست؛ نتیجه چاپگر صفحه‌های تمام‌مشکی
+   بود (با خروجی واقعی بازتولید شد: بادی تیره + همه‌چیز مخفی).
+   این بلوک عمداً در انتهای فایل است تا در تساوی specificity ببرد. */
+@media print{
+  html[data-theme="dark"],
+  html[data-theme="dark"] body,
+  :root:not([data-theme]),
+  :root:not([data-theme]) body{
+    background-color:#fff!important;
+    background-image:none!important;
+  }
+  html[data-theme="dark"] body::before,
+  :root:not([data-theme]) body::before{display:none!important}
+  /* ترمیم نمایش مودال سند استاندارد: قانون مخفی‌سازی سراسری
+     (body.std-form-printing * با specificity بالاتر) قانون‌های بازگردانی را
+     می‌شکست و مودال همیشه مخفی می‌ماند — با شناسه، خاص‌تر می‌شود. */
+  body.std-form-printing #accStandardDocModal.standard-form-overlay,
+  body.std-form-printing #accStandardDocModal .standard-form-dialog,
+  body.std-form-printing #accStandardDocModal .standard-form-sheet,
+  body.std-form-printing #accStandardDocModal .standard-form-sheet *{
+    visibility:visible!important;
+  }
+  /* سربرگ جدول‌ها: قانون سراسری components.css آن‌ها را سبزِ تیره با !important
+     می‌کند که روی کاغذ با متن مشکی نامرئی است. در چاپ همیشه روشن با جوهر تیره.
+     (table th خاص‌تر از th تنها است تا ترتیب لود فایل‌ها اثر نکند.) */
+  table thead th,table th{background:#f1f5f9!important;color:#0f172a!important;border-color:#999!important}
+}

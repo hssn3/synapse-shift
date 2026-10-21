@@ -1,0 +1,33 @@
+# =====================================================================
+# نسخهٔ Cloudflare Workers — فقط ماژول «پرسنل و برنامهٔ ماهانهٔ شیفت»
+# ---------------------------------------------------------------------
+# راه‌اندازی (جزئیات کامل در cloudflare/README.md):
+#   1) npx wrangler d1 create synapse-shift
+#      → مقدارِ database_id برگشتی را همان‌جا در همین فایل بگذارید.
+#   2) npx wrangler d1 execute synapse-shift --local  --file=cloudflare/schema.sql
+#      npx wrangler d1 execute synapse-shift --local  --file=cloudflare/seed.sql
+#   3) npx wrangler dev            (تست محلی)
+#   4) npx wrangler d1 execute synapse-shift --remote --file=cloudflare/schema.sql
+#      npx wrangler d1 execute synapse-shift --remote --file=cloudflare/seed.sql
+#      npx wrangler deploy        (دیپلوی)
+#   5) npx wrangler secret put JWT_SECRET   (یک رشتهٔ تصادفیِ ≥ ۳۲ کاراکتری)
+# =====================================================================
+name = "synapse-shift"
+main = "cloudflare/worker-main.js"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# فایل‌های ثابتِ همان پوشهٔ public پروژه — خودِ ورکر مسیرهای /api/* را می‌گیرد
+[assets]
+directory = "public"
+binding = "ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "synapse-shift"
+# بعد از `npx wrangler d1 create synapse-shift` مقدارِ id را این‌جا بگذارید
+database_id = "fb81da92-42c0-47ac-ab4d-f0e33dc25527"
+
+# JWT_SECRET عمداً این‌جا نیست؛ فقط به‌صورت Secret ست می‌شود:
+#   npx wrangler secret put JWT_SECRET
+# (برای wrangler dev، مقدار از فایل .env خوانده می‌شود.)

@@ -1,0 +1,109 @@
+/* =====================================================================
+   فرم‌های کد ۵۵ / ۹۹ و فرم بحران — استایل چاپ A4 افقی
+   ---------------------------------------------------------------------
+   عمداً از shift-print.css جدا است تا هیچ قاعده‌ای از برگهٔ شیفت موجود
+   تغییر نکند یا با آن تداخل نداشته باشد.
+   ===================================================================== */
+
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('/fonts/Vazirmatn-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@page { size: A4 landscape; margin: 6mm; }
+
+html, body {
+  margin: 0; padding: 0; background: #fff; color: #000;
+  font-family: 'Vazirmatn', Tahoma, sans-serif;
+  direction: rtl;
+  font-size: 8pt;
+}
+
+.print-toolbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 99;
+  display: flex; gap: 8px; justify-content: center;
+  padding: 8px; background: #0f172a; color: #fff;
+}
+.print-toolbar button {
+  font-family: inherit; font-size: 13px; padding: 6px 18px;
+  border-radius: 8px; border: 1px solid #c8a24a; background: #c8a24a;
+  color: #0f172a; cursor: pointer; font-weight: 600;
+}
+.print-toolbar button#ssPrintClose { background: transparent; color: #fff; }
+
+.cd-sheet {
+  width: 285mm; min-height: 160mm;
+  margin: 0 auto 6mm;
+  padding: 0;
+  page-break-after: always;
+  break-after: page;
+}
+.cd-sheet:last-child { page-break-after: auto; break-after: auto; }
+
+@media print {
+  .noprint { display: none !important; }
+  body { padding: 0; }
+  .cd-sheet { margin: 0; width: auto; min-height: 0; }
+}
+
+/* ---------- سربرگ ---------- */
+.cd-top {
+  display: flex; align-items: stretch;
+  border: 1px solid #000; margin-bottom: 1.6mm;
+}
+.cd-logo { width: 20mm; display: flex; align-items: center; justify-content: center; padding: 0.6mm; border-left: 1px solid #000; }
+.cd-logo img { max-width: 17mm; max-height: 14mm; object-fit: contain; }
+.cd-head { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.4mm; padding: 1mm 2mm; text-align: center; border-left: 1px solid #000; }
+.cd-head .hosp { font-size: 10pt; font-weight: 700; }
+.cd-head .title { font-size: 10.5pt; font-weight: 800; }
+.cd-head .sub { font-size: 7pt; }
+.cd-code { width: 40mm; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1mm; padding: 1mm; font-size: 7.5pt; text-align: center; }
+.cd-code b { font-size: 8.5pt; }
+
+/* ---------- جدول ---------- */
+table.cd-table {
+  width: 100%; border-collapse: collapse; table-layout: fixed;
+  font-size: 7pt; height: 146mm;
+}
+table.cd-table th, table.cd-table td {
+  border: 1px solid #000; padding: 0.6mm 0.4mm; text-align: center;
+  vertical-align: middle; overflow-wrap: anywhere;
+}
+table.cd-table th { background: #f1f1f1; font-weight: 600; font-size: 6.4pt; }
+table.cd-table td.cd-shift { font-weight: 700; font-size: 8pt; background: #fafafa; white-space: nowrap; }
+table.cd-table td.cd-role { text-align: right; padding-right: 1mm; font-size: 6.3pt; }
+table.cd-table td.cd-role .tag { color: #555; font-size: 5.8pt; }
+table.cd-table td.cd-day { font-size: 5.9pt; }
+table.cd-block { margin-bottom: 1mm; }
+
+/* ---------- پاورقی ---------- */
+.cd-roles-note {
+  border: 1px solid #000; border-top: 0; padding: 1mm 2mm;
+  font-size: 6.3pt; line-height: 1.6; text-align: right;
+}
+.cd-sign {
+  display: flex; gap: 0; margin-top: 2mm; border: 1px solid #000;
+}
+.cd-sign > div {
+  flex: 1; padding: 1.4mm 2mm; font-size: 6.6pt; line-height: 1.9;
+  border-left: 1px solid #000;
+}
+.cd-sign > div:last-child { border-left: 0; }
+.cd-sign .lbl { color: #333; }
+.cd-sign .nm { font-weight: 700; }
+
+.cd-date { display: inline-block; direction: ltr; unicode-bidi: isolate; }
+
+
+/* همهٔ خانه‌ها وسط‌چین، فقط امضاهای پاورقی راست‌چین */
+table.cd-table th, table.cd-table td { text-align: center !important; }
+table.cd-table td.cd-role { text-align: center !important; padding-right: 0.4mm; }
+.cd-day { font-size: 7pt; font-weight: 600; }
+.cd-sign > div { text-align: right; }
+
+
+/* تعطیلات در چاپ فرم‌های کد */
+.cd-table th.holiday, .cd-table td.holiday { background: #f3d7d7 !important; }
+

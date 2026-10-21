@@ -1,0 +1,130 @@
+/* ==========================================================================
+   layout-modern.css - Sidebar, Header, Layout Grids, and Rule 11
+   ========================================================================== */
+
+/* --- Layout Wrapper --- */
+body {
+  min-height: 100vh;
+  /* We don't make body flex because the app's JS manages the root layout */
+}
+
+#side {
+  width: 260px;
+  background: var(--bg-secondary) !important;
+  border-left: 1px solid var(--border-normal) !important;
+  transition: width var(--duration-normal) var(--ease-in-out);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+
+#side.collapsed {
+  width: 72px;
+}
+
+#content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* prevent flex overflow */
+}
+
+/* --- Header --- */
+#top, header {
+  height: 64px !important;
+  background: rgba(16,21,28,0.8) !important;
+  backdrop-filter: blur(12px) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-6);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+/* --- Main Content --- */
+#content, main {
+  padding: var(--space-8);
+  max-width: 1440px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* --- Form Groups & Grid --- */
+.fg {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+}
+
+.fg label {
+  font-weight: 600;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.docgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-6);
+  align-items: start;
+}
+
+/* ==========================================================================
+   RULE 11 COMPLIANCE: Horizontal Flow
+   ========================================================================== */
+
+/* Any place where steps, cards, or branches were vertical, make them horizontal */
+.horizontal-flow, .v-stack {
+  display: flex !important;
+  flex-direction: row !important;
+  overflow-x: auto !important;
+  scroll-snap-type: x mandatory;
+  gap: var(--space-4) !important;
+  padding-bottom: var(--space-4) !important;
+}
+
+.horizontal-flow > *, .v-stack > * {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+  min-width: 280px;
+}
+
+/* Customize Scrollbar for horizontal flows */
+.horizontal-flow::-webkit-scrollbar, .v-stack::-webkit-scrollbar {
+  height: 6px;
+}
+.horizontal-flow::-webkit-scrollbar-track, .v-stack::-webkit-scrollbar-track {
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-full);
+}
+.horizontal-flow::-webkit-scrollbar-thumb, .v-stack::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: var(--radius-full);
+}
+.horizontal-flow::-webkit-scrollbar-thumb:hover, .v-stack::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-gold);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  #side {
+    position: fixed;
+    height: 100vh;
+    transform: translateX(100%); /* hidden by default in RTL */
+  }
+  #side.open, #side.mo {
+    transform: translateX(0) !important;
+  }
+  #content {
+    padding: var(--space-4);
+  }
+}
+
+@media (max-width: 640px) {
+  .docgrid {
+    grid-template-columns: 1fr; /* single column on mobile */
+  }
+}

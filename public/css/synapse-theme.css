@@ -1,0 +1,199 @@
+/* ============================================================
+   synapse-theme.css — لایهٔ برند «سیناپس»
+   پالت: سرمهٔ نوی عمیق + فیروزه‌ای درخشان + طلایی گرم
+   این فایل باید آخرین استایل صفحه باشد تا روی تم پایه بنشیند.
+   ============================================================ */
+
+:root{
+  --syn-navy-0:#081222;
+  --syn-navy-1:#0b1830;
+  --syn-navy-2:#12233f;
+  --syn-cyan:#3ec6d8;
+  --syn-cyan-bright:#5fd9ea;
+  --syn-cyan-dim:rgba(62,198,216,.14);
+  --syn-gold:#e2b56d;
+  --syn-gold-bright:#f2cd8a;
+  --syn-glow:0 0 22px rgba(62,198,216,.28);
+}
+
+/* --- نشان برند (تصویر گلی که داخل lmark نشسته) --- */
+.lmark .syn-ico,
+.bmark .syn-ico,
+.shead .bmark img,
+img.syn-ico{
+  width:22px;height:22px;display:block;object-fit:contain;
+  filter:drop-shadow(0 0 7px rgba(95,217,234,.55)) drop-shadow(0 0 14px rgba(95,217,234,.25));
+}
+.lmark.shine::after{ /* درخشش طلایی قبلی روی نشان جدید ملایم‌تر شود */
+  background:linear-gradient(115deg,transparent 35%,rgba(95,217,234,.28) 50%,transparent 65%);
+}
+.ghdr-brand b,.gftr-brand b{letter-spacing:.2px}
+.ghdr-brand .syn-ico{width:23px;height:23px}
+
+/* --- انتخاب متن و فوکوس --- */
+::selection{background:rgba(62,198,216,.35);color:#fff}
+:focus-visible{outline-color:rgba(95,217,234,.7)!important}
+
+/* --- اسکرول‌بار --- */
+*::-webkit-scrollbar-thumb{background:rgba(62,198,216,.30)!important;border-radius:8px}
+*::-webkit-scrollbar-thumb:hover{background:rgba(62,198,216,.48)!important}
+
+/* --- تیترهای گرادیانی برند --- */
+.gold-gradient-text{
+  background:linear-gradient(135deg,#f2cd8a 0%,#e2b56d 55%,#8fd3e2 130%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+.emerald-gradient-text{
+  background:linear-gradient(135deg,#8ce8f5 0%,#3ec6d8 55%,#2b8fb0 120%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+
+/* --- هالهٔ لطیف برند در هدر و فوتر عمومی --- */
+.ghdr-in{border-bottom:1px solid rgba(62,198,216,.10)}
+.gftr-in{border-top:1px solid rgba(62,198,216,.10)}
+.gftr-cr{border-top:1px solid rgba(62,198,216,.08)}
+
+/* --- لندیگ: هالهٔ فیروزه‌ای ملایم پشت هیرو --- */
+.lhero{position:relative}
+.lhero::before{
+  content:"";position:absolute;inset:-40px -60px auto -60px;height:340px;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(46% 60% at 50% 8%,rgba(62,198,216,.14),transparent 70%),
+    radial-gradient(30% 45% at 82% 0%,rgba(226,181,109,.08),transparent 70%);
+}
+.lhero>*{position:relative;z-index:1}
+
+/* --- دکمهٔ اصلی: گرادیان فیروزه‌ای درخشان --- */
+.btn.btn-syn{
+  background:linear-gradient(135deg,#39b7cd,#1f86a6);border:none;color:#f2fbff;font-weight:800;
+  box-shadow:0 0 22px rgba(62,198,216,.35),inset 0 1px 0 rgba(255,255,255,.15);
+}
+.btn.btn-syn:hover{box-shadow:0 0 30px rgba(62,198,216,.55)}
+
+/* --- موبایل: نوار پایین — خط بالای فیروزه‌ای --- */
+@media (max-width:768px){
+  body.app-shell .app-nav,.app-tabbar,.bnav{border-top-color:rgba(62,198,216,.22)!important}
+}
+
+/* --- اسپینر بارگذاری (index.html) هماهنگ شد؛ اینجا برای اطمینان --- */
+@keyframes syn-spin{to{transform:rotate(360deg)}}
+
+
+/* ============ ۱۴۰۵/۰۷/۲۳ (ب) — لوگوی شفاف در هدر + هدر حرفه‌ای + تبِ دانا ============ */
+/* نشانِ بدون کادر (نسخهٔ بدون پس‌زمینه) */
+.syn-mk{
+  width:34px;height:34px;display:block;object-fit:contain;flex:0 0 auto;
+  filter:drop-shadow(0 0 9px rgba(95,217,234,.45)) drop-shadow(0 0 20px rgba(95,217,234,.18));
+}
+.ghdr-brand{gap:10px}
+.ghdr-brand .syn-mk{width:36px;height:36px}
+.ghdr-brand b{
+  font-size:15px;font-weight:800;letter-spacing:.2px;
+  background:linear-gradient(120deg,#f4f8fb 25%,#a9e8f4 78%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+.ltop-brand .syn-mk{width:42px;height:42px}
+.gftr-brand .syn-mk{width:30px;height:30px}
+.shead .syn-mk,.brand .syn-mk{width:32px;height:32px}
+
+/* هدر حرفه‌ای: شیشه‌ای‌تر، خط فیروزه‌ای، عمق ملایم */
+.ghdr-in{
+  background:linear-gradient(180deg,rgba(9,20,38,.96) 0%,rgba(8,18,34,.84) 100%)!important;
+  border-bottom:1px solid rgba(95,217,234,.14)!important;
+  box-shadow:0 14px 38px -26px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.03)!important;
+}
+.ghdr-nav a{position:relative;transition:color .2s}
+.ghdr-nav a::after{
+  content:"";position:absolute;right:50%;left:50%;bottom:-7px;height:2px;border-radius:2px;
+  background:linear-gradient(90deg,#5fd9ea,#3ec6d8);opacity:0;transition:.25s;
+}
+.ghdr-nav a:hover::after{right:10%;left:10%;opacity:1}
+.ghdr-nav a:hover{color:#c9f2fa!important}
+
+/* تبِ مرکزی دانا: بدون برچسب — آیکون وسط‌چین بماند */
+.app-tabbar .app-tab.app-tab-dana .app-tab-t{display:none!important}
+.app-tabbar .app-tab.app-tab-dana{align-items:center;justify-content:center}
+
+
+/* ============ ۱۴۰۵/۰۷/۲۳ (ج) — لوگوی کامل در هدر + نشان دانا ============ */
+.syn-lg{display:block;height:44px;width:auto;filter:drop-shadow(0 0 14px rgba(95,217,234,.22));}
+.ghdr-brand .syn-lg{height:46px}
+.ltop-brand .syn-lg{height:54px}
+.gftr-brand .syn-lg{height:40px}
+.shead .syn-lg,.brand .syn-lg{height:40px}
+
+/* نشانِ دانا: گلِ تمیز روی پس‌زمینهٔ پاک */
+.app-tabbar .app-tab.app-tab-dana .app-tab-ic{
+  width:48px;height:48px;margin-top:-18px;background:none!important;border-radius:50%;
+  box-shadow:0 6px 20px -6px rgba(62,198,216,.55),0 0 26px rgba(62,198,216,.28)!important;color:inherit!important;
+}
+.app-tabbar .app-tab.app-tab-dana .app-tab-ic img{width:48px;height:48px;display:block;border-radius:50%}
+.app-tabbar .app-tab.app-tab-dana .dana-orbit{display:none!important}
+
+
+/* ============================================================
+   ۱۴۰۵/۰۷/۲۳ — راند بازبینی زنده (درخواست کارفرما):
+   ۱) داک شناور (منو + دستیار) از پایین-راست به پایین-چپ منتقل شود
+   ۲) پنل گفتگوی دستیار نیز کنار همان سمت چپ باز شود
+   ۳) آیکون دکمه/نشان دستیار: نشان گُل سیناپس (به‌جای ✨ و AI)
+   ============================================================ */
+@media (min-width: 1025px) {
+  body.app-shell .floatdock.in-side { left: 18px; right: auto; }
+  body.app-shell .floatdock.in-side .dockmenu { left: 0; right: auto; }
+  body.app-shell #floatDock.in-side.side-narrow { left: 13px; right: auto; flex-direction: row; padding: 8px 10px; gap: 10px; }
+  body.app-shell .ent-assistant-drawer { left: 18px; right: auto; }
+  body.app-shell #floatDock.in-side.side-narrow .ent-assistant-drawer { left: 13px; right: auto; }
+}
+
+/* دکمه دستیار سیناپس: نشان گُل، هم‌خانواده با تبِ مرکزی */
+.ent-assistant-bubble {
+  background: transparent !important;
+  border-color: transparent !important;
+  padding: 0 !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .5) !important;
+}
+.ent-assistant-bubble .bubble-icon { width: 100%; height: 100%; margin: 0; display: flex; align-items: center; justify-content: center; }
+.ent-assistant-bubble .bubble-img { width: 100%; height: 100%; display: block; border-radius: 50%; }
+.ent-assistant-bubble:hover {
+  border-color: transparent !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .6), 0 0 22px rgba(62, 198, 216, .38) !important;
+}
+/* نشان کوچک کنار عنوان پنل: نشان گُل */
+.ent-assistant-drawer .drawer-badge { width: 30px; height: 30px; padding: 0 !important; border-radius: 50% !important; background: none !important; overflow: hidden; display: inline-flex; align-items: center; justify-content: center; }
+.ent-assistant-drawer .drawer-badge img { width: 100%; height: 100%; display: block; border-radius: 50%; }
+
+
+/* ============================================================
+   ۱۴۰۵/۰۷/۲۴ — اصلاح دکمهٔ دستیار (درخواست کاربر):
+   ۱) بدون نشانِ عدد   ۲) گُلِ کامل و کاملاً دایره‌ای
+   ۳) پس‌زمینهٔ مدالِ گردِ طلاییِ شاینینگ (بدون پس‌زمینهٔ تیره)
+   ============================================================ */
+.ent-assistant-bubble{
+  width:50px !important; height:50px !important; min-width:50px; min-height:50px; flex:0 0 auto;
+  border-radius:50% !important;
+  border:0 !important;
+  background:radial-gradient(circle at 32% 26%, #fff6d8 0%, #f9dd85 22%, #eec25f 48%, #b8892f 100%) !important;
+  box-shadow:0 0 16px rgba(247,208,112,.65), 0 0 36px rgba(247,208,112,.28), 0 6px 22px rgba(0,0,0,.45) !important;
+  overflow:hidden;
+}
+.ent-assistant-bubble:hover{
+  box-shadow:0 0 24px rgba(255,224,135,.95), 0 0 52px rgba(247,208,112,.45), 0 8px 24px rgba(0,0,0,.5) !important;
+}
+.ent-assistant-bubble .bubble-icon{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
+.ent-assistant-bubble .bubble-img{
+  width:72% !important; height:72% !important;
+  object-fit:contain !important; border-radius:0 !important;
+  filter:drop-shadow(0 1px 3px rgba(96,64,4,.5));
+}
+.ent-assistant-bubble::after{
+  content:''; position:absolute; inset:-30%; border-radius:50%; pointer-events:none;
+  background:linear-gradient(112deg, rgba(255,255,255,0) 36%, rgba(255,255,255,.5) 50%, rgba(255,255,255,0) 64%);
+  animation:synAsstShine 3.4s ease-in-out infinite;
+}
+@keyframes synAsstShine{
+  0%{ transform:translateX(-130%) rotate(6deg); }
+  55%{ transform:translateX(130%) rotate(6deg); }
+  100%{ transform:translateX(130%) rotate(6deg); }
+}
+/* حذف کامل نشانِ عدد کنار دکمهٔ دستیار */
+#ent-assistant-badge, .ent-assistant-badge{ display:none !important; }

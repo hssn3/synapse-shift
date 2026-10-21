@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img"
+     aria-label="نشان سامانه جامع مدیریت و اعتباربخشی بیمارستان شماره یک">
+  <title>نشان بیمارستان نمونه شماره یک</title>
+  <defs>
+    <!-- گرادیان زمردی عمیق لوکس -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0c2f24"/>
+      <stop offset="50%" stop-color="#081f18"/>
+      <stop offset="100%" stop-color="#030f0b"/>
+    </linearGradient>
+
+    <!-- گرادیان طلایی درخشان -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fdf4dc"/>
+      <stop offset="35%" stop-color="#d4af37"/>
+      <stop offset="70%" stop-color="#aa820a"/>
+      <stop offset="100%" stop-color="#f7d070"/>
+    </linearGradient>
+
+    <!-- گرادیان فیروزه‌ای/زمردی نئونی -->
+    <linearGradient id="emeraldNeon" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="50%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+
+    <!-- فیلتر هاله نوری ملایم -->
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- پس‌زمینه کپسولی گرد با رنگ تیره زمردی -->
+  <rect width="512" height="512" rx="120" fill="url(#bgGrad)"/>
+
+  <!-- کادر طلایی بیرونی متصل و باوقار -->
+  <rect x="28" y="28" width="456" height="456" rx="98" fill="none" stroke="url(#goldGrad)" stroke-width="5" opacity="0.85"/>
+  <circle cx="256" cy="256" r="218" fill="none" stroke="url(#emeraldNeon)" stroke-width="2" stroke-dasharray="8 6" opacity="0.4"/>
+
+  <!-- نماد ابر درمانی هوشمند (Cloud Health Core) -->
+  <path d="M 170 330 
+           L 345 330 
+           A 48 48 0 0 0 385 260 
+           A 58 58 0 0 0 355 178 
+           A 72 72 0 0 0 220 162 
+           A 52 52 0 0 0 148 215 
+           A 50 50 0 0 0 170 330 Z"
+        fill="rgba(16, 185, 129, 0.08)"
+        stroke="url(#emeraldNeon)"
+        stroke-width="12"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        filter="url(#softGlow)"/>
+
+  <!-- گوشی پزشکی متصل (Stethoscope inside the Cloud) -->
+  <!-- هدبند و گوشی‌ها (Earpieces & Binaural) -->
+  <path d="M 224 165 
+           C 224 195, 235 220, 256 225 
+           C 277 220, 288 195, 288 165" 
+        fill="none" 
+        stroke="url(#goldGrad)" 
+        stroke-width="9" 
+        stroke-linecap="round"/>
+  
+  <!-- زیتون‌های گوشی (Ear tips) -->
+  <circle cx="224" cy="165" r="7" fill="#fdf4dc"/>
+  <circle cx="288" cy="165" r="7" fill="#fdf4dc"/>
+
+  <!-- لوله اصلی و اتصال به بل سینه (Tubing to Chestpiece) -->
+  <path d="M 256 225 
+           L 256 268 
+           C 256 295, 290 295, 290 268 
+           L 290 260" 
+        fill="none" 
+        stroke="url(#goldGrad)" 
+        stroke-width="9" 
+        stroke-linecap="round"/>
+
+  <!-- دیافراگم / بل گوشی (Stethoscope Chestpiece) با نشان ضربان -->
+  <circle cx="290" cy="254" r="16" fill="#0c2f24" stroke="url(#goldGrad)" stroke-width="6"/>
+  <circle cx="290" cy="254" r="6" fill="#10b981"/>
+
+  <!-- خط ضربان قلب طلایی/سبز (Pulse / ECG Line) در پایانه ابر -->
+  <path d="M 125 330 
+           L 195 330 
+           L 215 300 
+           L 235 365 
+           L 260 280 
+           L 282 345 
+           L 300 315 
+           L 318 330 
+           L 388 330" 
+        fill="none" 
+        stroke="url(#goldGrad)" 
+        stroke-width="11" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"/>
+
+  <!-- صلیب نمادین اعتباربخشی و سلامت در مرکز بالا -->
+  <g transform="translate(256, 120) scale(0.75)">
+    <rect x="-8" y="-22" width="16" height="44" rx="5" fill="url(#goldGrad)"/>
+    <rect x="-22" y="-8" width="44" height="16" rx="5" fill="url(#goldGrad)"/>
+    <circle cx="0" cy="0" r="4" fill="#081f18"/>
+  </g>
+
+  <!-- ستاره‌های نشان کیفیت در دو طرف -->
+  <path d="M 105 256 L 110 268 L 122 268 L 112 276 L 116 288 L 105 280 L 94 288 L 98 276 L 88 268 L 100 268 Z" fill="url(#goldGrad)" opacity="0.85"/>
+  <path d="M 407 256 L 412 268 L 424 268 L 414 276 L 418 288 L 407 280 L 396 288 L 400 276 L 390 268 L 402 268 Z" fill="url(#goldGrad)" opacity="0.85"/>
+
+  <!-- متن زیرین متصل و ظریف: اعتباربخشی و کیفیت -->
+  <text x="256" y="420" text-anchor="middle" fill="#d4af37" font-family="Tahoma, Arial, sans-serif" font-size="24" font-weight="bold" letter-spacing="3">HOSPITAL QUALITY &amp; ACCREDITATION</text>
+  <text x="256" y="448" text-anchor="middle" fill="#94a3b8" font-family="Tahoma, Arial, sans-serif" font-size="18" font-weight="bold">بیمارستان نمونه شماره یک</text>
+</svg>

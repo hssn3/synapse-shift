@@ -1,0 +1,270 @@
+/* ==========================================================================
+   ui-polish.css — «بزرگ‌تر و شیک‌تر» + «وضوح فرم‌ها» (استانداردسازی ۲۰۲۶-۰۹-۲۹)
+   --------------------------------------------------------------------------
+   چرا: کارفرما خواست (۱) چیپ‌های دستهٔ داشبورد بزرگ و شیک شوند و
+   (۲) هرجا فرمی هست، دقیقاً روشن باشد که چطور باید کار کرد.
+   این فایل آخر از همه لود می‌شود تا روکش نهایی باشد؛ هیچ منطقی را تغییر نمی‌دهد.
+   تم روشن (data-theme=light) دست‌نخورده می‌ماند؛ قواعد رنگی فقط برای تم تیره‌اند.
+   ========================================================================== */
+
+/* ---------- ۱) چیپ‌های دستهٔ داشبورد (موتور تصمیم‌گیرنده) ---------- */
+.acc-decision-tabs{
+  display:flex; flex-wrap:wrap; gap:12px; align-items:stretch;
+  padding:4px 2px 14px; margin-bottom:18px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  overflow:visible;
+}
+.acc-decision-tab{
+  display:inline-flex; align-items:center; justify-content:center; gap:9px;
+  min-height:54px; padding:12px 20px;
+  font-size:15px; font-weight:800; line-height:1.5; letter-spacing:.2px;
+  border-radius:15px; cursor:pointer; white-space:nowrap;
+  transition:transform .16s ease, box-shadow .2s ease, border-color .2s ease, color .2s ease, background .25s ease;
+}
+html:not([data-theme="light"]) .acc-decision-tab{
+  color:#c7d3e6;
+  background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 2px 10px rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.04);
+}
+html:not([data-theme="light"]) .acc-decision-tab:hover{
+  transform:translateY(-2px); color:#eaf1fb;
+  border-color:rgba(212,175,90,.5);
+  box-shadow:0 10px 24px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.06);
+}
+html:not([data-theme="light"]) .acc-decision-tab.active{
+  color:#d9f6fb;
+  background:linear-gradient(180deg, rgba(16,160,185,.32), rgba(16,160,185,.10));
+  border-color:rgba(52,187,211,.75);
+  box-shadow:0 10px 26px rgba(16,160,185,.26), inset 0 1px 0 rgba(255,255,255,.10);
+}
+.acc-decision-tab:focus-visible{
+  outline:none !important; border-color:#34bbd3 !important;
+  box-shadow:0 0 0 3px rgba(16,160,185,.35) !important;
+}
+.acc-decision-tab .dt-count{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:28px; height:28px; padding:0 9px; margin-inline-start:1px;
+  border-radius:999px; font-size:13px; font-weight:900; line-height:1;
+}
+html:not([data-theme="light"]) .acc-decision-tab .dt-count{
+  background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.18); color:#e8eefb;
+}
+html:not([data-theme="light"]) .acc-decision-tab:hover .dt-count{ border-color:rgba(212,175,90,.5); }
+html:not([data-theme="light"]) .acc-decision-tab.active .dt-count{
+  background:rgba(14,31,58,.55); border-color:rgba(94,213,234,.5); color:#d1f4fa;
+}
+@media (max-width:768px){
+  .acc-decision-tabs{ gap:10px; }
+  .acc-decision-tab{ min-height:50px; padding:11px 16px; font-size:14px; }
+  .acc-decision-tab .dt-count{ min-width:25px; height:25px; font-size:12px; }
+}
+
+/* ---------- ۲) وضوح فرم‌ها ---------- */
+
+/* ۲-۰) نشانگر راهنمای «؟» کمی درشت‌تر و واضح‌تر */
+.hlp{ width:20px; height:20px; font-size:12.5px; }
+.hlp:hover{ transform:scale(1.08); }
+
+/* ۲-۱) نوار راهنمای بالای فرم — «چطور کار کنم؟» در یک نگاه */
+.form-guide{
+  display:flex; align-items:flex-start; gap:10px;
+  margin:0 0 16px; padding:11px 15px;
+  border-radius:12px; font-size:12.5px; line-height:2;
+}
+html:not([data-theme="light"]) .form-guide{
+  color:#e9dcc0;
+  background:linear-gradient(180deg, rgba(212,175,90,.12), rgba(212,175,90,.04));
+  border:1px solid rgba(212,175,90,.30);
+}
+html:not([data-theme="light"]) .form-guide b{ color:#f6e7bd; font-weight:900; }
+.form-guide .fg-ico{ font-size:15px; line-height:1.7; flex-shrink:0; }
+
+/* ۲-۲) ستارهٔ الزامی، استایل‌دار (به‌جای ستارهٔ متن ساده) */
+.fg label .req{ color:#fb7185; font-weight:900; margin-inline-start:5px; font-size:1.06em; }
+
+/* ۲-۳) برچسب و فیلدهای فرم: خواناتر، بزرگ‌تر، لمس‌پذیر */
+.pbody .fg > label, .modal-box .fg > label{ font-size:13.5px; margin-bottom:7px; }
+html:not([data-theme="light"]) .pbody .fg > label,
+html:not([data-theme="light"]) .modal-box .fg > label{ color:#dae2f0; }
+.pbody .fg input, .pbody .fg select, .pbody .fg textarea,
+.modal-box .fg input, .modal-box .fg select, .modal-box .fg textarea{
+  min-height:46px; padding:12px 15px; font-size:15px; border-radius:12px;
+}
+.pbody .fg textarea, .modal-box .fg textarea{ min-height:100px; line-height:2; }
+
+/* ۲-۴) فوکوس واضح روی همهٔ فیلدهای فرم */
+.pbody .fg input:focus, .pbody .fg select:focus, .pbody .fg textarea:focus,
+.modal-box .fg input:focus, .modal-box .fg select:focus, .modal-box .fg textarea:focus{
+  border-color:#10a0b9 !important;
+  box-shadow:0 0 0 3px rgba(16,160,185,.22);
+}
+html:not([data-theme="light"]) .pbody .fg input:focus,
+html:not([data-theme="light"]) .pbody .fg select:focus,
+html:not([data-theme="light"]) .pbody .fg textarea:focus,
+html:not([data-theme="light"]) .modal-box .fg input:focus,
+html:not([data-theme="light"]) .modal-box .fg select:focus,
+html:not([data-theme="light"]) .modal-box .fg textarea:focus{
+  background:rgba(0,0,0,.34);
+}
+
+/* ۲-۵) placeholder خواناتر (نه کم‌رنگ) */
+.pbody .fg input::placeholder, .pbody .fg textarea::placeholder,
+.modal-box .fg input::placeholder, .modal-box .fg textarea::placeholder{
+  color:#8da2c0; opacity:1;
+}
+
+/* ۲-۶) دکمه‌های فرم: «ثبت/ذخیره» درشت و برجسته، «انصراف» واضح */
+.form-submit{ min-height:50px; padding:13px 30px; font-size:15.5px; font-weight:800; border-radius:14px; }
+html:not([data-theme="light"]) .form-submit{ box-shadow:0 10px 24px rgba(212,175,90,.24); }
+html:not([data-theme="light"]) .form-submit:hover{ box-shadow:0 14px 30px rgba(212,175,90,.32); }
+.form-cancel{ min-height:46px; padding:12px 22px; font-size:14.5px; border-radius:12px; }
+
+/* ۲-۷) فاصلهٔ سالم بین فیلدها در گرید فرم‌ها */
+.pbody .docgrid, .modal-box .docgrid{ gap:16px; }
+.pbody .fg, .modal-box .fg{ margin-bottom:16px; }
+
+/* ---------- ۳) کم‌کردن شلوغی: سربرگ‌های پنل و گرید شیفت ---------- */
+
+/* ۳-۱) تیتر سربرگ هرگز له نشود و «عمودی» نشود.
+   صفحهٔ «برنامهٔ شیفت» نشان داد در دسکتاپ، .phd (فلکس با wrap) بلوک عنوان را
+   که flex:1 با basis:0% است، به باقی‌ماندهٔ فضا (~۶۹px) می‌چسباند در حالی که
+   ردیف دکمه‌ها (بدون wrap، ۵۴۴px) جای خودش را می‌گیرد → متن کلمه‌به‌کلمه
+   زیر هم و شبیه ستون عمودی. با کفِ min-width روی «بلوک‌های حاوی h3»، فلکس
+   مجبور می‌شود ردیف کنترل‌ها را به سطر بعد ببرد (همان راهکاری که
+   design-system فقط برای موبایل داشت — اینجا برای همهٔ عرض‌ها).
+   min(440px, calc(100%-56px)): در موبایل باریک سرریز هم نمی‌دهد (جا برای آیکون). */
+.phd > div:has(h3){ min-width:min(440px, calc(100% - 56px)); }
+.phd > div:has(h3) h3, .phd > div:has(h3) .sub{ white-space:normal; }
+@media print{ .phd > div:has(h3){ min-width:0; } }
+
+/* ۳-۲) دکمه‌های داخل سربرگ بین ۳۲→۳۸px؛ در موبایل همان کف ۴۲px حفظ شود */
+.phd .btn-sm{ min-height:38px; padding:8px 16px; font-size:12.5px; }
+@media (max-width:768px){ .phd .btn-sm{ min-height:42px; } }
+
+/* ۳-۳) خوانایی گرید برنامهٔ شیفت: فونت بزرگ‌تر، پدینگ بازتر، سلول‌های لمس‌پذیرتر.
+   کاربر حتی نمی‌توانست خانه‌های روی صفحهٔ تیره را ببیند؛ حالا هر خانه پس‌زمینهٔ
+   لطیف دارد و خطوط واضح‌ترند (فقط تم تیره؛ تم روشن دست‌نخورده). */
+table.ss-grid{ font-size:12.5px; }
+table.ss-grid th, table.ss-grid td{ padding:6px 8px; }
+td.ss-cell{ min-width:28px; }
+html:not([data-theme="light"]) table.ss-grid th,
+html:not([data-theme="light"]) table.ss-grid td{ border-color:rgba(255,255,255,.15); }
+html:not([data-theme="light"]) td.ss-cell{ background:rgba(255,255,255,.02); }
+html:not([data-theme="light"]) td.ss-cell:hover{ background:rgba(212,175,90,.20); }
+
+/* ۳-۴) جدول برنامهٔ شیفت باید اول دیده شود، نه بعد از فیلدهای یادداشت.
+   ترتیب قالب: [پنل‌های تنظیمات] [یادداشت+توضیحات چاپ] [جدول] [راهنمای M/E/N/H].
+   کاربر وقتی صفحه را باز می‌کند باید اول برنامه را ببیند، بعد تنظیمات. با
+   flex-order فقط ترتیب نمایش می‌چرخد (DOM دست‌نخورده → print و منطق سالم می‌مانند):
+   جدول → راهنما → یادداشت/توضیحات. */
+.pbody:has(> .tbl-wrap.ss-grid-wrap){ display:flex; flex-direction:column; }
+.pbody:has(> .tbl-wrap.ss-grid-wrap) > div[id^="ss"]{ order:0; }
+.pbody:has(> .tbl-wrap.ss-grid-wrap) > .tbl-wrap.ss-grid-wrap,
+.pbody:has(> .tbl-wrap.ss-grid-wrap) > .empty{ order:1; }
+.pbody:has(> .tbl-wrap.ss-grid-wrap) > .sd-note{ order:2; }
+.pbody:has(> .tbl-wrap.ss-grid-wrap) > .docgrid{ order:3; margin-top:16px; }
+
+/* ۳-۵) حروف روز هفته در سطر اول هدر جدول (inline 9.5px بودند) خواناتر */
+table.ss-grid thead tr:first-child th[style*="font-size:9.5px"]{ font-size:11px !important; font-weight:600 !important; }
+
+/* ---------- ۴) استانداردسازی جریان افقی کارت‌ها و اتصال سرشاخه‌ها (Horizontal RTL & Zero Vertical Stacking) ---------- */
+
+/* ۴-۱) سه شاخه اصلی اعتباربخشی: در تمام ابعاد جریان منحصراً افقی راست‌به‌چپ (Zero Stacking) */
+@media (max-width: 900px) {
+  .acc-root-grid {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory !important;
+    -webkit-overflow-scrolling: touch !important;
+    gap: 16px !important;
+    padding-bottom: 14px !important;
+    direction: rtl !important;
+  }
+  .acc-root-card {
+    min-width: 290px !important;
+    flex: 0 0 290px !important;
+    scroll-snap-align: start !important;
+  }
+}
+
+/* ۴-۲) اتصال بصری سرشاخه‌ها به یکدیگر (Branch Connector Pathway) */
+.acc-root-grid {
+  position: relative;
+}
+.acc-root-card:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -12px;
+  width: 12px;
+  height: 2px;
+  background: linear-gradient(270deg, rgba(212,175,90,.6), rgba(16,160,185,.4));
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 10;
+}
+.acc-root-card:hover {
+  border-color: rgba(212,175,90,.7) !important;
+  box-shadow: 0 12px 32px rgba(0,0,0,.45), 0 0 20px rgba(212,175,90,.18) !important;
+}
+
+/* ۴-۳) پایداری کارت‌های زیرمحور و جلوگیری از فشرده‌شدن عمودی */
+.acc-subaxes-grid {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  gap: 16px !important;
+  direction: rtl !important;
+}
+.acc-subaxis-card {
+  flex: 1 1 calc(33.333% - 16px) !important;
+  min-width: 280px !important;
+  box-sizing: border-box !important;
+}
+@media (max-width: 768px) {
+  .acc-subaxes-grid {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory !important;
+    padding-bottom: 12px !important;
+  }
+  .acc-subaxis-card {
+    flex: 0 0 270px !important;
+    min-width: 270px !important;
+    scroll-snap-align: start !important;
+  }
+}
+
+/* ۴-۴) کارت‌های فرآیند و مراحل کاری: جریان راست به چپ و گره‌های متصل */
+.process-flow-row, .steps-horizontal-flow {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+  overflow-x: auto !important;
+  gap: 20px !important;
+  padding: 10px 4px 18px !important;
+  direction: rtl !important;
+}
+.process-step-card {
+  flex: 0 0 240px !important;
+  min-width: 240px !important;
+  position: relative;
+  background: rgba(21,25,31,0.88);
+  border: 1px solid rgba(212, 175, 90, 0.25);
+  border-radius: 14px;
+  padding: 18px;
+}
+.process-step-card:not(:last-child)::after {
+  content: '←';
+  position: absolute;
+  top: 50%;
+  left: -14px;
+  transform: translateY(-50%);
+  color: var(--sn-gold, #d4af5a);
+  font-size: 16px;
+  font-weight: 900;
+}
+

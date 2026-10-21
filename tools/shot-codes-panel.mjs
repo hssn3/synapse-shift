@@ -1,0 +1,22 @@
+import puppeteer from 'puppeteer-core';
+import path from 'node:path';
+
+const BASE = 'http://localhost:8787';
+const b = await puppeteer.launch({ executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: 'new', args: ['--no-sandbox'] });
+const p = await b.newPage();
+await p.setViewport({ width: 1400, height: 1100, deviceScaleFactor: 2 });
+await p.goto(BASE + '/?v=2#staffshift', { waitUntil: 'networkidle2' });
+await p.waitForFunction(() => [...document.querySelectorAll('button')].some(x => (x.textContent || '').includes('مدیر پرستاری')));
+await p.evaluate(() => [...document.querySelectorAll('button')].find(x => (x.textContent || '').includes('مدیر پرستاری')).click());
+await p.waitForSelector('input[type=password]');
+await p.type('input[type=password]', '0000');
+await p.keyboard.press('Enter');
+await p.waitForFunction(() => [...document.querySelectorAll('button')].some(x => (x.textContent || '').includes('فرم‌های کد')));
+await p.evaluate(() => [...document.querySelectorAll('button')].find(x => (x.textContent || '').includes('فرم‌های کد')).click());
+await p.waitForSelector('.ss-meta-box', { timeout: 20000 });
+await new Promise(r => setTimeout(r, 700));
+const panel = await p.$('.ss-meta-box');
+const host = await panel.evaluateHandle(el => el.closest('.panel'));
+await host.asElement().screenshot({ path: path.join('build', 'codes-panel-crisis.png') });
+console.log('ok');
+await b.close();

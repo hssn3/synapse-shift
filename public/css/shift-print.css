@@ -1,0 +1,345 @@
+/* =====================================================================
+   برگهٔ چاپِ A4 افقی — «برنامه درمانی ماهانه بخش»
+   ---------------------------------------------------------------------
+   این فایل فقط داخل iframe چاپ بارگذاری می‌شود. هدف: بازتولید همان
+   فرم کاغذی بیمارستان؛ بدون رنگ‌های تزئینی، بدون نوار ابزار و بدون
+   ستون‌های اضافی. فقط روزهای واقعیِ ماه (۲۸ تا ۳۱) ستون می‌گیرند.
+   ===================================================================== */
+
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('/fonts/Vazirmatn-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@page { size: A4 landscape; margin: 0; }
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  color: #000;
+  font-family: 'Vazirmatn', Tahoma, 'Segoe UI', sans-serif;
+  font-size: 7pt;
+  line-height: 1.35;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.sheet {
+  width: 297mm;
+  /* ۲۰۹ به‌جای ۲۱۰ تا گردکردن مرورگر یک صفحهٔ خالیِ دوم نسازد. */
+  height: 209mm;
+  overflow: hidden;
+  background: #fff;
+  page-break-after: always;
+  break-after: page;
+}
+.sheet:last-child { page-break-after: auto; break-after: auto; }
+
+.sheet-inner {
+  width: 100%;
+  height: 100%;
+  padding: 2.4mm 3mm;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65mm;
+  overflow: hidden;
+}
+
+/* ---------------- سربرگ ---------------- */
+.top {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 2.5mm;
+}
+.top-main {
+  flex: 1.35;
+  display: flex;
+  align-items: center;
+  gap: 2mm;
+  min-width: 0;
+}
+.logo {
+  width: 16mm;
+  height: 16mm;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+/* متن کنار لوگو کمی به چپ و وسط‌چین می‌شود؛ خواستهٔ کارفرما */
+.title-wrap { flex: 1; min-width: 0; text-align: center; padding-left: 3mm; }
+.hosp {
+  font-size: 9.5pt;
+  font-weight: 900;
+  line-height: 1.35;
+}
+.form-title {
+  font-size: 12pt;
+  font-weight: 900;
+  line-height: 1.35;
+  margin-top: 0.2mm;
+}
+.head-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2mm;
+  margin-top: 0.8mm;
+}
+.month-big { font-size: 11pt; font-weight: 900; line-height: 1.25; }
+.beds { font-size: 7pt; font-weight: 700; }
+
+.top-side { flex: 0.65; min-width: 0; }
+.legend {
+  display: flex;
+  gap: 2mm;
+  font-size: 6pt;
+  line-height: 1.5;
+}
+.legend-col { flex: 1; }
+.legend b { font-weight: 900; }
+
+.levels {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 5.7pt;
+  margin-top: 0.6mm;
+  table-layout: fixed;
+}
+.levels th, .levels td {
+  border: 0.25mm solid #000;
+  padding: 0.15mm 0.3mm;
+  text-align: center;
+  height: 3.4mm;
+  overflow: hidden;
+}
+.levels .levels-title,
+.levels td:first-child {
+  text-align: center;
+  font-weight: 700;
+}
+.levels .levels-title { width: 31%; }
+
+/* ---------------- نوار اطلاعات بالای جدول ---------------- */
+.head-strip {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 0;
+  font-size: 6.4pt;
+  border: 0.3mm solid #000;
+}
+.head-strip > div {
+  padding: 0.55mm 0.8mm;
+  border-inline-start: 0.2mm solid #000;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.head-strip > div:first-child { border-inline-start: 0; }
+.head-strip b { font-weight: 900; }
+
+/* ---------------- جدول اصلی ---------------- */
+.grid-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+}
+.form-table {
+  width: 100%;
+  height: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  border: 0.45mm solid #000;
+}
+.form-table th,
+.form-table td {
+  border: 0.22mm solid #000;
+  padding: 0;
+  text-align: center;
+  vertical-align: middle;
+  font-size: var(--table-font, 6.8pt);
+  overflow: hidden;
+}
+.form-table thead th { font-weight: 800; }
+.form-table thead tr:first-child th { height: 4.1mm; }
+.form-table thead tr:nth-child(2) th { height: 5mm; }
+.form-table th.wd { font-size: 6pt; font-weight: 700; }
+.form-table th.daynum { font-size: 6.6pt; }
+
+.form-table .c-num { width: 5.6mm; }
+.form-table .c-name { width: 40mm; }
+.form-table .c-pos { width: 14mm; }
+.form-table .c-fixed { width: 8mm; }
+.form-table .c-emp { width: 11mm; }
+.form-table .c-exp { width: 6.5mm; }
+/* ستونِ اضافه/کسری‌کار بعد از آخرین روزِ ماه (سمتِ چپِ جدول در RTL) */
+.form-table .c-ot { width: 11mm; }
+.form-table th.ot { font-size: 5.2pt; line-height: 1.05; }
+.form-table td.ot {
+  font-size: calc(var(--table-font, 6.8pt) * 0.92);
+  font-weight: 800;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.form-table td.ot-pos { color: #0b6b3a; }
+.form-table td.ot-neg { color: #b00020; }
+
+.form-table tbody tr.staff-row { height: var(--row-h, 5.3mm); page-break-inside: avoid; }
+.form-table tbody tr.staff-row td { height: var(--row-h, 5.3mm); line-height: 1.04; }
+.form-table td.name {
+  text-align: center;
+  padding: 0 0.3mm;
+  font-weight: 600;
+  /* نام و نام‌خانوادگی یک‌خطی — خواستهٔ کارفرما؛ دیگر زیر هم نمی‌افتد. */
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: calc(var(--table-font, 6.8pt) * 0.94);
+  line-height: 1.02;
+}
+.form-table td.name .nm { display: block; }
+.form-table td.fixed { font-weight: 900; }
+.form-table td.num { font-size: calc(var(--table-font, 6.8pt) * 0.95); }
+
+.form-table td.holiday,
+.form-table th.holiday { background: #d9d9d9; }
+.form-table td .lead { font-size: 5.5pt; margin-right: 0.3mm; vertical-align: super; }
+.form-table td.code-M,
+.form-table td.code-E,
+.form-table td.code-N,
+.form-table td.code-H { font-weight: 800; }
+
+.sum-first td { border-top: 0.8mm solid #000; }
+.sum-box { padding: 0 !important; vertical-align: middle !important; }
+.sum-row td.sum-shift{font-weight:900;text-align:center;vertical-align:middle;border-inline-end:0.25mm solid #000}
+.sum-row td.sum-kind{font-weight:600;text-align:center;border-inline-start:0.25mm solid #000}
+.sum-pair {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: var(--row-h, 4.2mm);
+  align-items: stretch;
+  direction: rtl;
+}
+.sum-pair > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 50%;
+  text-align: center;
+  font-size: 6.2pt;
+  line-height: 1.1;
+  overflow: hidden;
+}
+.sum-pair .sum-shift { font-weight: 900; }
+.sum-pair .sum-kind { border-inline-start: 0.2mm solid #000; }
+.sum-non .sum-kind { font-weight: 600; }
+.sum-count {
+  height: var(--row-h, 4.2mm);
+  font-size: calc(var(--table-font, 6.8pt) * 0.82);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.sum-row td { height: var(--row-h, 4.2mm); }
+
+/* ---------------- امضاها ---------------- */
+.sign {
+  flex: 0 0 auto;
+  border: 0.45mm solid #000;
+  border-top: 0;
+}
+.sign-title {
+  font-size: 6.4pt;
+  font-weight: 900;
+  padding: 0.55mm 1.2mm;
+  border-bottom: 0.3mm solid #000;
+  text-align: center;
+}
+.sign-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+.sign-cell {
+  min-height: 10.5mm;
+  padding: 0.5mm 0.8mm 0.8mm;
+  border-inline-start: 0.3mm solid #000;
+  text-align: center;
+}
+.sign-cell:first-child { border-inline-start: 0; }
+.sign-label { font-size: 6.1pt; font-weight: 700; line-height: 1.45; text-align: center; }
+.sign-name {
+  font-size: 7pt;
+  font-weight: 800;
+  text-align: center;
+  margin-top: 1.2mm;
+  line-height: 1.35;
+}
+
+/* ---------------- پیش‌نمایش روی صفحه ---------------- */
+@media screen {
+  body { background: #e9edf2; padding: 10px; }
+  .sheet {
+    margin: 0 auto 12px;
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.25);
+  }
+}
+
+@media print {
+  body { background: #fff; padding: 0; }
+  .sheet { margin: 0; box-shadow: none; break-inside: avoid; page-break-inside: avoid; }
+  .form-table tr { page-break-inside: avoid; break-inside: avoid; }
+}
+
+/* نوار ابزارِ پنجرهٔ چاپ — فقط روی صفحه، هرگز روی کاغذ */
+.print-toolbar {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 9999;
+  display: flex;
+  gap: 8px;
+  padding: 8px 10px;
+  background: #0f172a;
+  border: 1px solid #c9a84c;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .25);
+}
+.print-toolbar button {
+  font-family: inherit;
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 7px;
+  border: 1px solid #c9a84c;
+  background: #c9a84c;
+  color: #081222;
+  cursor: pointer;
+  font-weight: 700;
+}
+.print-toolbar button#ssPrintClose {
+  background: transparent;
+  color: #fff;
+}
+@media print {
+  .print-toolbar, .noprint { display: none !important; }
+}
+
+/* اعداد جمع بزرگ‌تر و وسط‌چین */
+.sum-row td.sum-count { font-size: 8.2pt; font-weight: 800; text-align: center; }
+.sum-row td.sum-shift, .sum-row td.sum-kind { text-align: center; }
+
+
+/* تعطیلات در چاپ */
+th.holiday, td.holiday, .holiday { background: #f3d9d9 !important; }
+
+/* فقط همان تعداد برگه‌ای که ساخته شده چاپ شود؛ شکست صفحهٔ اضافی نسازد */
+@media print {
+  html, body { height: auto; }
+  .sheet { break-after: auto; page-break-after: auto; }
+  .sheet + .sheet { break-before: page; page-break-before: always; }
+}
+
