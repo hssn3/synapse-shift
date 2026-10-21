@@ -646,11 +646,17 @@
     const paint = () => box.querySelectorAll('[data-k]').forEach(b => b.classList.toggle('btn-g', b.dataset.k === sel));
     paint();
     box.querySelectorAll('[data-k]').forEach(b => { b.onclick = () => { sel = (sel === b.dataset.k ? '' : b.dataset.k); paint(); }; });
-    const close = () => box.remove();
+    const doSave = async () => { close(); await ssSaveCrisisCell(staffId, day, sel); };
+    const onKey = (ev) => {
+      if (ev.key === 'Enter') { ev.preventDefault(); doSave(); }
+      else if (ev.key === 'Escape') { ev.preventDefault(); close(); }
+    };
+    const close = () => { box.remove(); document.removeEventListener('keydown', onKey); };
+    document.addEventListener('keydown', onKey);
     box.querySelector('#ssCxCancel').onclick = close;
-    box.addEventListener('click', ev => { if (ev.target === box) close(); });
-    box.querySelector('#ssCxClear').onclick = async () => { await ssSaveCrisisCell(staffId, day, ''); close(); };
-    box.querySelector('#ssCxSave').onclick = async () => { await ssSaveCrisisCell(staffId, day, sel); close(); };
+    box.addEventListener('click', ev => { if (ev.target === box) doSave(); });
+    box.querySelector('#ssCxClear').onclick = async () => { close(); await ssSaveCrisisCell(staffId, day, ''); };
+    box.querySelector('#ssCxSave').onclick = doSave;
   };
 
   async function ssSaveCrisisCell(staffId, day, codes) {
@@ -1450,16 +1456,23 @@
     const paint = () => box.querySelectorAll('[data-k]').forEach(b => b.classList.toggle('btn-g', b.dataset.k === sel));
     paint();
     box.querySelectorAll('[data-k]').forEach(b => { b.onclick = () => { sel = (sel === b.dataset.k ? '' : b.dataset.k); paint(); }; });
-    const close = () => box.remove();
-    box.querySelector('#ssPopCancel').onclick = close;
-    box.addEventListener('click', ev => { if (ev.target === box) close(); });
-    box.querySelector('#ssPopClear').onclick = async () => { close(); await ssSubmitCell(staffId, day, '', false); };
-    box.querySelector('#ssPopSave').onclick = async () => {
+    const onKey = (ev) => {
+      if (ev.key === 'Enter') { ev.preventDefault(); doSave(); }
+      else if (ev.key === 'Escape') { ev.preventDefault(); close(); }
+    };
+    const close = () => { box.remove(); document.removeEventListener('keydown', onKey); };
+    const doSave = async () => {
       const leadEl = box.querySelector('#ssPopLead');
       const lead = (!isAid && leadEl) ? leadEl.checked : false;
       close();
       await ssSubmitCell(staffId, day, sel, lead);
     };
+    document.addEventListener('keydown', onKey);
+    box.querySelector('#ssPopCancel').onclick = close;
+    // کلیک بیرون از کادر = ذخیره و بستن (اتو‌سیو)
+    box.addEventListener('click', ev => { if (ev.target === box) doSave(); });
+    box.querySelector('#ssPopClear').onclick = async () => { close(); await ssSubmitCell(staffId, day, '', false); };
+    box.querySelector('#ssPopSave').onclick = doSave;
   };
 
   async function ssSubmitCell(staffId, day, codes, lead) {
