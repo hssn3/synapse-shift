@@ -303,7 +303,7 @@
   // چیدمان کارت‌ها (فقط ظاهری): مدیریت پرستاری و بحران بالا، سپس درمانگاه‌ها،
   // اتاق عمل و جراحی، ICUها و در پایان پشتیبانی.
   const SS_WARD_LAYOUT = [
-    { label: 'مدیریت پرستاری و بحران', items: ['فرم‌های کد ۹۹ و ۵۵', 'دفتر پرستاری', 'همه پرسنل', 'ساعت شیفت'] },
+    { label: 'مدیریت پرستاری و بحران', items: ['دفتر پرستاری', 'فرم‌های کد ۹۹ و ۵۵'] },
     { label: 'اورژانس و درمانگاه', items: ['اورژانس', 'کلینیک', 'آندوسکوپی'] },
     { label: 'اتاق عمل و جراحی', items: ['اتاق عمل', 'جراحی'] },
     { label: 'مراقبت‌های ویژه', items: ['ICU 1', 'ICU 2'] },
@@ -375,6 +375,8 @@
           <button class="ss-view-tab ${SS.tab === 'staff' ? 'active' : ''}" onclick="ssSelectTab('staff')">${I('user')} پرسنل</button>
           <button class="ss-view-tab ${SS.tab === 'grid' ? 'active' : ''}" onclick="ssSelectTab('grid')">${I('calendar')} برنامه‌ی شیفت</button>
           ${ssHasCrisis() ? `<button class="ss-view-tab ${SS.tab === 'crisis' ? 'active' : ''}" onclick="ssSelectTab('crisis')">${I('shield')} برنامهٔ بحران</button>` : ''}
+          ${(SS.isManager && SS.wardTitle === 'دفتر پرستاری') ? `<button class="ss-view-tab ${SS.tab === 'allstaff' ? 'active' : ''}" onclick="ssOpenAllStaff()">${I('users')} همه پرسنل</button>
+          <button class="ss-view-tab ${SS.tab === 'hours' ? 'active' : ''}" onclick="ssOpenHours()">${I('clock')} ساعت شیفت</button>` : ''}
         </div>
       </div>
     </div>
@@ -383,11 +385,14 @@
   }
 
   /* ---------------- تب «ساعت شیفت» (فقط مدیر پرستاری) ---------------- */
+  async function ssLoadHours() {
+    try { const r = await API.shiftGetSettings('دفتر پرستاری'); SS.settings = r.settings; } catch (e) { /* پیش‌فرض */ }
+    try { const h = await API.shiftHoursGet(); SS.supSettings = h.sup || {}; } catch (e) { SS.supSettings = SS.supSettings || {}; }
+  }
   global.ssOpenHours = async function () {
     if (!SS.isManager) return;
     SS.tab = 'hours';
-    SS.hoursWard = SS.hoursWard || SS.wardTitle;
-    try { const r = await API.shiftGetSettings(SS.hoursWard); SS.settings = r.settings; } catch (e) { /* پیش‌فرض */ }
+    await ssLoadHours();
     ssDraw();
   };
   global.ssHoursWardChange = async function (w) {
@@ -402,10 +407,7 @@
       <div class="phd">${I('clock', 'lg')}<div style="flex:1"><h3>ساعت شیفت بخش‌ها</h3>
         <div class="sub">فقط مدیر پرستاری — برای هر بخش جداگانه. بازه را عوض کنی ساعت خودکار می‌آید؛ عدد را دستی هم می‌توانی بزنی.</div></div></div>
       <div class="pbody" style="padding-top:0">
-        <div class="fg" style="max-width:320px;margin-bottom:12px"><label>بخش</label>
-          <select onchange="ssHoursWardChange(this.value)">
-            ${wards.map(w => `<option value="${e(w.title)}"${w.title === cur ? ' selected' : ''}>${e(w.title)}</option>`).join('')}
-          </select></div>
+        <div class="sub" style="margin-bottom:10px">این ساعت برای <b>همهٔ بخش‌ها</b> یکسان اعمال می‌شود.</div>
         ${ssSettingsHtml()}
       </div>
     </div>`;
@@ -932,7 +934,7 @@
     return Math.round((end - start) * 10) / 10;
   }
   global.ssAutoHours = function () {
-    [['cm', 'hm'], ['ce', 'he'], ['cn', 'hn']].forEach(([clockId, hourId]) => {
+    [['cm', 'hm'], ['ce', 'he'], ['cn', 'hn'], ['sm', 'shm'], ['se', 'she'], ['sn', 'shn']].forEach(([clockId, hourId]) => {
       const h = ssClockHours((document.getElementById('ss_' + clockId) || {}).value);
       const out = document.getElementById('ss_' + hourId);
       if (out && h != null) out.value = String(Math.round(h));
@@ -966,6 +968,15 @@
       </div></div>`;
     const ro = (label, id, val) => `<div class="fg"><label>${label}</label>
       <div class="ss-clock-row"><input id="ss_${id}" class="ss-hours-input" type="text" readonly tabindex="-1" value="${e(String(val))}"><span class="ss-hours-unit">ساعت</span></div></div>`;
+    const sup = SS.supSettings || {};
+    const supField = (label, clockId, hourId, clock, hour) => `<div class="fg">
+      <label>${label}</label>
+      <div class="ss-clock-row">
+        <input id="ss_${clockId}" class="ss-clock-input" style="direction:ltr" value="${e(clock || '')}"
+          oninput="ssAutoHours()" onchange="ssAutoHours()" placeholder="07:00-14:00">
+        <input id="ss_${hourId}" class="ss-hours-input" type="text" inputmode="numeric" value="${e(hour == null ? '' : String(hour))}">
+        <span class="ss-hours-unit">ساعت</span>
+      </div></div>`;
     const hm = Number(st.hour_m) || 0, he = Number(st.hour_e) || 0, hn = Number(st.hour_n) || 0;
     return `<div class="panel g ss-settings-box" style="margin-bottom:16px;background:var(--bg)">
       <div class="ss-box-head">
@@ -989,7 +1000,22 @@
           ${ro('صبح + شب (MN)', 'rmn', hm + hn)}
           ${ro('۲۴ ساعته (MEN)', 'rmen', hm + he + hn)}
         </div>
-        <button class="btn btn-g btn-sm" style="margin-top:8px" onclick="ssSaveSettings()">${I('check')} ذخیره‌ی ساعتِ شیفت این بخش</button>
+        <div class="ss-box-head" style="margin:14px 0 6px">
+          <div><b>پشتیبانی (کمک‌پرستار، بهیار، منشی، سایر سمت‌ها)</b><span class="sub">ساعتِ این گروه جدا از پرسنل پرستاری است</span></div>
+        </div>
+        <div class="docgrid">
+          ${supField('شیفت صبح (M)', 'sm', 'shm', sup.clock_m, sup.hour_m)}
+          ${supField('شیفت عصر (E)', 'se', 'she', sup.clock_e, sup.hour_e)}
+          ${supField('شیفت شب (N)', 'sn', 'shn', sup.clock_n, sup.hour_n)}
+        </div>
+        <div class="docgrid" style="margin-top:8px">
+          <div class="fg"><label>مرخصی (H)</label>
+            <div class="ss-clock-row">
+              <input id="ss_shh" class="ss-hours-input" type="text" inputmode="numeric" value="${e(String(sup.hour_h == null ? (Number(sup.hour_m) || 0) : sup.hour_h))}">
+              <span class="ss-hours-unit">ساعت</span>
+            </div></div>
+        </div>
+        <button class="btn btn-g btn-sm" style="margin-top:10px" onclick="ssSaveSettings()">${I('check')} ذخیره‌ی ساعت شیفت (برای همهٔ بخش‌ها)</button>
       </div>
     </div>`;
   }
@@ -997,7 +1023,27 @@
   global.ssToggleSettings = function () { SS.showSettings = !SS.showSettings; ssDraw(); };
   global.ssSaveSettings = async function () {
     try {
-      const ward = (SS.tab === 'hours') ? (SS.hoursWard || SS.wardTitle) : SS.wardTitle;
+      const isGlobal = (SS.tab === 'hours');
+      const pick = (id) => { const el = document.getElementById('ss_' + id); return el ? el.value : undefined; };
+      if (isGlobal) {
+        const pro = {
+          hour_m: pick('hm'), clock_m: pick('cm'), hour_e: pick('he'), clock_e: pick('ce'),
+          hour_n: pick('hn'), clock_n: pick('cn'), hour_h: pick('hh'),
+        };
+        for (const w of (SS.wards || [])) {
+          try { await API.shiftSetSettings(Object.assign({ ward: w.title }, pro)); } catch (e2) { /* بخش بدون دسترسی */ }
+        }
+        const sup = {
+          hour_m: pick('shm'), clock_m: pick('sm'), hour_e: pick('she'), clock_e: pick('se'),
+          hour_n: pick('shn'), clock_n: pick('sn'), hour_h: pick('shh'),
+        };
+        try { const rs = await API.shiftHoursSet(sup); SS.supSettings = rs.sup || sup; } catch (e2) { /* بی‌صدا */ }
+        if (typeof toast === 'function') toast('ساعت شیفت برای همهٔ بخش‌ها ذخیره شد');
+        await ssLoadHours('دفتر پرستاری');
+        ssDraw();
+        return;
+      }
+      const ward = SS.wardTitle;
       const r = await API.shiftSetSettings({
         ward: ward,
         hour_m: document.getElementById('ss_hm').value, clock_m: document.getElementById('ss_cm').value,

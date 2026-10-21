@@ -133,6 +133,8 @@
     shiftSchedule: (ward, year, month) => req('GET', '/shift/schedule?ward=' + encodeURIComponent(ward) + '&year=' + year + '&month=' + month),
     shiftCrisisGet: (ward, year, month) => req('GET', '/shift/crisis?ward=' + encodeURIComponent(ward) + '&year=' + year + '&month=' + month),
     shiftCrisisCell: (b) => req('PUT', '/shift/crisis/cell', b),
+    shiftHoursGet: () => req('GET', '/shift/hours'),
+    shiftHoursSet: (b) => req('PUT', '/shift/hours', b),
     shiftSetNote: (b) => req('PUT', '/shift/schedule/note', b),
     shiftSetCell: (b) => req('PUT', '/shift/schedule/cell', b),
     shiftGetSettings: (ward) => req('GET', '/shift/settings?ward=' + encodeURIComponent(ward)),

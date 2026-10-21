@@ -12,6 +12,7 @@
 import worker from './worker.js';
 import { isCodesPath, handleCodes } from './codes-api.js';
 import { isCrisisPath, handleCrisis } from './crisis-api.js';
+import { isHoursPath, handleHours } from './hours-api.js';
 
 const FORM_DAYS = 31;                 // فقط پشتیبان، اگر سرور تعداد روز را نداد
 const SHIFT_KEYS = ['M', 'E', 'N', 'H'];
@@ -60,6 +61,7 @@ export default {
     const url = new URL(request.url);
     if (isCodesPath(url.pathname)) return handleCodes(request, env, worker);
     if (isCrisisPath(url.pathname)) return handleCrisis(request, env, worker);
+    if (isHoursPath(url.pathname)) return handleHours(request, env, worker);
 
     // فقط پاسخِ خواندنِ برنامه را گسترش می‌دهیم؛ نوشتن‌ها دست نمی‌خورند
     // (endpoint خانه، روز ۱ تا ۳۱ را از قبل می‌پذیرد).
