@@ -3230,3 +3230,17 @@ html[data-theme="light"] .ss-cd-wrap table.ss-cd-grid td.cd-role {
 .ss-ward-card{font-weight:600}
 .ss-ward-card .ss-ward-name{line-height:1.2}
 @media (min-width:900px){.ss-ward-grid{gap:12px}}
+
+/* کارت‌های بزرگ‌تر و تناسب یکدست (فقط ظاهر) */
+.ss-ward-grid{grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:14px}
+.ss-ward-card{height:70px;border-radius:16px;padding:0 16px;gap:12px}
+.ss-ward-ico{width:40px;height:40px;border-radius:12px}
+.ss-ward-ico svg{width:21px;height:21px}
+.ss-ward-name{font-size:15px}
+@media (max-width:560px){
+  .ss-ward-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+  .ss-ward-card{height:56px;padding:0 12px;gap:10px}
+  .ss-ward-ico{width:30px;height:30px;border-radius:9px}
+  .ss-ward-ico svg{width:16px;height:16px}
+  .ss-ward-name{font-size:13px}
+}

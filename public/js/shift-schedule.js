@@ -93,12 +93,12 @@
     return SS_GROUPS[SS_GROUPS.length - 1];
   }
 
-  const SS = { wards: [], wardTitle: null, wardId: null, wardBedCount: null, tab: 'staff', year: null, month: null,
+  const SS = { wards: [], wardTitle: null, wardId: null, wardBedCount: null, tab: null, year: null, month: null,
     staff: [], sched: null, settings: null, canEdit: false, isManager: false,
     positions: [], doctors: [], showDoctors: false,
     showSettings: false, showPrintCfg: false, printCfg: null,
     showCustomRows: false, showUnits: false, canManageUnits: false, units: [], groupFilter: 'all',
-    dragStaffId: null, crisis: null };
+    dragStaffId: null, crisis: null, allStaff: null, hoursWard: null };
 
   function todayJ() {
     if (typeof todayJalali === 'function') return todayJalali();
@@ -185,7 +185,7 @@
   // با عوض کردن بخش، اگر فرم‌های کد یا پنل پزشکان باز بود بسته می‌شود و
   // برنامهٔ شیفت همان بخشِ انتخاب‌شده نشان داده می‌شود (نه فرم قبلی).
   function ssResetViewOnWardChange() {
-    SS.tab = 'grid';
+    if (SS.tab === 'crisis' || SS.tab === 'codes' || SS.tab === 'hours' || SS.tab === 'allstaff') SS.tab = 'grid';
     SS.showDoctors = false;
     SS.codes = null;
   }
@@ -300,41 +300,64 @@
     return 'building';
   }
 
+  // چیدمان کارت‌ها (فقط ظاهری): مدیریت پرستاری و بحران بالا، سپس درمانگاه‌ها،
+  // اتاق عمل و جراحی، ICUها و در پایان پشتیبانی.
+  const SS_WARD_LAYOUT = [
+    { label: 'مدیریت پرستاری و بحران', items: ['فرم‌های کد ۹۹ و ۵۵', 'دفتر پرستاری', 'همه پرسنل', 'ساعت شیفت'] },
+    { label: 'اورژانس و درمانگاه', items: ['اورژانس', 'کلینیک', 'آندوسکوپی'] },
+    { label: 'اتاق عمل و جراحی', items: ['اتاق عمل', 'جراحی'] },
+    { label: 'مراقبت‌های ویژه', items: ['ICU 1', 'ICU 2'] },
+    { label: 'پشتیبانی و انبار', items: ['CSSD', 'انبار'] },
+  ];
+
+  function ssWardCardHtml(label, opts) {
+    return `<button type="button" class="ss-ward-card ${opts.active ? 'active' : ''}" onclick="${opts.fn}" title="${e(label)}">
+      <span class="ss-ward-ico">${I(opts.ico)}</span><span class="ss-ward-name">${e(label)}</span>
+    </button>`;
+  }
+
   function ssWardGroupsHtml() {
-    const groups = SS_WARD_GROUPS.map(g => ({ label: g.label, test: g.test, items: [] }));
-    SS.wards.forEach((w, wi) => {
-      const g = groups.find(x => x.test(w.title || '')) || groups[groups.length - 1];
-      g.items.push({ w, wi });
-    });
+    const wardByTitle = new Map((SS.wards || []).map((w, i) => [w.title, { w, i }]));
+    const used = new Set();
+    const groups = [];
+    for (const g of SS_WARD_LAYOUT) {
+      const cards = [];
+      for (const title of g.items) {
+        if (title === 'همه پرسنل') {
+          if (!SS.isManager) continue;
+          cards.push(ssWardCardHtml(title, { ico: 'users', fn: 'ssOpenAllStaff()', active: SS.tab === 'allstaff' }));
+          continue;
+        }
+        if (title === 'ساعت شیفت') {
+          if (!SS.isManager) continue;
+          cards.push(ssWardCardHtml(title, { ico: 'clock', fn: 'ssOpenHours()', active: SS.tab === 'hours' }));
+          continue;
+        }
+        if (title === 'فرم‌های کد ۹۹ و ۵۵') {
+          if (!SS.isManager) continue;
+          cards.push(ssWardCardHtml(title, { ico: 'docs', fn: 'ssOpenCodesCard()', active: SS.tab === 'codes' }));
+          continue;
+        }
+        const hit = wardByTitle.get(title);
+        if (!hit) continue;
+        used.add(title);
+        cards.push(ssWardCardHtml(title, { ico: ssWardIconName(title), fn: `ssSelectWardByIndex(${hit.i})`, active: SS.wardTitle === title }));
+      }
+      if (cards.length) groups.push({ label: g.label, cards: cards });
+    }
+    const rest = (SS.wards || []).map((w, i) => ({ w: w, i: i })).filter(x => !used.has(x.w.title));
+    if (rest.length) {
+      groups.push({
+        label: 'سایر بخش‌ها',
+        cards: rest.map(x => ssWardCardHtml(x.w.title, { ico: ssWardIconName(x.w.title), fn: `ssSelectWardByIndex(${x.i})`, active: SS.wardTitle === x.w.title })),
+      });
+    }
     return `<div class="ss-ward-groups">
-      ${groups.filter(g => g.items.length).map(g => `
+      ${groups.map(g => `
         <div class="ss-ward-group">
-          <div class="ss-ward-group-title"><span>${e(g.label)}</span><span class="ss-ward-count">${F(g.items.length)}</span><i></i></div>
-          <div class="ss-ward-grid">
-            ${g.items.map(({ w, wi }) => `<button type="button" class="ss-ward-card ${w.title === SS.wardTitle ? 'active' : ''}"
-              onclick="ssSelectWardByIndex(${wi})" title="${e(w.title)}">
-              <span class="ss-ward-ico">${I(ssWardIconName(w.title))}</span><span class="ss-ward-name">${e(w.title)}</span>
-            </button>`).join('')}
-          </div>
+          <div class="ss-ward-group-title"><span>${e(g.label)}</span><span class="ss-ward-count">${F(g.cards.length)}</span><i></i></div>
+          <div class="ss-ward-grid">${g.cards.join('')}</div>
         </div>`).join('')}
-      ${SS.isManager ? `<div class="ss-ward-group">
-        <div class="ss-ward-group-title"><span>مدیر پرستاری</span><span class="ss-ward-count">۲</span><i></i></div>
-        <div class="ss-ward-grid">
-          <button type="button" class="ss-ward-card ${SS.tab === 'allstaff' ? 'active' : ''}" onclick="ssOpenAllStaff()" title="همهٔ پرسنل همهٔ بخش‌ها">
-            <span class="ss-ward-ico">${I('users')}</span><span class="ss-ward-name">همه پرسنل</span>
-          </button>
-          <button type="button" class="ss-ward-card ${SS.tab === 'hours' ? 'active' : ''}" onclick="ssOpenHours()" title="ساعت شیفت بخش‌ها (فقط مدیر پرستاری)">
-            <span class="ss-ward-ico">${I('clock')}</span><span class="ss-ward-name">ساعت شیفت</span>
-          </button>
-        </div>
-      </div><div class="ss-ward-group">
-        <div class="ss-ward-group-title"><span>گروه بحران</span><span class="ss-ward-count">۱</span><i></i></div>
-        <div class="ss-ward-grid">
-          <button type="button" class="ss-ward-card ${SS.tab === 'codes' ? 'active' : ''}" onclick="ssOpenCodesCard()" title="فرم‌های کد ۹۹ و ۵۵">
-            <span class="ss-ward-ico">${I('docs')}</span><span class="ss-ward-name">فرم‌های کد ۹۹ و ۵۵</span>
-          </button>
-        </div>
-      </div>` : ''}
     </div>`;
   }
 
@@ -355,7 +378,7 @@
         </div>
       </div>
     </div>
-    ${SS.tab === 'hours' ? ssHoursHtml() : (SS.tab === 'allstaff' ? ssAllStaffHtml() : (SS.tab === 'staff' ? ssStaffHtml() : (SS.tab === 'crisis' ? ssCrisisHtml() : (SS.tab === 'codes' ? ssCodesHtml() : ssGridHtml()))))}
+    ${SS.tab === null ? '' : (SS.tab === 'hours' ? ssHoursHtml() : (SS.tab === 'allstaff' ? ssAllStaffHtml() : (SS.tab === 'staff' ? ssStaffHtml() : (SS.tab === 'crisis' ? ssCrisisHtml() : (SS.tab === 'codes' ? ssCodesHtml() : ssGridHtml())))))}
 `;
   }
 
