@@ -283,6 +283,23 @@
     { label: 'سایر بخش‌ها', test: () => true },
   ];
 
+  // آیکون هر کارت بر اساس نام بخش (فقط ظاهر)
+  const SS_WARD_ICONS = {
+    'دفتر پرستاری': 'clipboard',
+    'اورژانس': 'alert',
+    'اتاق عمل': 'stethoscope',
+    'جراحی': 'scale',
+    'CSSD': 'refresh',
+    'انبار': 'grid',
+    'کلینیک': 'bed',
+    'آندوسکوپی': 'eye',
+  };
+  function ssWardIconName(title) {
+    if (SS_WARD_ICONS[title]) return SS_WARD_ICONS[title];
+    if (/ICU/i.test(title || '')) return 'heart';
+    return 'building';
+  }
+
   function ssWardGroupsHtml() {
     const groups = SS_WARD_GROUPS.map(g => ({ label: g.label, test: g.test, items: [] }));
     SS.wards.forEach((w, wi) => {
@@ -296,7 +313,7 @@
           <div class="ss-ward-grid">
             ${g.items.map(({ w, wi }) => `<button type="button" class="ss-ward-card ${w.title === SS.wardTitle ? 'active' : ''}"
               onclick="ssSelectWardByIndex(${wi})" title="${e(w.title)}">
-              <span class="ss-ward-ico">${e(w.icon || '🏥')}</span><span class="ss-ward-name">${e(w.title)}</span>
+              <span class="ss-ward-ico">${I(ssWardIconName(w.title))}</span><span class="ss-ward-name">${e(w.title)}</span>
             </button>`).join('')}
           </div>
         </div>`).join('')}
@@ -304,17 +321,17 @@
         <div class="ss-ward-group-title"><span>مدیر پرستاری</span><span class="ss-ward-count">۲</span><i></i></div>
         <div class="ss-ward-grid">
           <button type="button" class="ss-ward-card ${SS.tab === 'allstaff' ? 'active' : ''}" onclick="ssOpenAllStaff()" title="همهٔ پرسنل همهٔ بخش‌ها">
-            <span class="ss-ward-ico">👥</span><span class="ss-ward-name">همه پرسنل</span>
+            <span class="ss-ward-ico">${I('users')}</span><span class="ss-ward-name">همه پرسنل</span>
           </button>
           <button type="button" class="ss-ward-card ${SS.tab === 'hours' ? 'active' : ''}" onclick="ssOpenHours()" title="ساعت شیفت بخش‌ها (فقط مدیر پرستاری)">
-            <span class="ss-ward-ico">⏱️</span><span class="ss-ward-name">ساعت شیفت</span>
+            <span class="ss-ward-ico">${I('clock')}</span><span class="ss-ward-name">ساعت شیفت</span>
           </button>
         </div>
       </div><div class="ss-ward-group">
         <div class="ss-ward-group-title"><span>گروه بحران</span><span class="ss-ward-count">۱</span><i></i></div>
         <div class="ss-ward-grid">
           <button type="button" class="ss-ward-card ${SS.tab === 'codes' ? 'active' : ''}" onclick="ssOpenCodesCard()" title="فرم‌های کد ۹۹ و ۵۵">
-            <span class="ss-ward-ico">🗂️</span><span class="ss-ward-name">فرم‌های کد ۹۹ و ۵۵</span>
+            <span class="ss-ward-ico">${I('docs')}</span><span class="ss-ward-name">فرم‌های کد ۹۹ و ۵۵</span>
           </button>
         </div>
       </div>` : ''}

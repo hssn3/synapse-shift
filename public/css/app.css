@@ -3186,3 +3186,47 @@ html[data-theme="light"] .ss-cd-wrap table.ss-cd-grid td.cd-role {
   background: #ffffff !important;
 }
 
+
+/* ---- ظاهر صفحهٔ بخش‌ها (فقط ظاهر، بدون تغییر رفتار) ---- */
+.ss-ward-groups{gap:18px}
+.ss-ward-group-title{font-size:12.5px;color:var(--gdl,#c9a84c);letter-spacing:.3px;margin-bottom:2px}
+.ss-ward-group-title::before{content:'';width:3px;height:14px;border-radius:2px;background:linear-gradient(180deg,#e7c979,#b3892f);flex:0 0 auto}
+.ss-ward-group-title i{background:linear-gradient(90deg,rgba(201,168,76,.35),rgba(148,163,184,.06))}
+.ss-ward-count{background:rgba(201,168,76,.14);color:var(--gdl,#c9a84c);border:1px solid rgba(201,168,76,.25);font-weight:700}
+.ss-ward-grid{gap:10px;grid-template-columns:repeat(auto-fill,minmax(168px,1fr))}
+.ss-ward-card{height:52px;border-radius:14px;padding:0 12px;gap:10px;
+  background:linear-gradient(180deg,rgba(148,163,184,.07),rgba(148,163,184,.03));
+  border:1px solid rgba(148,163,184,.18);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03),0 6px 14px -12px rgba(0,0,0,.9)}
+.ss-ward-card:hover{background:linear-gradient(180deg,rgba(201,168,76,.16),rgba(201,168,76,.06));
+  border-color:rgba(201,168,76,.5);transform:translateY(-2px);box-shadow:0 10px 22px -14px rgba(0,0,0,.95)}
+.ss-ward-card.active{background:linear-gradient(180deg,#e7c979,#c9a84c);border-color:#e7c979;color:#0a1526;
+  box-shadow:0 10px 24px -12px rgba(201,168,76,.55)}
+.ss-ward-ico{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:9px;
+  background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.22);color:var(--gdl,#c9a84c);flex:0 0 auto;font-size:0}
+.ss-ward-ico svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.7}
+.ss-ward-card.active .ss-ward-ico{background:rgba(8,18,34,.16);border-color:rgba(8,18,34,.2);color:#0a1526}
+.ss-ward-name{font-size:13.5px;letter-spacing:.1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ss-view-tabs{gap:6px;background:rgba(148,163,184,.05);border:1px solid rgba(148,163,184,.12);
+  border-radius:14px;padding:5px;width:max-content;margin:14px auto 0}
+.ss-view-tab{height:38px;border:0;background:transparent;border-radius:10px;min-width:120px}
+.ss-view-tab:hover{background:rgba(201,168,76,.12)}
+.ss-view-tab.active{background:linear-gradient(180deg,#e7c979,#c9a84c);color:#0a1526;
+  box-shadow:0 6px 16px -10px rgba(201,168,76,.8)}
+.ss-ward-card:focus-visible,.ss-view-tab:focus-visible{outline:2px solid rgba(201,168,76,.7);outline-offset:2px}
+@media (max-width:560px){
+  .ss-ward-card{height:48px}
+  .ss-ward-ico{width:26px;height:26px}
+  .ss-ward-ico svg{width:15px;height:15px}
+  .ss-ward-name{font-size:12.5px}
+  .ss-view-tabs{width:100%}
+}
+
+/* پالایش نهایی ظاهر کارت‌ها */
+.ss-ward-groups{row-gap:20px}
+.ss-ward-group-title i{opacity:.55}
+.ss-ward-group-title{min-height:20px}
+.ss-ward-count{min-width:18px;height:18px;font-size:10.5px}
+.ss-ward-card{font-weight:600}
+.ss-ward-card .ss-ward-name{line-height:1.2}
+@media (min-width:900px){.ss-ward-grid{gap:12px}}
