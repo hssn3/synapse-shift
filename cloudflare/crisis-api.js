@@ -75,7 +75,8 @@ export async function handleCrisis(request, env, worker) {
 
     // فقط پرسنل پرستاری و کارشناسی؛ کمک‌پرستار/بهیار در برنامهٔ بحران نمی‌آید.
     const staff = await qall(env,
-      `SELECT id, first_name, last_name, position, fixed_shift, gender, sort_order
+      `SELECT id, first_name, last_name, position, fixed_shift, gender, sort_order,
+              years_experience, employment_status, monthly_hour_quota
        FROM ward_staff
        WHERE hospital_id=? AND ward=? AND is_active=1
          AND COALESCE(position,'') NOT LIKE '%کمک%'

@@ -80,9 +80,12 @@
   // ترتیب مهم است: «سرپرستار» خودش «پرستار» دارد و باید *پیش از* گروه پرستاران
   // بیاید، و «کمک‌پرستار» هم نباید در گروه پرستاران بیفتد.
   const SS_GROUPS = [
-    { key: 'senior', label: 'مدیریت و سرپرستی', test: s => /مدیر پرستاری|مترون|سوپروایزر|کنترل عفونت|آموزش|سرپرستار|جانشین/.test(s.position || '') },
-    { key: 'nurse', label: 'پرستاران', test: s => /پرستار/.test(s.position || '') && !/کمک|بهیار/.test(s.position || '') },
+    { key: 'senior', label: 'مدیریت و سرپرستی', test: s => /مدیر پرستاری|مترون|سوپروایزر|کنترل عفونت|آموزش|سرپرستار|جانشین|مسئول بخش/.test(s.position || '') },
+    { key: 'nurse', label: 'پرستاران', test: s => /پرستار/.test(s.position || '') && !/کمک|بهیار|بیهوشی/.test(s.position || '') },
+    { key: 'anes', label: 'کارشناسان بیهوشی', test: s => /بیهوشی/.test(s.position || '') },
+    { key: 'ortech', label: 'کارشناسان اتاق عمل', test: s => /اتاق عمل/.test(s.position || '') && !/کمک|منشی/.test(s.position || '') },
     { key: 'aid', label: 'کمک‌پرستاران و بهیاران', test: s => /کمک|بهیار/.test(s.position || '') },
+    { key: 'sec', label: 'منشی‌ها', test: s => /منشی/.test(s.position || '') },
     { key: 'other', label: 'سایر', test: () => true },
   ];
   function ssGroupOf(s) {
@@ -340,33 +343,93 @@
   function ssCrisisHtml() {
     const sc = (SS.sched && SS.sched.schedule) || {};
     const days = sc.days || 30;
+    const st = SS.settings || {};
     const holidayMap = ssMonthHolidayMap();
     const holidays = new Set(holidayMap.keys());
     const dayCols = Array.from({ length: days }, (_, i) => i + 1);
-    const rows = (SS.crisis && SS.crisis.rows) || [];
+    const raw = (SS.crisis && SS.crisis.rows) || [];
+    const hoursOf = (codes) => {
+      if (!codes) return 0;
+      if (codes.includes('H')) return Number(st.hour_h) || 0;
+      let h = 0;
+      if (codes.includes('M')) h += Number(st.hour_m) || 0;
+      if (codes.includes('E')) h += Number(st.hour_e) || 0;
+      if (codes.includes('N')) h += Number(st.hour_n) || 0;
+      return h;
+    };
+    const rows = raw.map(s => {
+      let total = 0;
+      for (const d of dayCols) total += hoursOf((s.cells || {})[d]);
+      return Object.assign({}, s, { total_hours: total });
+    });
+    const hc = {};
+    for (const d of dayCols) hc[d] = { M: 0, E: 0, N: 0, H: 0 };
+    for (const s of rows) {
+      for (const d of dayCols) {
+        const c = (s.cells && s.cells[d]) || '';
+        ['M', 'E', 'N', 'H'].forEach(k => { if (c.includes(k)) hc[d][k]++; });
+      }
+    }
+    const list = SS.groupFilter === 'all' ? rows : rows.filter(s => ssGroupOf(s).key === SS.groupFilter);
     return `<div class="panel g noprint">
-      <div class="phd">${I('shield', 'lg')}<div style="flex:1"><h3>برنامهٔ بحران — بخش «${e(SS.wardTitle)}»</h3>
-        <div class="sub">${JM[SS.month - 1]} ${F(SS.year)} — همین نفرات بخش (بدون کمک‌پرستار/بهیار). روی هر خانه بزن تا شیفت را بگذاری.</div></div></div>
+      <div class="phd">${I('shield', 'lg')}<div style="flex:1"><h3>برنامه بحران — بخش «${e(SS.wardTitle)}»</h3>
+        <div class="sub">${JM[SS.month - 1]} ${F(SS.year)} — روی هر خانه بزن تا شیفت آن روز را بگذاری.</div></div></div>
       <div class="pbody" style="padding-top:0">
-        ${!rows.length ? '<div class="empty">در حال بارگذاری…</div>' : `
+        ${!rows.length ? '<div class="empty">در این بخش پرسنلی برای برنامه بحران ثبت نشده</div>' : `
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+          <span class="sub">نمایشِ گروه:</span>
+          <button class="btn btn-sm ${SS.groupFilter === 'all' ? 'btn-g' : 'btn-o'}" onclick="ssSetGroupFilter('all')">همه</button>
+          ${SS_GROUPS.filter(g => rows.some(s => ssGroupOf(s).key === g.key)).map(g => `<button class="btn btn-sm ${SS.groupFilter === g.key ? 'btn-g' : 'btn-o'}" onclick="ssSetGroupFilter('${g.key}')">${e(g.label)}</button>`).join('')}
+        </div>
         <div class="tbl-wrap ss-grid-wrap"><table class="ss-grid">
           <thead>
-            <tr><th class="ss-sticky" colspan="3">روز هفته</th>
-              ${dayCols.map(d => `<th style="font-size:9.5px;font-weight:400">${WEEKDAY_SHORT[weekdayOf(SS.year, SS.month, d)] || ''}</th>`).join('')}</tr>
-            <tr><th class="ss-sticky ss-c-num">ردیف</th><th class="ss-c-name">نام و نام خانوادگی</th><th class="ss-c-pos">سمت</th>
-              ${dayCols.map(d => `<th class="${holidays.has(d) ? 'ss-holiday' : ''}" title="${e(holidayMap.get(d) || '')}">${F(d)}</th>`).join('')}</tr>
-          </thead>
+          <tr><th class="ss-sticky" colspan="6">روز هفته</th>
+            ${dayCols.map(d => `<th style="font-size:9.5px;font-weight:400">${WEEKDAY_SHORT[weekdayOf(SS.year, SS.month, d)] || ''}</th>`).join('')}
+            <th colspan="2"></th></tr>
+          <tr>
+            <th class="ss-sticky ss-c-num">ردیف</th>
+            <th class="ss-c-name">نام و نام خانوادگی</th>
+            <th class="ss-c-pos">سمت</th>
+            <th class="ss-c-code">شیفت ثابت</th>
+            <th class="ss-c-exp">سابقه (سال)</th>
+            <th class="ss-c-status">وضعیت استخدام</th>
+            ${dayCols.map(d => `<th class="${holidays.has(d) ? 'ss-holiday' : ''}" title="${e(holidayMap.get(d) || '')}">${F(d)}</th>`).join('')}
+            <th>کارکرد کل</th><th>سقف</th>
+          </tr></thead>
           <tbody>
-            ${rows.map((s, i) => `<tr data-crisis-id="${e(s.id)}">
-              <td class="ss-sticky ss-c-num">${F(i + 1)}</td>
-              <td class="ss-c-name"><div class="ss-name-stack"><span>${e(s.first_name)}</span><span>${e(s.last_name)}</span></div></td>
-              <td class="ss-c-pos">${e(s.position || '—')}</td>
-              ${dayCols.map(d => {
-                const code = (s.cells && s.cells[d]) || '';
-                return `<td class="ss-cell ${code ? 'ss-' + code : ''}${holidays.has(d) ? ' ss-holiday-col' : ''}"
-                  onclick="ssEditCrisisCell('${e(s.id)}',${d},'${e(code)}')">${e(code)}</td>`;
-              }).join('')}
-            </tr>`).join('')}
+          ${(() => {
+            if (!list.length) return `<tr><td colspan="${6 + days + 2}">در این گروه کسی ثبت نشده</td></tr>`;
+            let n = 0;
+            const out = [];
+            const hasSpecial = rows.some(s => ['anes', 'ortech', 'sec'].includes(ssGroupOf(s).key));
+            for (const _g of SS_GROUPS) {
+              const members = list.filter(s => ssGroupOf(s).key === _g.key);
+              if (!members.length && !(hasSpecial && SS.groupFilter === 'all')) continue;
+              out.push(`<tr class="ss-group-row"><td class="ss-sticky" colspan="6">${e(_g.label)}</td><td colspan="${days + 2}"></td></tr>`);
+              for (const s of members) {
+                n++;
+                out.push(`<tr data-crisis-id="${e(s.id)}">
+            <td class="ss-sticky ss-c-num">${F(n)}</td>
+            <td class="ss-c-name"><div class="ss-name-stack"><span>${e(s.first_name)}</span><span>${e(s.last_name)}</span></div></td>
+            <td class="ss-c-pos">${e(s.position || '—')}</td>
+            <td class="ss-c-code">${s.fixed_shift ? e(s.fixed_shift) : '<span class="ss-muted">چرخشی</span>'}</td>
+            <td class="ss-c-exp">${s.years_experience == null ? '—' : F(s.years_experience)}</td>
+            <td class="ss-c-status">${e(s.employment_status || '—')}</td>
+            ${dayCols.map(d => {
+              const code = (s.cells && s.cells[d]) || '';
+              return `<td class="ss-cell ${code ? 'ss-' + code : ''}${holidays.has(d) ? ' ss-holiday-col' : ''}" onclick="ssEditCrisisCell('${e(s.id)}',${d},'${e(code)}')" title="${e(code || 'خالی')}">${e(code)}</td>`;
+            }).join('')}
+            <td><b>${F(s.total_hours)}</b></td>
+            <td>${F(s.monthly_hour_quota)}</td>
+          </tr>`);
+              }
+            }
+            return out.join('');
+          })()}
+          ${SHIFT_COUNT_ROWS.map(r => `<tr class="ss-hc-row ss-hc-${r.k}">
+            <td class="ss-sticky" colspan="6">${e(r.label)}</td>
+            ${dayCols.map(d => `<td>${F(hc[d][r.k] || 0)}</td>`).join('')}
+            <td colspan="2"></td></tr>`).join('')}
           </tbody>
         </table></div>
         <div class="sd-note" style="margin-top:12px">${I('info')}<div>M=صبح · E=عصر · N=شب · ME/EN/MEN=ترکیب · H=مرخصی · S=استعلاجی · C=کلاس</div></div>`}
@@ -609,7 +672,7 @@
         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
           <span class="sub">نمایشِ گروه:</span>
           <button class="btn btn-sm ${SS.groupFilter === 'all' ? 'btn-g' : 'btn-o'}" onclick="ssSetGroupFilter('all')">همه</button>
-          ${SS_GROUPS.slice(0, 3).map(g => `<button class="btn btn-sm ${SS.groupFilter === g.key ? 'btn-g' : 'btn-o'}" onclick="ssSetGroupFilter('${g.key}')">${e(g.label)}</button>`).join('')}
+          ${SS_GROUPS.filter(g => gridStaff.some(s => ssGroupOf(s).key === g.key)).map(g => `<button class="btn btn-sm ${SS.groupFilter === g.key ? 'btn-g' : 'btn-o'}" onclick="ssSetGroupFilter('${g.key}')">${e(g.label)}</button>`).join('')}
         </div>
         <div class="tbl-wrap ss-grid-wrap"><table class="ss-grid">
           <thead>
@@ -631,16 +694,16 @@
           ${(() => {
             const list = SS.groupFilter === 'all' ? gridStaff : gridStaff.filter(s => ssGroupOf(s).key === SS.groupFilter);
             if (!list.length) return `<tr><td colspan="${6 + days + 3}">در این گروه کسی ثبت نشده</td></tr>`;
-            let lastGroup = null, n = 0;
+            let n = 0;
             const out = [];
-            for (const s of list) {
-              const g = ssGroupOf(s);
-              if (g.key !== lastGroup) {
-                lastGroup = g.key;
-                out.push(`<tr class="ss-group-row"><td class="ss-sticky" colspan="6">${e(g.label)}</td><td colspan="${days + 3}"></td></tr>`);
-              }
+            const hasSpecial = gridStaff.some(s => ['anes', 'ortech', 'sec'].includes(ssGroupOf(s).key));
+            for (const _g of SS_GROUPS) {
+              const members = list.filter(s => ssGroupOf(s).key === _g.key);
+              if (!members.length && !(hasSpecial && SS.groupFilter === 'all')) continue;
+              out.push(`<tr class="ss-group-row"><td class="ss-sticky" colspan="6">${e(_g.label)}</td><td colspan="${days + 3}"></td></tr>`);
+              for (const s of members) {
               n++;
-              out.push(`<tr data-staff-id="${e(s.id)}" data-group="${e(g.key)}" ondragover="ssDragOverRow(event,this)" ondragleave="ssDragLeaveRow(event,this)" ondrop="ssDropRow(event,this)">
+              out.push(`<tr data-staff-id="${e(s.id)}" data-group="${e(ssGroupOf(s).key)}" ondragover="ssDragOverRow(event,this)" ondragleave="ssDragLeaveRow(event,this)" ondrop="ssDropRow(event,this)">
             <td class="ss-sticky ss-c-num"><span class="ss-drag-handle" draggable="true" title="برای جابه‌جایی بکشید"
               ondragstart="ssDragStart(event,'${e(s.id)}')" ondragend="ssDragEnd(event)">⋮⋮</span>${F(n)}</td>
             <td class="ss-c-name"><div class="ss-name-stack"><span>${e(s.first_name)}</span><span>${e(s.last_name)}</span></div></td>
@@ -657,6 +720,7 @@
             <td>${F(s.monthly_hour_quota)}</td>
             <td class="${s.overtime > 0 ? 'ss-pos' : (s.overtime < 0 ? 'ss-neg' : '')}">${s.overtime > 0 ? '+' : ''}${F(s.overtime)}</td>
           </tr>`);
+              }
             }
             return out.join('');
           })()}
@@ -1912,9 +1976,17 @@
       </div></div>`;
   }
 
-  global.ssToggleDoctors = function (force) {
+  global.ssToggleDoctors = async function (force) {
     SS.showDoctors = typeof force === 'boolean' ? force : !SS.showDoctors;
     ssDraw();
+    // اگر فهرست پزشکان هنوز بارگذاری نشده، همین لحظه بیاور تا پنل خالی نماند.
+    if (SS.showDoctors && !((SS.doctors || []).length)) {
+      try {
+        const r = await ssCodesRequest('/api/shift/doctors');
+        SS.doctors = r.doctors || [];
+        ssDraw();
+      } catch (e) { /* بدون دسترسی — پنل خالی می‌ماند */ }
+    }
   };
   global.ssAddDoctor = async function () {
     const nameEl = $('ssDocNewName'), specEl = $('ssDocNewSpec');
