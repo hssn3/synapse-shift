@@ -1,0 +1,96 @@
+  /* ---------------- کارت «همه پرسنل» (مدیر پرستاری) ---------------- */
+  global.ssOpenAllStaff = async function () {
+    SS.tab = 'allstaff';
+    ssDraw();
+    if (!SS.allStaff) {
+      try { await ssLoadAllStaff(); } catch (e) { SS.allStaff = []; }
+      ssDraw();
+    }
+  };
+
+  async function ssLoadAllStaff() {
+    const out = [];
+    for (const w of (SS.wards || [])) {
+      try {
+        const r = await API.shiftStaffList(w.title);
+        (r.staff || []).forEach(s => out.push(Object.assign({}, s, { _ward: w.title })));
+      } catch (e) { /* بدون دسترسی به این بخش */ }
+    }
+    SS.allStaff = out;
+  }
+
+  function ssAllStaffHtml() {
+    const list = SS.allStaff;
+    if (!list) return `<div class="panel g noprint"><div class="pbody"><div class="empty">در حال بارگذاری…</div></div></div>`;
+    const byWard = new Map();
+    list.forEach(s => { if (!byWard.has(s._ward)) byWard.set(s._ward, []); byWard.get(s._ward).push(s); });
+    const order = (SS.wards || []).map(w => w.title).filter(t => byWard.has(t));
+    return `<div class="panel g noprint">
+      <div class="phd">${I('users', 'lg')}<div style="flex:1"><h3>همهٔ پرسنل (${F(list.length)} نفر)</h3>
+        <div class="sub">بخش به بخش و نفر به نفر — با دکمهٔ ویرایش هر ردیف تغییر می‌کند.</div></div></div>
+      <div class="pbody" style="padding-top:0">
+        ${order.map(t => `
+          <div style="margin-bottom:14px">
+            <div class="ss-ward-group-title" style="margin-bottom:6px"><span>${e(t)}</span><span class="ss-ward-count">${F(byWard.get(t).length)}</span><i></i></div>
+            <div class="tbl-wrap"><table>
+              <thead><tr><th>نام و نام‌خانوادگی</th><th>سمت</th><th>شیفت ثابت</th><th>سابقه</th><th>وضعیت استخدام</th><th>سقف ساعت</th><th style="width:80px"></th></tr></thead>
+              <tbody>
+                ${byWard.get(t).map(s => `<tr>
+                  <td><div class="ss-name-stack"><span>${e(s.first_name)}</span><span>${e(s.last_name)}</span></div></td>
+                  <td>${e(s.position || '—')}</td>
+                  <td>${s.fixed_shift ? e(s.fixed_shift) : 'چرخشی'}</td>
+                  <td>${s.years_experience == null ? '—' : F(s.years_experience)}</td>
+                  <td>${e(s.employment_status || '—')}</td>
+                  <td>${F(s.monthly_hour_quota)}</td>
+                  <td><button class="btn btn-o btn-sm" onclick="ssEditAllStaff('${e(s.id)}')" aria-label="ویرایش">${I('edit')}</button></td>
+                </tr>`).join('')}
+              </tbody>
+            </table></div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  global.ssEditAllStaff = function (id) {
+    const s = (SS.allStaff || []).find(x => x.id === id);
+    if (!s) return;
+    const positions = (SS.positions || []);
+    const opts = (!s.position || positions.includes(s.position)) ? positions : [s.position].concat(positions);
+    shOpenModal({
+      title: 'ویرایش پرسنل — ' + (s._ward || ''),
+      submitText: 'ذخیره',
+      width: 460,
+      body: `<div class="docgrid">
+        <div class="fg"><label>نام</label><input id="as_fn" value="${e(s.first_name)}"></div>
+        <div class="fg"><label>نام خانوادگی</label><input id="as_ln" value="${e(s.last_name)}"></div>
+        <div class="fg"><label>سمت</label><select id="as_pos">${opts.map(p => `<option value="${e(p)}"${p === s.position ? ' selected' : ''}>${e(p)}</option>`).join('')}</select></div>
+        <div class="fg"><label>شیفت ثابت</label><select id="as_fixed">
+          <option value=""${!s.fixed_shift ? ' selected' : ''}>چرخشی</option>
+          ${['M', 'E', 'N', 'ME', 'EN', 'MN', 'MEN'].map(k => `<option value="${k}"${s.fixed_shift === k ? ' selected' : ''}>${k}</option>`).join('')}
+        </select></div>
+        <div class="fg"><label>سابقه (سال)</label><input id="as_exp" type="number" min="0" max="60" value="${s.years_experience == null ? '' : s.years_experience}"></div>
+        <div class="fg"><label>وضعیت استخدام</label><select id="as_emp">
+          ${['قراردادی', 'ساعتی'].map(x => `<option value="${x}"${(s.employment_status || 'قراردادی') === x ? ' selected' : ''}>${x}</option>`).join('')}
+        </select></div>
+        <div class="fg"><label>سقف ساعت ماهانه</label><input id="as_quota" type="number" value="${s.monthly_hour_quota}"></div>
+      </div>`,
+      onSubmit: async (form, close) => {
+        const v = (k) => { const el = form.querySelector('#' + k); return el ? String(el.value || '').trim() : ''; };
+        const body = {
+          first_name: v('as_fn'),
+          last_name: v('as_ln'),
+          position: v('as_pos'),
+          fixed_shift: v('as_fixed'),
+          employment_status: v('as_emp'),
+          years_experience: v('as_exp') === '' ? null : v('as_exp'),
+          monthly_hour_quota: v('as_quota'),
+        };
+        await API.shiftStaffUpdate(id, body);
+        if (typeof toast === 'function') toast('ذخیره شد');
+        await ssLoadAllStaff();
+        close();
+        ssDraw();
+      },
+    });
+  };
+

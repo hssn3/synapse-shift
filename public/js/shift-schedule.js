@@ -301,6 +301,13 @@
           </div>
         </div>`).join('')}
       ${SS.isManager ? `<div class="ss-ward-group">
+        <div class="ss-ward-group-title"><span>مدیر پرستاری</span><span class="ss-ward-count">۲</span><i></i></div>
+        <div class="ss-ward-grid">
+          <button type="button" class="ss-ward-card ${SS.tab === 'allstaff' ? 'active' : ''}" onclick="ssOpenAllStaff()" title="همهٔ پرسنل همهٔ بخش‌ها">
+            <span class="ss-ward-ico">👥</span><span class="ss-ward-name">همه پرسنل</span>
+          </button>
+        </div>
+      </div><div class="ss-ward-group">
         <div class="ss-ward-group-title"><span>گروه بحران</span><span class="ss-ward-count">۱</span><i></i></div>
         <div class="ss-ward-grid">
           <button type="button" class="ss-ward-card ${SS.tab === 'codes' ? 'active' : ''}" onclick="ssOpenCodesCard()" title="فرم‌های کد ۹۹ و ۵۵">
@@ -328,9 +335,105 @@
         </div>
       </div>
     </div>
-    ${SS.tab === 'staff' ? ssStaffHtml() : (SS.tab === 'crisis' ? ssCrisisHtml() : (SS.tab === 'codes' ? ssCodesHtml() : ssGridHtml()))}
+    ${SS.tab === 'allstaff' ? ssAllStaffHtml() : (SS.tab === 'staff' ? ssStaffHtml() : (SS.tab === 'crisis' ? ssCrisisHtml() : (SS.tab === 'codes' ? ssCodesHtml() : ssGridHtml())))}
 `;
   }
+
+  /* ---------------- کارت «همه پرسنل» (مدیر پرستاری) ---------------- */
+  global.ssOpenAllStaff = async function () {
+    SS.tab = 'allstaff';
+    ssDraw();
+    if (!SS.allStaff) {
+      try { await ssLoadAllStaff(); } catch (e) { SS.allStaff = []; }
+      ssDraw();
+    }
+  };
+
+  async function ssLoadAllStaff() {
+    const out = [];
+    for (const w of (SS.wards || [])) {
+      try {
+        const r = await API.shiftStaffList(w.title);
+        (r.staff || []).forEach(s => out.push(Object.assign({}, s, { _ward: w.title })));
+      } catch (e) { /* بدون دسترسی به این بخش */ }
+    }
+    SS.allStaff = out;
+  }
+
+  function ssAllStaffHtml() {
+    const list = SS.allStaff;
+    if (!list) return `<div class="panel g noprint"><div class="pbody"><div class="empty">در حال بارگذاری…</div></div></div>`;
+    const byWard = new Map();
+    list.forEach(s => { if (!byWard.has(s._ward)) byWard.set(s._ward, []); byWard.get(s._ward).push(s); });
+    const order = (SS.wards || []).map(w => w.title).filter(t => byWard.has(t));
+    return `<div class="panel g noprint">
+      <div class="phd">${I('users', 'lg')}<div style="flex:1"><h3>همهٔ پرسنل (${F(list.length)} نفر)</h3>
+        <div class="sub">بخش به بخش و نفر به نفر — با دکمهٔ ویرایش هر ردیف تغییر می‌کند.</div></div></div>
+      <div class="pbody" style="padding-top:0">
+        ${order.map(t => `
+          <div style="margin-bottom:14px">
+            <div class="ss-ward-group-title" style="margin-bottom:6px"><span>${e(t)}</span><span class="ss-ward-count">${F(byWard.get(t).length)}</span><i></i></div>
+            <div class="tbl-wrap"><table>
+              <thead><tr><th>نام و نام‌خانوادگی</th><th>سمت</th><th>شیفت ثابت</th><th>سابقه</th><th>وضعیت استخدام</th><th>سقف ساعت</th><th style="width:80px"></th></tr></thead>
+              <tbody>
+                ${byWard.get(t).map(s => `<tr>
+                  <td><div class="ss-name-stack"><span>${e(s.first_name)}</span><span>${e(s.last_name)}</span></div></td>
+                  <td>${e(s.position || '—')}</td>
+                  <td>${s.fixed_shift ? e(s.fixed_shift) : 'چرخشی'}</td>
+                  <td>${s.years_experience == null ? '—' : F(s.years_experience)}</td>
+                  <td>${e(s.employment_status || '—')}</td>
+                  <td>${F(s.monthly_hour_quota)}</td>
+                  <td><button class="btn btn-o btn-sm" onclick="ssEditAllStaff('${e(s.id)}')" aria-label="ویرایش">${I('edit')}</button></td>
+                </tr>`).join('')}
+              </tbody>
+            </table></div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  global.ssEditAllStaff = function (id) {
+    const s = (SS.allStaff || []).find(x => x.id === id);
+    if (!s) return;
+    const positions = (SS.positions || []);
+    const opts = (!s.position || positions.includes(s.position)) ? positions : [s.position].concat(positions);
+    shOpenModal({
+      title: 'ویرایش پرسنل — ' + (s._ward || ''),
+      submitText: 'ذخیره',
+      width: 460,
+      body: `<div class="docgrid">
+        <div class="fg"><label>نام</label><input id="as_fn" value="${e(s.first_name)}"></div>
+        <div class="fg"><label>نام خانوادگی</label><input id="as_ln" value="${e(s.last_name)}"></div>
+        <div class="fg"><label>سمت</label><select id="as_pos">${opts.map(p => `<option value="${e(p)}"${p === s.position ? ' selected' : ''}>${e(p)}</option>`).join('')}</select></div>
+        <div class="fg"><label>شیفت ثابت</label><select id="as_fixed">
+          <option value=""${!s.fixed_shift ? ' selected' : ''}>چرخشی</option>
+          ${['M', 'E', 'N', 'ME', 'EN', 'MN', 'MEN'].map(k => `<option value="${k}"${s.fixed_shift === k ? ' selected' : ''}>${k}</option>`).join('')}
+        </select></div>
+        <div class="fg"><label>سابقه (سال)</label><input id="as_exp" type="number" min="0" max="60" value="${s.years_experience == null ? '' : s.years_experience}"></div>
+        <div class="fg"><label>وضعیت استخدام</label><select id="as_emp">
+          ${['قراردادی', 'ساعتی'].map(x => `<option value="${x}"${(s.employment_status || 'قراردادی') === x ? ' selected' : ''}>${x}</option>`).join('')}
+        </select></div>
+        <div class="fg"><label>سقف ساعت ماهانه</label><input id="as_quota" type="number" value="${s.monthly_hour_quota}"></div>
+      </div>`,
+      onSubmit: async (form, close) => {
+        const v = (k) => { const el = form.querySelector('#' + k); return el ? String(el.value || '').trim() : ''; };
+        const body = {
+          first_name: v('as_fn'),
+          last_name: v('as_ln'),
+          position: v('as_pos'),
+          fixed_shift: v('as_fixed'),
+          employment_status: v('as_emp'),
+          years_experience: v('as_exp') === '' ? null : v('as_exp'),
+          monthly_hour_quota: v('as_quota'),
+        };
+        await API.shiftStaffUpdate(id, body);
+        if (typeof toast === 'function') toast('ذخیره شد');
+        await ssLoadAllStaff();
+        close();
+        ssDraw();
+      },
+    });
+  };
 
   /* ---------------- تب برنامهٔ بحران ---------------- */
   async function ssLoadCrisis() {
@@ -1625,17 +1728,44 @@
     const c = cfg || {};
     const sc = SS.sched.schedule;
     const ward = sc.ward || SS.wardTitle;
-    const staff = SS.sched.staff || [];
-    const headName = ssPrintHeadName(staff);
-    // همهٔ پرسنل + ۶ ردیف جمع در یک برگه؛ ارتفاع سطر و اندازهٔ قلم بر اساس
-    // تعداد نفرات کوچک می‌شود تا هر تعداد اسمی که باشد به صفحهٔ دوم نرود.
-    const rowCount = Math.max(staff.length, 20) + 6;
-    // بودجهٔ ارتفاعِ واقعیِ بدنهٔ جدول در A4 افقی (سربرگ + نوار + امضاها +
-    // سرستون‌ها کم شده است). با ۲۰ ردیف اسم (۹ نفر واقعی + ۱۱ خالی) و ۶ ردیف
-    // جمع، ردیف‌ها حدود ۴٫۷mm می‌شوند که برای دو خط نام کافی است.
-    const rowH = Math.max(1.7, Math.min(5.2, 122 / rowCount));
-    const tableFont = Math.max(2.8, Math.min(6.6, rowH * 1.34));
-    const body = ssPrintPageHtml(c, staff, 0, ward, headName, { rowH, tableFont });
+    const all = SS.sched.staff || [];
+    // اگر تب/گروه خاصی انتخاب شده، فقط همان گروه چاپ می‌شود.
+    const filtered = (SS.groupFilter && SS.groupFilter !== 'all')
+      ? all.filter(s => ssGroupOf(s).key === SS.groupFilter)
+      : all;
+    // صفحه‌بندی: هر صفحه حداکثر ۲۰ ردیف، گروه‌ها نصفه نمی‌شوند و ترتیب گروه‌ها
+    // همان ترتیب جدول است (سرپرستار → بیهوشی → اتاق عمل → کمک‌بهیار → منشی).
+    const groups = SS_GROUPS
+      .map(g => ({ items: filtered.filter(s => ssGroupOf(s).key === g.key) }))
+      .filter(g => g.items.length);
+    const pages = [];
+    let cur = [];
+    for (const g of groups) {
+      if (g.items.length > 20) {
+        if (cur.length) { pages.push(cur); cur = []; }
+        pages.push(g.items.slice());
+        continue;
+      }
+      if (cur.length + g.items.length > 20 && cur.length) { pages.push(cur); cur = []; }
+      cur = cur.concat(g.items);
+    }
+    if (cur.length) pages.push(cur);
+    if (!pages.length) pages.push([]);
+
+    const backup = SS.sched.staff;
+    SS.sched.staff = filtered;
+    const headName = ssPrintHeadName(filtered);
+    let offset = 0;
+    const body = pages.map(pageStaff => {
+      const rowCount = Math.max(pageStaff.length, 20) + 6;
+      const rowH = Math.max(1.7, Math.min(5.2, 122 / rowCount));
+      const tableFont = Math.max(2.8, Math.min(6.6, rowH * 1.34));
+      const html = ssPrintPageHtml(c, pageStaff, offset, ward, headName, { rowH, tableFont });
+      offset += Math.max(pageStaff.length, 20);
+      return html;
+    }).join('');
+    SS.sched.staff = backup;
+
     return `<!DOCTYPE html><html lang="fa" dir="rtl"><head><meta charset="utf-8">
       <base href="${e((typeof location !== 'undefined' && location.origin) ? location.origin + '/' : '/')}">
       <title>برنامه درمانی ماهانه بخش ${e(ward)}</title>
@@ -1647,6 +1777,7 @@
       </div>
       ${body}</body></html>`;
   }
+
   // برای تست/پیش‌نمایش بدون باز کردن پنجرهٔ چاپ
   global.ssBuildPrintHtml = function (cfg) { return ssBuildPrintHtml(cfg || SS.printCfg || {}); };
 

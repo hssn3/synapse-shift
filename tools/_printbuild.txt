@@ -1,0 +1,53 @@
+  function ssBuildPrintHtml(cfg) {
+    const c = cfg || {};
+    const sc = SS.sched.schedule;
+    const ward = sc.ward || SS.wardTitle;
+    const all = SS.sched.staff || [];
+    // اگر تب/گروه خاصی انتخاب شده، فقط همان گروه چاپ می‌شود.
+    const filtered = (SS.groupFilter && SS.groupFilter !== 'all')
+      ? all.filter(s => ssGroupOf(s).key === SS.groupFilter)
+      : all;
+    // صفحه‌بندی: هر صفحه حداکثر ۲۰ ردیف، گروه‌ها نصفه نمی‌شوند و ترتیب گروه‌ها
+    // همان ترتیب جدول است (سرپرستار → بیهوشی → اتاق عمل → کمک‌بهیار → منشی).
+    const groups = SS_GROUPS
+      .map(g => ({ items: filtered.filter(s => ssGroupOf(s).key === g.key) }))
+      .filter(g => g.items.length);
+    const pages = [];
+    let cur = [];
+    for (const g of groups) {
+      if (g.items.length > 20) {
+        if (cur.length) { pages.push(cur); cur = []; }
+        pages.push(g.items.slice());
+        continue;
+      }
+      if (cur.length + g.items.length > 20 && cur.length) { pages.push(cur); cur = []; }
+      cur = cur.concat(g.items);
+    }
+    if (cur.length) pages.push(cur);
+    if (!pages.length) pages.push([]);
+
+    const backup = SS.sched.staff;
+    SS.sched.staff = filtered;
+    const headName = ssPrintHeadName(filtered);
+    let offset = 0;
+    const body = pages.map(pageStaff => {
+      const rowCount = Math.max(pageStaff.length, 20) + 6;
+      const rowH = Math.max(1.7, Math.min(5.2, 122 / rowCount));
+      const tableFont = Math.max(2.8, Math.min(6.6, rowH * 1.34));
+      const html = ssPrintPageHtml(c, pageStaff, offset, ward, headName, { rowH, tableFont });
+      offset += Math.max(pageStaff.length, 20);
+      return html;
+    }).join('');
+    SS.sched.staff = backup;
+
+    return `<!DOCTYPE html><html lang="fa" dir="rtl"><head><meta charset="utf-8">
+      <base href="${e((typeof location !== 'undefined' && location.origin) ? location.origin + '/' : '/')}">
+      <title>برنامه درمانی ماهانه بخش ${e(ward)}</title>
+      <link rel="stylesheet" href="/css/shift-print.css">
+      </head><body>
+      <div class="print-toolbar noprint" dir="rtl">
+        <button type="button" id="ssPrintNow">چاپ</button>
+        <button type="button" id="ssPrintClose">بستن</button>
+      </div>
+      ${body}</body></html>`;
+  }
