@@ -1794,11 +1794,11 @@
   // پیشنهاد نام هر نقش فقط از هم‌تخصص همان نقش — برای «پزشک» فقط پزشک‌ها.
   const CODE_ROLE_MATCH = {
     1: p => /پزشک|دکتر/.test(p),
-    2: p => /سوپروایزر|سرپرستار|مسئول/.test(p),
+    2: p => /سوپروایزر/.test(p) && !/سرپرستار/.test(p),
     3: p => /بیهوشی/.test(p),
-    4: p => /پرستار/.test(p) && !/کمک|بهیار/.test(p),
-    5: p => /پرستار/.test(p) && !/کمک|بهیار/.test(p),
-    6: p => /پرستار|بهیار|کمک/.test(p),
+    4: p => /پرستار/.test(p) && !/کمک|بهیار|سرپرستار|سوپروایزر/.test(p),
+    5: p => /پرستار/.test(p) && !/کمک|بهیار|سرپرستار|سوپروایزر/.test(p),
+    6: p => /پرستار/.test(p) && !/کمک|بهیار|سرپرستار|سوپروایزر/.test(p),
   };
   const CODE_WEEKDAYS = ['یک‌شنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه'];
   const CODE_ROLE_TEXT = 'شرح وظايف اعضاء: ۱- مسئول هماهنگي تيم، ۲- ناظر تيم، ۳- مسئول باز نگه‌داشتن راه هوايي، ۴- برقراري تنفس، ۵- مسئول برقراري گردش خون و ماساژ قلب، ۶- مسئول دارويي';
@@ -1879,13 +1879,16 @@
 
   // ویرایش داخل خود خانه: کلیک → input با پیشنهاد نام پرسنل موجود → Enter/blur ذخیره.
   global.ssEditCodeCell = function (el, day, role) {
-    if (!SS.codes || !el || el.querySelector('select,input')) return;
+    if (!SS.codes) return;
+    document.querySelectorAll('.ss-code-modal').forEach(x => x.remove());
     const shift = SS.codeShift;
     const key = day + '|' + shift + '|' + role;
     const before = SS.codes.map[key] || '';
     const dl = document.getElementById('ssCodePeopleList-' + role);
     const names = dl ? [...dl.options].map(o => o.value).filter(Boolean) : [];
     if (before && !names.includes(before)) names.unshift(before);
+    const roleLabel = (CODE_ROLES.find(r => r.no === role) || {}).label || 'این سمت';
+    const shiftLabel = (CODE_SHIFTS.find(s => s.k === shift) || {}).label || shift;
 
     const save = async (name) => {
       try {
@@ -1903,46 +1906,55 @@
       ssDraw();
     };
 
-    const sel = document.createElement('select');
-    sel.className = 'ss-code-input';
-    sel.innerHTML = `<option value="">— خالی —</option>`
-      + names.map(n => `<option value="${e(n)}"${n === before ? ' selected' : ''}>${e(n)}</option>`).join('')
-      + `<option value="__new">+ نام تازه…</option>`;
-    el.innerHTML = '';
-    el.appendChild(sel);
-    sel.focus();
-    let done = false;
-    sel.onchange = async () => {
-      if (done) return;
-      done = true;
-      if (sel.value === '__new') {
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.className = 'ss-code-input';
-        input.value = before;
-        el.innerHTML = '';
-        el.appendChild(input);
-        input.focus();
-        let closed = false;
-        const finish = async () => {
-          if (closed) return;
-          closed = true;
-          const val = input.value.trim().slice(0, 80);
-          if (val === before) { ssDraw(); return; }
-          await save(val);
-        };
-        input.onblur = finish;
-        input.onkeydown = (ev) => {
-          if (ev.key === 'Enter') { ev.preventDefault(); input.blur(); }
-          else if (ev.key === 'Escape') { ev.preventDefault(); closed = true; ssDraw(); }
-        };
-        return;
+    const modal = document.createElement('div');
+    modal.className = 'ss-code-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(4,10,20,.72);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
+    modal.innerHTML = `<div dir="rtl" style="background:#0f1b2e;border:1px solid rgba(212,175,90,.35);border-radius:14px;max-width:520px;width:100%;max-height:82vh;display:flex;flex-direction:column;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.08)">
+        <div style="flex:1"><b style="font-size:14px">${e(roleLabel)}</b>
+          <div style="font-size:12px;color:#94a3b8">روز ${F(day)} — شیفت ${e(shiftLabel)}</div></div>
+        <button type="button" id="ssCmClose" style="background:#1b2a42;color:#e5e7eb;border:0;border-radius:8px;padding:6px 10px;cursor:pointer">بستن ✕</button>
+      </div>
+      <div id="ssCmList" style="overflow:auto;padding:10px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+        ${names.length ? names.map(n => `<button type="button" data-n="${e(n)}" style="text-align:right;background:${n === before ? 'rgba(212,175,90,.25)' : '#16233a'};color:#f3f4f6;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 12px;cursor:pointer;font-size:13px">${e(n)}${n === before ? ' ✓' : ''}</button>`).join('') : '<div style="color:#94a3b8;font-size:12.5px;padding:6px;grid-column:1/-1">برای این سمت هنوز نامی ثبت نشده — با دکمهٔ پایین اضافه کنید.</div>'}
+      </div>
+      <div style="padding:10px;border-top:1px solid rgba(255,255,255,.08)">
+        <button type="button" id="ssCmAdd" style="width:100%;background:#d4af5a;color:#0b1220;border:0;border-radius:10px;padding:12px;font-weight:700;cursor:pointer">+ افزودن ${e(roleLabel)} جدید</button>
+        <div id="ssCmNewWrap" style="display:none;gap:8px;margin-top:8px">
+          <input id="ssCmNew" placeholder="نام و نام خانوادگی" style="flex:1;background:#16233a;color:#f3f4f6;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px">
+          <button type="button" id="ssCmSaveNew" style="background:#1f9d55;color:#fff;border:0;border-radius:10px;padding:10px 14px;cursor:pointer">ثبت</button>
+        </div>
+        ${before ? '<button type="button" id="ssCmClear" style="width:100%;margin-top:8px;background:#3a1515;color:#ffb4b4;border:1px solid #7f1d1d;border-radius:10px;padding:9px;cursor:pointer">پاک‌کردن این خانه</button>' : ''}
+      </div>
+    </div>`;
+    document.body.appendChild(modal);
+    const close = () => modal.remove();
+    modal.querySelector('#ssCmClose').onclick = close;
+    modal.addEventListener('click', ev => { if (ev.target === modal) close(); });
+    modal.querySelectorAll('[data-n]').forEach(b => {
+      b.onclick = async () => { const n = b.dataset.n; close(); if (n !== before) await save(n); };
+    });
+    modal.querySelector('#ssCmAdd').onclick = () => {
+      const wrap = modal.querySelector('#ssCmNewWrap');
+      wrap.style.display = 'flex';
+      modal.querySelector('#ssCmNew').focus();
+    };
+    const doAdd = async () => {
+      const val = (modal.querySelector('#ssCmNew').value || '').trim().slice(0, 80);
+      if (val.length < 2) { if (typeof toast === 'function') toast('نام را بنویسید', true); return; }
+      if (role === 1) {
+        try {
+          const r = await ssCodesRequest('/api/shift/doctors', { method: 'POST', body: JSON.stringify({ full_name: val, specialty: 'پزشک طب اورژانس' }) });
+          SS.doctors = r.doctors || SS.doctors;
+        } catch (e2) { /* سرور هنگام ذخیرهٔ خانه هم اضافه می‌کند */ }
       }
-      const val = sel.value;
-      if (val === before) { ssDraw(); return; }
+      close();
       await save(val);
     };
-    sel.onblur = () => { setTimeout(() => { if (!done) { done = true; if (sel.value && sel.value !== '__new' && sel.value !== before) save(sel.value); else ssDraw(); } }, 120); };
+    modal.querySelector('#ssCmSaveNew').onclick = doAdd;
+    modal.querySelector('#ssCmNew').onkeydown = ev => { if (ev.key === 'Enter') { ev.preventDefault(); doAdd(); } };
+    const clr = modal.querySelector('#ssCmClear');
+    if (clr) clr.onclick = async () => { close(); await save(''); };
   };
 
 
@@ -2150,7 +2162,16 @@
         const extra = role === 1
           ? []
           : used.filter(n => !doctSet.has(n) && !/^\s*د\./.test(n));
-        lists[role] = [...new Set(docs.concat(matched, extra))];
+        const all = docs.concat(matched, extra);
+        const seen = new Set();
+        const uniq = [];
+        for (const n of all) {
+          const k = String(n).replace(/\u064A/g, '\u06CC').replace(/\u0643/g, '\u06A9').replace(/\s+/g, '').trim();
+          if (!k || seen.has(k)) continue;
+          seen.add(k);
+          uniq.push(k);
+        }
+        lists[role] = uniq;
       });
       return lists;
     })();
