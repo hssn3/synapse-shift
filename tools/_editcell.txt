@@ -1,0 +1,36 @@
+  global.ssEditCell = function (staffId, day, current, isLead) {
+    const row = ((SS.sched && SS.sched.staff) || []).find(r => r.id === staffId);
+    // قانون: برای کمک‌پرستار/بهیار تیک «مسئول شیفت» نمی‌آید.
+    const isAid = row ? /کمک|بهیار/.test(row.position || '') : false;
+    const opts = ['M', 'E', 'N', 'ME', 'EN', 'MN', 'MEN', 'H'];
+    const box = document.createElement('div');
+    box.className = 'ss-popover';
+    box.innerHTML = `<div class="ss-pop-inner">
+      <div style="font-size:12px;color:var(--td);margin-bottom:8px">روز ${F(day)} — ${e(row ? (row.first_name + ' ' + row.last_name) : '')}</div>
+      <div class="ss-pop-presets">
+        ${opts.map(k => `<button type="button" class="btn btn-o btn-sm" data-k="${k}">${k}</button>`).join('')}
+      </div>
+      ${isAid ? '' : `<label class="ss-pop-opt ss-pop-lead" style="margin-top:10px;display:block"><input type="checkbox" id="ssPopLead" ${isLead ? 'checked' : ''}> ★ مسئول شیفتِ این روز (روی برگه ستاره می‌خورد)</label>`}
+      <div style="display:flex;gap:6px;margin-top:10px">
+        <button class="btn btn-g btn-sm" id="ssPopSave">ذخیره</button>
+        <button class="btn btn-o btn-sm" id="ssPopClear">پاک‌کردن</button>
+        <button class="btn btn-o btn-sm" id="ssPopCancel">بستن</button>
+      </div>
+    </div>`;
+    document.body.appendChild(box);
+    let sel = (current || '').split('').filter(c => 'MENH'.includes(c)).join('');
+    if (!opts.includes(sel)) sel = '';
+    const paint = () => box.querySelectorAll('[data-k]').forEach(b => b.classList.toggle('btn-g', b.dataset.k === sel));
+    paint();
+    box.querySelectorAll('[data-k]').forEach(b => { b.onclick = () => { sel = (sel === b.dataset.k ? '' : b.dataset.k); paint(); }; });
+    const close = () => box.remove();
+    box.querySelector('#ssPopCancel').onclick = close;
+    box.addEventListener('click', ev => { if (ev.target === box) close(); });
+    box.querySelector('#ssPopClear').onclick = async () => { close(); await ssSubmitCell(staffId, day, '', false); };
+    box.querySelector('#ssPopSave').onclick = async () => {
+      const leadEl = box.querySelector('#ssPopLead');
+      const lead = (!isAid && leadEl) ? leadEl.checked : false;
+      close();
+      await ssSubmitCell(staffId, day, sel, lead);
+    };
+  };

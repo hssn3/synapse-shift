@@ -373,8 +373,20 @@
     const list = SS.groupFilter === 'all' ? rows : rows.filter(s => ssGroupOf(s).key === SS.groupFilter);
     return `<div class="panel g noprint">
       <div class="phd">${I('shield', 'lg')}<div style="flex:1"><h3>برنامه بحران — بخش «${e(SS.wardTitle)}»</h3>
-        <div class="sub">${JM[SS.month - 1]} ${F(SS.year)} — روی هر خانه بزن تا شیفت آن روز را بگذاری.</div></div></div>
+        <div class="sub">${JM[SS.month - 1]} ${F(SS.year)} — روی هر خانه بزن تا شیفت آن روز را بگذاری.</div></div>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+          ${SS.isManager ? `<button class="btn btn-o btn-sm" onclick="ssToggleSettings()">${I('settings')} ساعتِ شیفت</button>` : ''}
+          ${SS.isManager ? `<button class="btn btn-o btn-sm" onclick="ssTogglePrintCfg()">${I('settings')} نام‌های امضا / قالب چاپ</button>` : ''}
+          ${SS.isManager ? `<button class="btn btn-o btn-sm" onclick="ssOpenPositions()">${I('settings')} سمت‌ها</button>` : ''}
+          ${SS.isManager && SS.wardId ? `<button class="btn btn-o btn-sm" onclick="ssResetWardPass()">${I('key') || I('settings')} رمز ورود این بخش</button>` : ''}
+          <button class="btn btn-o btn-sm" onclick="ssGenderCheck()">${I('users')} بررسی همگنی آقا/خانم</button>
+          <button class="btn btn-g btn-sm" onclick="ssPrintCrisis()">${I('print')} چاپ فرم A4 افقی</button>
+        </div>
+      </div>
       <div class="pbody" style="padding-top:0">
+        <div id="ssSettingsPanel">${SS.showSettings ? ssSettingsHtml() : ''}</div>
+        <div id="ssPrintCfgPanel">${SS.showPrintCfg ? (SS.printCfg ? ssPrintCfgHtml() : '<div class="empty">در حال بارگذاری…</div>') : ''}</div>
+
         ${!rows.length ? '<div class="empty">در این بخش پرسنلی برای برنامه بحران ثبت نشده</div>' : `
         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
           <span class="sub">نمایشِ گروه:</span>
@@ -1163,20 +1175,18 @@
   };
 
   global.ssEditCell = function (staffId, day, current, isLead) {
-    const letters = ['M', 'E', 'N', 'H'];
-    const chosen = new Set(current.split('').filter(c => letters.includes(c)));
+    const row = ((SS.sched && SS.sched.staff) || []).find(r => r.id === staffId);
+    // قانون: برای کمک‌پرستار/بهیار تیک «مسئول شیفت» نمی‌آید.
+    const isAid = row ? /کمک|بهیار/.test(row.position || '') : false;
+    const opts = ['M', 'E', 'N', 'ME', 'EN', 'MN', 'MEN', 'H'];
     const box = document.createElement('div');
     box.className = 'ss-popover';
     box.innerHTML = `<div class="ss-pop-inner">
-      <div style="font-size:12px;color:var(--td);margin-bottom:8px">روز ${fa ? fa(day) : day}</div>
+      <div style="font-size:12px;color:var(--td);margin-bottom:8px">روز ${F(day)} — ${e(row ? (row.first_name + ' ' + row.last_name) : '')}</div>
       <div class="ss-pop-presets">
-        ${SHIFT_PRESETS.map(p => `<button type="button" class="btn btn-o btn-sm" data-preset="${p.k}">${e(p.label)}<i>${
-          F(p.hours(SS.settings))} ساعت</i></button>`).join('')}
+        ${opts.map(k => `<button type="button" class="btn btn-o btn-sm" data-k="${k}">${k}</button>`).join('')}
       </div>
-      <div style="height:1px;background:var(--bd);margin:8px 0"></div>
-      ${letters.map(l => `<label class="ss-pop-opt"><input type="checkbox" data-l="${l}" ${chosen.has(l) ? 'checked' : ''}> ${
-        { M: 'M — صبح', E: 'E — عصر', N: 'N — شب', H: 'H — مرخصی' }[l]}</label>`).join('')}
-      <label class="ss-pop-opt ss-pop-lead"><input type="checkbox" id="ssPopLead" ${isLead ? 'checked' : ''}> ★ مسئول شیفتِ این روز (روی برگه ستاره می‌خورد)</label>
+      ${isAid ? '' : `<label class="ss-pop-opt ss-pop-lead" style="margin-top:10px;display:block"><input type="checkbox" id="ssPopLead" ${isLead ? 'checked' : ''}> ★ مسئول شیفتِ این روز (روی برگه ستاره می‌خورد)</label>`}
       <div style="display:flex;gap:6px;margin-top:10px">
         <button class="btn btn-g btn-sm" id="ssPopSave">ذخیره</button>
         <button class="btn btn-o btn-sm" id="ssPopClear">پاک‌کردن</button>
@@ -1184,20 +1194,20 @@
       </div>
     </div>`;
     document.body.appendChild(box);
+    let sel = (current || '').split('').filter(c => 'MENH'.includes(c)).join('');
+    if (!opts.includes(sel)) sel = '';
+    const paint = () => box.querySelectorAll('[data-k]').forEach(b => b.classList.toggle('btn-g', b.dataset.k === sel));
+    paint();
+    box.querySelectorAll('[data-k]').forEach(b => { b.onclick = () => { sel = (sel === b.dataset.k ? '' : b.dataset.k); paint(); }; });
     const close = () => box.remove();
     box.querySelector('#ssPopCancel').onclick = close;
     box.addEventListener('click', ev => { if (ev.target === box) close(); });
-    box.querySelectorAll('[data-preset]').forEach(btn => {
-      btn.onclick = () => {
-        const want = new Set(btn.dataset.preset.split(''));
-        letters.forEach(l => { box.querySelector(`input[data-l="${l}"]`).checked = want.has(l); });
-      };
-    });
-    box.querySelector('#ssPopClear').onclick = async () => { await ssSubmitCell(staffId, day, '', false); close(); };
+    box.querySelector('#ssPopClear').onclick = async () => { close(); await ssSubmitCell(staffId, day, '', false); };
     box.querySelector('#ssPopSave').onclick = async () => {
-      const codes = [...box.querySelectorAll('input[data-l]:checked')].map(i => i.dataset.l).join('');
-      const lead = box.querySelector('#ssPopLead').checked;
-      await ssSubmitCell(staffId, day, codes, lead); close();
+      const leadEl = box.querySelector('#ssPopLead');
+      const lead = (!isAid && leadEl) ? leadEl.checked : false;
+      close();
+      await ssSubmitCell(staffId, day, sel, lead);
     };
   };
 
@@ -1640,7 +1650,7 @@
   // برای تست/پیش‌نمایش بدون باز کردن پنجرهٔ چاپ
   global.ssBuildPrintHtml = function (cfg) { return ssBuildPrintHtml(cfg || SS.printCfg || {}); };
 
-  global.ssPrint = async function () {
+  global.ssPrint = async function (override) {
     if (!SS.sched) return;
     // پنجره را پیش از هر await باز می‌کنیم؛ مرورگرهای موبایل popup بعد از await
     // را جزو ژست کاربر نمی‌دانند و بلاک می‌کنند. اگر بلاک شد، iframe پایین می‌آید.
@@ -1649,7 +1659,7 @@
     if (!SS.printCfg) {
       try { SS.printCfg = (await API.shiftGetPrintConfig()).config; } catch (e2) { SS.printCfg = {}; }
     }
-    const html = ssBuildPrintHtml(SS.printCfg || {});
+    const html = ssBuildPrintHtml(Object.assign({}, SS.printCfg || {}, override || {}));
 
     // 1) Top-level print window: works on desktop and mobile, unlike a hidden iframe.
     if (win) {
@@ -1869,49 +1879,72 @@
 
   // ویرایش داخل خود خانه: کلیک → input با پیشنهاد نام پرسنل موجود → Enter/blur ذخیره.
   global.ssEditCodeCell = function (el, day, role) {
-    if (!SS.codes || !el || el.querySelector('input')) return;
+    if (!SS.codes || !el || el.querySelector('select,input')) return;
     const shift = SS.codeShift;
     const key = day + '|' + shift + '|' + role;
     const before = SS.codes.map[key] || '';
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.value = before;
-    input.setAttribute('list', 'ssCodePeopleList-' + role);
-    input.className = 'ss-code-input';
-    el.innerHTML = '';
-    el.appendChild(input);
-    input.focus();
-    input.select();
-    let closed = false;
-    const finish = async (save) => {
-      if (closed) return;
-      closed = true;
-      const val = input.value.trim().slice(0, 80);
-      if (!save || val === before) { ssDraw(); return; }
+    const dl = document.getElementById('ssCodePeopleList-' + role);
+    const names = dl ? [...dl.options].map(o => o.value).filter(Boolean) : [];
+    if (before && !names.includes(before)) names.unshift(before);
+
+    const save = async (name) => {
       try {
         await ssCodesRequest('/api/shift/codes/entry', {
           method: 'PUT',
-          body: JSON.stringify({ type: SS.codeType, year: SS.year, month: SS.month, day, shift, role: role, name: val }),
+          body: JSON.stringify({ type: SS.codeType, year: SS.year, month: SS.month, day, shift, role, name }),
         });
-        if (val) SS.codes.map[key] = val; else delete SS.codes.map[key];
-        // نام تازهٔ پزشک را همان‌جا به فهرست پزشکان هم اضافه کن (سرور هم این کار را می‌کند).
-        if (role === 1 && val && !(SS.doctors || []).some(d => d.full_name === val)) {
-          try {
-            const dr = await ssCodesRequest('/api/shift/doctors');
-            SS.doctors = dr.doctors || SS.doctors;
-          } catch (e2) { /* فهرست بعداً بارگذاری می‌شود */ }
+        if (name) SS.codes.map[key] = name; else delete SS.codes.map[key];
+        if (role === 1 && name && !(SS.doctors || []).some(d => d.full_name === name)) {
+          try { const dr = await ssCodesRequest('/api/shift/doctors'); SS.doctors = dr.doctors || SS.doctors; } catch (e2) { /* بعداً */ }
         }
       } catch (err) {
         if (typeof toast === 'function') toast('ذخیره نشد: ' + err.message, true);
       }
       ssDraw();
     };
-    input.onblur = () => { finish(true); };
-    input.onkeydown = (ev) => {
-      if (ev.key === 'Enter') { ev.preventDefault(); input.blur(); }
-      else if (ev.key === 'Escape') { ev.preventDefault(); closed = true; ssDraw(); }
+
+    const sel = document.createElement('select');
+    sel.className = 'ss-code-input';
+    sel.innerHTML = `<option value="">— خالی —</option>`
+      + names.map(n => `<option value="${e(n)}"${n === before ? ' selected' : ''}>${e(n)}</option>`).join('')
+      + `<option value="__new">+ نام تازه…</option>`;
+    el.innerHTML = '';
+    el.appendChild(sel);
+    sel.focus();
+    let done = false;
+    sel.onchange = async () => {
+      if (done) return;
+      done = true;
+      if (sel.value === '__new') {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'ss-code-input';
+        input.value = before;
+        el.innerHTML = '';
+        el.appendChild(input);
+        input.focus();
+        let closed = false;
+        const finish = async () => {
+          if (closed) return;
+          closed = true;
+          const val = input.value.trim().slice(0, 80);
+          if (val === before) { ssDraw(); return; }
+          await save(val);
+        };
+        input.onblur = finish;
+        input.onkeydown = (ev) => {
+          if (ev.key === 'Enter') { ev.preventDefault(); input.blur(); }
+          else if (ev.key === 'Escape') { ev.preventDefault(); closed = true; ssDraw(); }
+        };
+        return;
+      }
+      const val = sel.value;
+      if (val === before) { ssDraw(); return; }
+      await save(val);
     };
+    sel.onblur = () => { setTimeout(() => { if (!done) { done = true; if (sel.value && sel.value !== '__new' && sel.value !== before) save(sel.value); else ssDraw(); } }, 120); };
   };
+
 
   function ssCodesBlockHtml(from, to) {
     const map = (SS.codes && SS.codes.map) || {};
@@ -2345,30 +2378,32 @@
     return (Array.isArray(signs) && signs[i] && signs[i].name) ? signs[i].name : '';
   }
 
-  // فرم اورژانس بحران = همان برگهٔ ماهانهٔ بخش با سربرگ/سطوح/امضای قابل ویرایش.
+  // چاپ برنامه بحران = همان برگهٔ برنامه شیفت (همان سربرگ و پاورقی) فقط عنوان بحران.
   global.ssPrintCrisis = async function () {
-    if (!SS.isManager) return;
     if (!SS.sched) { if (typeof toast === 'function') toast('اول برنامهٔ ماه را باز کنید', true); return; }
-    if (!SS.codeMeta || !SS.codeMeta.crisis) {
-      try { await ssLoadCodes(); } catch (e2) { /* با پیش‌فرض‌ها چاپ می‌شود */ }
-    }
-    if (!SS.printCfg) { try { SS.printCfg = (await API.shiftGetPrintConfig()).config; } catch (e2) { SS.printCfg = {}; } }
-    const m = ssCodeMeta('crisis');
-    const cfg = Object.assign({}, SS.printCfg || {}, {
-      title: m.title,
-      form_code: m.form_code,
-      beds: m.beds,
-      contract_hours: m.contract_hours,
-      care_method: m.method,
-      level_avg: m.level_avg,
-      level_hours: m.level_hours,
-      training_title: m.training_title,
-      signs: m.signs,
-      clinical_supervisor_name: ssSignAt(m.signs, 1),
-      nursing_manager_name: ssSignAt(m.signs, 2),
-      hospital_president_name: ssSignAt(m.signs, 3),
+    const days = (SS.sched.schedule && SS.sched.schedule.days) || 30;
+    const st = SS.settings || {};
+    const hoursOf = (c) => {
+      if (!c) return 0;
+      if (c.includes('H')) return Number(st.hour_h) || 0;
+      let h = 0;
+      if (c.includes('M')) h += Number(st.hour_m) || 0;
+      if (c.includes('E')) h += Number(st.hour_e) || 0;
+      if (c.includes('N')) h += Number(st.hour_n) || 0;
+      return h;
+    };
+    const backup = SS.sched.staff;
+    SS.sched.staff = ((SS.crisis && SS.crisis.rows) || []).map(s => {
+      const cells = s.cells || {};
+      let total = 0;
+      for (let d = 1; d <= days; d++) total += hoursOf(cells[d]);
+      return Object.assign({}, s, { cells: cells, total_hours: total, monthly_hour_quota: s.monthly_hour_quota || 0 });
     });
-    ssOpenPrintWindow(ssBuildPrintHtml(cfg));
+    try {
+      await ssPrint({ title: 'برنامه بحران بخش ' + SS.wardTitle + ' — ' + JM[SS.month - 1] + ' ' + F(SS.year) });
+    } finally {
+      SS.sched.staff = backup;
+    }
   };
 
 })(window);

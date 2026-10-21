@@ -1,0 +1,67 @@
+  global.ssEditCodeCell = function (el, day, role) {
+    if (!SS.codes || !el || el.querySelector('select,input')) return;
+    const shift = SS.codeShift;
+    const key = day + '|' + shift + '|' + role;
+    const before = SS.codes.map[key] || '';
+    const dl = document.getElementById('ssCodePeopleList-' + role);
+    const names = dl ? [...dl.options].map(o => o.value).filter(Boolean) : [];
+    if (before && !names.includes(before)) names.unshift(before);
+
+    const save = async (name) => {
+      try {
+        await ssCodesRequest('/api/shift/codes/entry', {
+          method: 'PUT',
+          body: JSON.stringify({ type: SS.codeType, year: SS.year, month: SS.month, day, shift, role, name }),
+        });
+        if (name) SS.codes.map[key] = name; else delete SS.codes.map[key];
+        if (role === 1 && name && !(SS.doctors || []).some(d => d.full_name === name)) {
+          try { const dr = await ssCodesRequest('/api/shift/doctors'); SS.doctors = dr.doctors || SS.doctors; } catch (e2) { /* بعداً */ }
+        }
+      } catch (err) {
+        if (typeof toast === 'function') toast('ذخیره نشد: ' + err.message, true);
+      }
+      ssDraw();
+    };
+
+    const sel = document.createElement('select');
+    sel.className = 'ss-code-input';
+    sel.innerHTML = `<option value="">— خالی —</option>`
+      + names.map(n => `<option value="${e(n)}"${n === before ? ' selected' : ''}>${e(n)}</option>`).join('')
+      + `<option value="__new">+ نام تازه…</option>`;
+    el.innerHTML = '';
+    el.appendChild(sel);
+    sel.focus();
+    let done = false;
+    sel.onchange = async () => {
+      if (done) return;
+      done = true;
+      if (sel.value === '__new') {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'ss-code-input';
+        input.value = before;
+        el.innerHTML = '';
+        el.appendChild(input);
+        input.focus();
+        let closed = false;
+        const finish = async () => {
+          if (closed) return;
+          closed = true;
+          const val = input.value.trim().slice(0, 80);
+          if (val === before) { ssDraw(); return; }
+          await save(val);
+        };
+        input.onblur = finish;
+        input.onkeydown = (ev) => {
+          if (ev.key === 'Enter') { ev.preventDefault(); input.blur(); }
+          else if (ev.key === 'Escape') { ev.preventDefault(); closed = true; ssDraw(); }
+        };
+        return;
+      }
+      const val = sel.value;
+      if (val === before) { ssDraw(); return; }
+      await save(val);
+    };
+    sel.onblur = () => { setTimeout(() => { if (!done) { done = true; if (sel.value && sel.value !== '__new' && sel.value !== before) save(sel.value); else ssDraw(); } }, 120); };
+  };
+
