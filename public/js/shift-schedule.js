@@ -143,12 +143,15 @@
     }
     // واحدهای دلخواه (مثل دفتر پرستاری) هم در همان فهرست بخش‌ها می‌آیند تا بتوانند
     // پرسنل و برنامهٔ شیفت داشته باشند؛ مدیر پرستاری برای هر واحد دسترسی دارد.
-    try {
-      const units = await API.shiftUnits();
-      (units.units || []).forEach(u => {
-        if (!wards.has(u.title)) wards.set(u.title, { title: u.title, icon: '🗂️', isUnit: true, bed_count: null });
-      });
-    } catch (e2) { /* بدون دسترسی — نادیده */ }
+    // واحدها فقط برای مدیر پرستاری؛ سرپرستار هر بخش فقط بخش خودش را می‌بیند.
+    if (SS.isManager) {
+      try {
+        const units = await API.shiftUnits();
+        (units.units || []).forEach(u => {
+          if (!wards.has(u.title)) wards.set(u.title, { title: u.title, icon: '🗂️', isUnit: true, bed_count: null });
+        });
+      } catch (e2) { /* بدون دسترسی — نادیده */ }
+    }
     return [...wards.values()];
   }
 
